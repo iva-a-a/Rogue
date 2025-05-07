@@ -18,17 +18,17 @@ class Room {
     //var player: Position?
     var isStartRoom: Bool = false
     var isEndRoom: Bool = false
-    
+
     var exitPosition: Position?
     var isVisited: Bool = false
-    
+
     init(_ topRight: Position, _ lowLeft: Position, _ sector: Int) {
         self.topRight = topRight
         self.lowLeft = lowLeft
-        generateDoors(sector)
+        generateRandomDoors(sector)
     }
-    
-    func generateDoor(_ dir: Direction) -> Door {
+
+    public func generateDoor(_ dir: Direction) -> Door {
         if dir == .up {
             return Door(Position(x: lowLeft.x, y: Int.random(in: (lowLeft.y + 2)...(topRight.y - 2))), .up)
         } else if dir == .down {
@@ -39,14 +39,14 @@ class Room {
             return Door(Position(x: Int.random(in: (lowLeft.x + 2)...(topRight.x - 2)), y: topRight.y), .right)
         }
     }
-    
-    func generateDoors(_ sector: Int) {
+
+    func generateRandomDoors(_ sector: Int) {
         let dir: [Direction] = randomDirection(getAcceptableDirection(for: sector), getDoorsCount(for: sector))
         for d in dir {
             doors.append(generateDoor(d))
         }
     }
-    
+
     func getDoorsCount(for sector: Int) -> Int {
         switch sector {
         case 5: return Int.random(in: 1...4)
@@ -54,7 +54,7 @@ class Room {
         default: return Int.random(in: 1...2)
         }
     }
-    
+
     func getAcceptableDirection(for sector: Int) -> [Direction] {
         switch sector {
         case 1: return [.right, .down]
