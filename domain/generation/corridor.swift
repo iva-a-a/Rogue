@@ -7,9 +7,7 @@ public class Corridor {
 
     init(from: Position, to: Position) {
         generateZShaped(from, to)
-        if !route.contains(where: { $0.x == to.x && $0.y == to.y }) {
-            route.append(to)
-        }
+        addEndPoint(to)
     }
 
     private func generateVertical(_ from: Position, toX: Int) {
@@ -31,6 +29,12 @@ public class Corridor {
         while y != toY {
             route.append(Position(from.x, y))
             y += step
+        }
+    }
+    
+    private func addEndPoint(_ point: Position) {
+        if !route.contains(point) {
+            route.append(point)
         }
     }
 
