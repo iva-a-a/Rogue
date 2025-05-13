@@ -2,10 +2,10 @@
 //  room.swift
 //  rogue
 
-struct Position: Hashable {
+public struct Position: Hashable {
     let x: Int
     let y: Int
-    
+
     init(_ x: Int, _ y: Int) {
         self.x = x
         self.y = y
@@ -16,7 +16,7 @@ public enum Sector: Int, CaseIterable {
     case topLeft = 1, topCenter, topRight
     case middleLeft, center, middleRight
     case bottomLeft, bottomCenter, bottomRight
-    
+
     var maxDoorCount: Int {
         switch self {
         case .center: return 4
@@ -24,7 +24,7 @@ public enum Sector: Int, CaseIterable {
         default: return 2
         }
     }
-    
+
     var acceptableDirection: [Direction] {
         switch self {
         case .topLeft: return [.right, .down]
@@ -43,19 +43,17 @@ public enum Sector: Int, CaseIterable {
 public class Room {
     let topRight: Position
     let lowLeft: Position
-    
+
     var doors: [Door] = []
+
+    var isStartRoom: Bool = false
+
     // предметы в комнате
     // var items: [(item: Item, position: Position)] = []
     // враги в комнате
     // var enemies: [(enemy: Enemy, position: Position)] = []
-    
     // положение игрока в комнате?
     //var player: Position?
-    var isStartRoom: Bool = false
-    var isEndRoom: Bool = false
-
-    var exitPosition: Position?
     // var isVisited: Bool = false
 
     init(_ topRight: Position, _ lowLeft: Position, _ sector: Sector) {
@@ -64,36 +62,45 @@ public class Room {
         generateRandomDoors(sector)
     }
 
-    func createDoor(_ dir: Direction) -> Door {
-        if dir == .up {
-            return Door(Position(lowLeft.x, Int.random(in: (lowLeft.y + Constants.stepForDoor)...(topRight.y - Constants.stepForDoor))), .up)
-        } else if dir == .down {
-            return Door(Position(topRight.x, Int.random(in: (lowLeft.y + Constants.stepForDoor)...(topRight.y - Constants.stepForDoor))), .down)
-        } else if dir == .left {
-            return Door(Position(Int.random(in: (lowLeft.x + Constants.stepForDoor)...(topRight.x - Constants.stepForDoor)), lowLeft.y), .left)
-        } else {
-            return Door(Position(Int.random(in: (lowLeft.x + Constants.stepForDoor)...(topRight.x - Constants.stepForDoor)), topRight.y), .right)
+    private func randomDoorPosition(for direction: Direction) -> Position {
+        switch direction {
+        case .up, .down:
+            let y = Int.random(in: (lowLeft.y + Constants.doorOffset)...(topRight.y - Constants.doorOffset))
+            return Position(direction == .up ? lowLeft.x : topRight.x, y)
+        case .left, .right:
+            let x = Int.random(in: (lowLeft.x + Constants.doorOffset)...(topRight.x - Constants.doorOffset))
+            return Position(x, direction == .left ? lowLeft.y : topRight.y)
         }
     }
 
-    func generateRandomDoors(_ sector: Sector) {
-        let dir: [Direction] = randomDirection(sector.acceptableDirection, getDoorsCount(for: sector))
-        for d in dir {
+    func createDoor(_ direction: Direction) -> Door {
+        return Door(randomDoorPosition(for: direction), direction)
+    }
+
+   private func generateRandomDoors(_ sector: Sector) {
+        let direction: [Direction] = randomDirection(sector.acceptableDirection, getDoorsCount(for: sector))
+        for d in direction {
             doors.append(createDoor(d))
         }
     }
 
-    func getDoorsCount(for sector: Sector) -> Int {
+    private func getDoorsCount(for sector: Sector) -> Int {
         return Int.random(in: 1...sector.maxDoorCount)
     }
-    
-    func randomDirection(_ directions: [Direction], _ count: Int) -> [Direction] {
+
+    private func randomDirection(_ directions: [Direction], _ count: Int) -> [Direction] {
         var randomDir: [Direction] = directions
         while randomDir.count > count {
             randomDir.remove(at: Int.random(in: 0..<randomDir.count))
         }
         return randomDir
     }
+
+    func removeDoor(in direction: Direction) {
+        doors.removeAll(where: { $0.direction == direction })
+    }
+
+    func setStartRoom() {
+        self.isStartRoom = true
+    }
 }
-
-

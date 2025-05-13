@@ -4,7 +4,7 @@
 
 public enum Direction: CaseIterable {
     case up, down, left, right
-    
+
     var opposite: Direction {
         switch self {
         case .up: return .down
@@ -18,7 +18,7 @@ public enum Direction: CaseIterable {
 struct Door {
     let position: Position
     let direction: Direction
-    
+
     init(_ position: Position, _ direction: Direction) {
         self.position = position
         self.direction = direction

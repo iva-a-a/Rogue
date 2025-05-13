@@ -31,7 +31,7 @@ public class Corridor {
             y += step
         }
     }
-    
+
     private func addEndPoint(_ point: Position) {
         if !route.contains(point) {
             route.append(point)

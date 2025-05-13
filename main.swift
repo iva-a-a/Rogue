@@ -1,5 +1,5 @@
 import Foundation
 import domain
 
-let map = Map()
+let map = LevelBuilder.buildLevel()
 map.draw()
