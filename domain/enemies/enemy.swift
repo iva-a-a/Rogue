@@ -1,17 +1,11 @@
 //
-//  Enemy.swift
+//  enemy.swift
 //  rogue
 
-// Domain Layer
-// MARK: - Enemy Protocol
 protocol EnemyProtocol {
     var type: EnemyType { get }
-    var health: Int { get set }
-    var maxHealth: Int { get }
-    var agility: Int { get }
-    var strength: Int { get }
+    var characteristics: Characteristics { get set }
     var hostility: Int { get }
-    var position: Position { get set }
     var isVisible: Bool { get set }
     func move(in room: Room, playerPosition: Position) -> Position
     func attack(player: Player) -> AttackResult
@@ -21,50 +15,46 @@ enum EnemyType {
     case zombie, vampire, ghost, ogre, snakeMage
 }
 
-// MARK: - Base Enemy
+enum AttackResult {
+    case miss
+    case hit(damage: Int)
+}
+
 class Enemy: EnemyProtocol {
     let type: EnemyType
-    var health: Int
-    let maxHealth: Int
-    let agility: Int
-    let strength: Int
+    var characteristics: Characteristics
     let hostility: Int
-    var position: Position
     var isVisible: Bool = true
     let movementStrategy: MovementStrategy
     var isResting: Bool = false
 
-    init(type: EnemyType, health: Int, maxHealth: Int, agility: Int, strength: Int, hostility: Int, position: Position, movementStrategy: MovementStrategy) {
+    init(type: EnemyType, characteristics: Characteristics, hostility: Int, movementStrategy: MovementStrategy) {
         self.type = type
-        self.health = health
-        self.maxHealth = maxHealth
-        self.agility = agility
-        self.strength = strength
+        self.characteristics = characteristics
         self.hostility = hostility
-        self.position = position
         self.movementStrategy = movementStrategy
     }
 
     func move(in room: Room, playerPosition: Position) -> Position {
         let newPosition = movementStrategy.move(
-            from: (x: position.x, y: position.y),
+            from: (x: characteristics.position.x, y: characteristics.position.y),
             in: room,
             toward: (x: playerPosition.x, y: playerPosition.y)
         )
-        position = Position(newPosition.x, newPosition.y)
-        return position
+        characteristics.position = Position(newPosition.x, newPosition.y)
+        return characteristics.position
     }
 
     func attack(player: Player) -> AttackResult {
         // Проверка на попадание на основе ловкости
-        let hitChance = calculateHitChance(agility: agility, targetAgility: player.agility)
+        let hitChance = calculateHitChance(agility: characteristics.agility, targetAgility: player.characteristics.agility)
         guard Int.random(in: 1...100) <= hitChance else {
             return .miss
         }
 
         // Расчет урона
         let damage = calculateDamage()
-        player.health -= damage
+        player.characteristics.health -= damage
         return .hit(damage: damage)
     }
 
@@ -77,7 +67,7 @@ class Enemy: EnemyProtocol {
 
     private func calculateDamage() -> Int {
         // Базовый урон на основе силы
-        return strength + Int.random(in: -2...2)
+        return characteristics.strength + Int.random(in: -2...2)
     }
     func randomMove(in room: Room, step: Int = 1) -> Position {
         let directions = [
@@ -88,15 +78,11 @@ class Enemy: EnemyProtocol {
         ]
         
         let possibleMoves = directions.map {
-            Position(position.x + $0.x, position.y + $0.y)
-        }.filter { room.isValidPosition($0) }
+            Position(characteristics.position.x + $0.x, characteristics.position.y + $0.y)
+        }.filter { room.isInsideRoom($0) }
         
-        return possibleMoves.randomElement() ?? position
+        return possibleMoves.randomElement() ?? characteristics.position
     }
 }
 
-// MARK: - Attack Result
-enum AttackResult {
-    case miss
-    case hit(damage: Int)
-}
+

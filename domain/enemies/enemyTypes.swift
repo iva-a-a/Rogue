@@ -1,61 +1,40 @@
 //
-//  EnemyTypes.swift
-//  
-//
-//  Created by Ginn on 15.05.2025.
-//
+//  enemyTypes.swift
+//  rogue
 
-// MARK: - Zombie
 class Zombie: Enemy {
     init(position: Position) {
-        super.init(
-            type: .zombie,
-            health: 100, // Высокое здоровье
-            maxHealth: 100,
-            agility: 20, // Низкая ловкость
-            strength: 50, // Средняя сила
-            hostility: 50, // Средняя враждебность
-            position: position,
-            movementStrategy: RandomMovement()
-        )
+        let characteristics = Characteristics(position: position, maxHealth: 100, health: 100, agility: 20, strength: 50)
+        super.init(type: .zombie, characteristics: characteristics, hostility: 50, movementStrategy: RandomMovement())
     }
 
     override func move(in room: Room, playerPosition: Position) -> Position {
         if shouldPursue(playerPosition: playerPosition) {
-            position = pursuePlayer(room: room, playerPosition: playerPosition)
+            characteristics.position = pursuePlayer(room: room, playerPosition: playerPosition)
         } else {
-            let newPosition = movementStrategy.move(from: (x: position.x, y: position.y), in: room, toward: (x: playerPosition.x, y: playerPosition.y))
-            position = Position(newPosition.x, newPosition.y)
+            let newPosition = movementStrategy.move(from: (x: characteristics.position.x, y: characteristics.position.y), in: room, toward: (x: playerPosition.x, y: playerPosition.y))
+            characteristics.position = Position(newPosition.x, newPosition.y)
         }
-        return position
+        return characteristics.position
     }
 
-    private func randomMove(in room: Room) -> Point {
+    private func randomMove(in room: Room) -> Position {
         let possibleMoves = [
-            Position(position.x + 1, position.y),
-            Position(position.x - 1, position.y),
-            Position(position.x, position.y + 1),
-            Position(position.x, position.y - 1)
+            Position(characteristics.position.x + 1, characteristics.position.y),
+            Position(characteristics.position.x - 1, characteristics.position.y),
+            Position(characteristics.position.x, characteristics.position.y + 1),
+            Position(characteristics.position.x, characteristics.position.y - 1)
         ].filter { room.isValidPosition($0) }
-        return possibleMoves.randomElement() ?? position
+        return possibleMoves.randomElement() ?? characteristics.position
     }
 }
 
-// MARK: - Vampire
 class Vampire: Enemy {
     private var isFirstHit = true
-
+    
     init(position: Position) {
-        super.init(
-            type: .vampire,
-            health: 80, // Высокое здоровье
-            maxHealth: 80,
-            agility: 80, // Высокая ловкость
-            strength: 40, // Средняя сила
-            hostility: 80, // Высокая враждебность
-            position: position,
-            movementStrategy: RandomMovement()
-        )
+        let characteristics = Characteristics(position: position, maxHealth: 80, health: 80, agility: 80, strength: 40)
+        super.init(type: .vampire, characteristics: characteristics, hostility: 80, movementStrategy: RandomMovement())
     }
 
     override func attack(player: Player) -> AttackResult {
@@ -65,8 +44,8 @@ class Vampire: Enemy {
         }
         let result = super.attack(player: player)
         if case .hit = result {
-            player.maxHealth -= 5 // Отнимает максимальное здоровье
-            player.health = min(player.health, player.maxHealth)
+            player.characteristics.maxHealth -= 5 // Отнимает максимальное здоровье
+            player.characteristics.health = min(player.characteristics.health, player.characteristics.maxHealth)
         }
         return result
     }
@@ -75,25 +54,17 @@ class Vampire: Enemy {
         if shouldPursue(playerPosition: playerPosition) {
             return pursuePlayer(room: room, playerPosition: playerPosition)
         }
-        let newPosition = movementStrategy.move(from: (x: position.x, y: position.y), in: room, toward: (x: playerPosition.x, y: playerPosition.y))
-        position = Position(newPosition.x, newPosition.y)
-        return position
+        let newPosition = movementStrategy.move(from: (x: characteristics.position.x, y: characteristics.position.y), in: room, toward: (x: playerPosition.x, y: playerPosition.y))
+        characteristics.position = Position(newPosition.x, newPosition.y)
+        return characteristics.position
     }
 }
 
-// MARK: - Ghost
 class Ghost: Enemy {
+    
     init(position: Position) {
-        super.init(
-            type: .ghost,
-            health: 30,
-            maxHealth: 30,
-            agility: 90,
-            strength: 20,
-            hostility: 20,
-            position: position,
-            movementStrategy: TeleportMovement() // Используем стратегию телепортации
-        )
+        let characteristics = Characteristics(position: position, maxHealth: 30, health: 30, agility: 90, strength: 20)
+        super.init(type: .ghost,characteristics: characteristics,hostility: 20,movementStrategy: TeleportMovement())
     }
 
     override func move(in room: Room, playerPosition: Position) -> Position {
@@ -102,56 +73,48 @@ class Ghost: Enemy {
         }
         // Телепортация с шансом 30%
         if Int.random(in: 1...100) <= 30 {
-            let newPosition = movementStrategy.move(from: (x: position.x, y: position.y), in: room, toward: (x: playerPosition.x, y: playerPosition.y))
-            position = Position(newPosition.x, newPosition.y)
+            let newPosition = movementStrategy.move(from: (x: characteristics.position.x, y: characteristics.position.y), in: room, toward: (x: playerPosition.x, y: playerPosition.y))
+            characteristics.position = Position(newPosition.x, newPosition.y)
             isVisible = Int.random(in: 1...100) > 20 // 80% шанс стать видимым после телепортации
-            return position
+            return characteristics.position
         }
         // Если не телепортировался, остается на месте и может стать невидимым
         isVisible = Int.random(in: 1...100) > 20
-        return position
+        return characteristics.position
     }
 }
 
-// MARK: - Ogre
 class Ogre: Enemy {
-    init(position: Position) {
-        super.init(
-            type: .ogre,
-            health: 150, // Очень высокое здоровье
-            maxHealth: 150,
-            agility: 20, // Низкая ловкость
-            strength: 90, // Очень высокая сила
-            hostility: 50, // Средняя враждебность
-            position: position,
-            movementStrategy: RandomMovement()
-        )
-    }
 
+    init(position: Position) {
+        let characteristics = Characteristics(position: position, maxHealth: 150, health: 150, agility: 20, strength: 90)
+        super.init(type: .ogre, characteristics: characteristics, hostility: 50, movementStrategy: RandomMovement())
+    }
+    
     override func move(in room: Room, playerPosition: Position) -> Position {
         if isResting {
             isResting = false
-            return position
+            return characteristics.position
         }
         
         // Для преследования
         if shouldPursue(playerPosition: playerPosition) {
             let newPosition = pursuePlayer(room: room, playerPosition: playerPosition, step: 2)
-            position = newPosition
+            characteristics.position = newPosition
             return newPosition
         }
         
         // Для обычного движения (с шагом 2)
         let basePosition = super.move(in: room, playerPosition: playerPosition)
-        let deltaX = basePosition.x - position.x
-        let deltaY = basePosition.y - position.y
+        let deltaX = basePosition.x - characteristics.position.x
+        let deltaY = basePosition.y - characteristics.position.y
         let finalPosition = Position(
-            position.x + deltaX * 2,
-            position.y + deltaY * 2
+            characteristics.position.x + deltaX * 2,
+            characteristics.position.y + deltaY * 2
         )
         
-        position = room.isValidPosition(finalPosition) ? finalPosition : basePosition
-        return position
+        characteristics.position = room.isValidPosition(finalPosition) ? finalPosition : basePosition
+        return characteristics.position
     }
 
     override func attack(player: Player) -> AttackResult {
@@ -162,43 +125,35 @@ class Ogre: Enemy {
 
     internal override func randomMove(in room: Room, step: Int) -> Position {
         let possibleMoves = [
-            Position(position.x + step, position.y),
-            Position(position.x - step, position.y),
-            Position(position.x, position.y + step),
-            Position(position.x, position.y - step)
+            Position(characteristics.position.x + step, characteristics.position.y),
+            Position(characteristics.position.x - step, characteristics.position.y),
+            Position(characteristics.position.x, characteristics.position.y + step),
+            Position(characteristics.position.x, characteristics.position.y - step)
         ].filter { room.isValidPosition($0) }
-        return possibleMoves.randomElement() ?? position
+        return possibleMoves.randomElement() ?? characteristics.position
     }
 }
 
-// MARK: - Snake Mage
 class SnakeMage: Enemy {
+
     init(position: Position) {
-        super.init(
-            type: .snakeMage,
-            health: 60,
-            maxHealth: 60,
-            agility: 95,
-            strength: 30,
-            hostility: 80,
-            position: position,
-            movementStrategy: DiagonalMovement() // Используем новую стратегию
-        )
+        let characteristics = Characteristics(position: position, maxHealth: 60, health: 60, agility: 95, strength: 30)
+        super.init(type: .snakeMage, characteristics: characteristics, hostility: 80, movementStrategy: DiagonalMovement())
     }
 
     override func move(in room: Room, playerPosition: Position) -> Position {
         if shouldPursue(playerPosition: playerPosition) {
             return pursuePlayer(room: room, playerPosition: playerPosition)
         }
-        let newPosition = movementStrategy.move(from: (x: position.x, y: position.y), in: room, toward: (x: playerPosition.x, y: playerPosition.y))
-        position = Position(newPosition.x, newPosition.y)
+        let newPosition = movementStrategy.move(from: (x: characteristics.position.x, y: characteristics.position.y), in: room, toward: (x: playerPosition.x, y: playerPosition.y))
+        characteristics.position = Position(newPosition.x, newPosition.y)
         // Если движение не удалось (например, стена), используем случайное движение
-        if newPosition.x == position.x && newPosition.y == position.y {
+        if newPosition.x == characteristics.position.x && newPosition.y == characteristics.position.y {
             let fallback = RandomMovement()
-            let fallbackPosition = fallback.move(from: (x: position.x, y: position.y), in: room, toward: (x: playerPosition.x, y: playerPosition.y))
-            position = Position(fallbackPosition.x, fallbackPosition.y)
+            let fallbackPosition = fallback.move(from: (x: characteristics.position.x, y: characteristics.position.y), in: room, toward: (x: playerPosition.x, y: playerPosition.y))
+            characteristics.position = Position(fallbackPosition.x, fallbackPosition.y)
         }
-        return position
+        return characteristics.position
     }
 
     override func attack(player: Player) -> AttackResult {
@@ -210,7 +165,6 @@ class SnakeMage: Enemy {
     }
 }
 
-// MARK: - Diagonal Direction
 enum DiagonalDirection {
     case topLeftBottomRight
     case topRightBottomLeft

@@ -2,16 +2,6 @@
 //  room.swift
 //  rogue
 
-public struct Position: Hashable {
-    let x: Int
-    let y: Int
-
-    init(_ x: Int, _ y: Int) {
-        self.x = x
-        self.y = y
-    }
-}
-
 public enum Sector: Int, CaseIterable {
     case topLeft = 1, topCenter, topRight
     case middleLeft, center, middleRight
@@ -47,14 +37,6 @@ public class Room {
     var doors: [Door] = []
 
     var isStartRoom: Bool = false
-
-    // предметы в комнате
-    // var items: [(item: Item, position: Position)] = []
-    // враги в комнате
-    // var enemies: [(enemy: Enemy, position: Position)] = []
-    // положение игрока в комнате?
-    //var player: Position?
-    // var isVisited: Bool = false
 
     init(_ topRight: Position, _ lowLeft: Position, _ sector: Sector) {
         self.topRight = topRight
@@ -102,5 +84,15 @@ public class Room {
 
     func setStartRoom() {
         self.isStartRoom = true
+    }
+    
+    func isInsideRoom(_ point: Position) -> Bool {
+            return point.x >= lowLeft.x && point.x <= topRight.x &&
+                   point.y >= lowLeft.y && point.y <= topRight.y
+    }
+
+    func isValidPosition(_ point: Position) -> Bool {
+        // нужно проверить что клетка комнаты свободна ?
+        return isInsideRoom(point)
     }
 }

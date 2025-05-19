@@ -1,9 +1,7 @@
 //
-//  MovementStrategy.swift
-//  
-//
-//  Created by Ginn on 17.05.2025.
-//
+//  movementStrategy.swift
+//  rogue
+
 
 import Foundation
 
@@ -52,11 +50,11 @@ class DiagonalMovement: MovementStrategy {
 
 struct TeleportMovement: MovementStrategy {
     func move(from position: (x: Int, y: Int), in room: Room, toward playerPosition: (x: Int, y: Int)) -> (x: Int, y: Int) {
-        // Пытаемся найти валидную позицию за有限нное число попыток
+        // Пытаемся найти валидную позицию за заданное число попыток
         var attempts = 10
         while attempts > 0 {
-            let newX = Int.random(in: room.bounds.minX...room.bounds.maxX)
-            let newY = Int.random(in: room.bounds.minY...room.bounds.maxY)
+            let newX = Int.random(in: room.lowLeft.x...room.topRight.x)
+            let newY = Int.random(in: room.lowLeft.y...room.topRight.y)
             let newPosition = Position(newX, newY)
             
             // Проверяем, что позиция валидна (не в стене и доступна для перемещения)
