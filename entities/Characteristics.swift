@@ -1,11 +1,5 @@
 import Foundation
 
-// struct CTime {
-//     func start() -> TimeInterval {
-//         Date().
-//     }
-// }
-
 struct Position: Hashable {
     let x: Int
     let y: Int

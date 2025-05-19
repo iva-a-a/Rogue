@@ -6,16 +6,16 @@ struct Character {
     var agility: Int 
     var strength: Int
 }
-// TODO: class
+
 class Player {
     var baseStats: Character 
     var backpack: Backpack
 
     var maxHP: Int
-    var weapon: Weapon
+    var weapon: Weapon?
     var elixirBuffs: Buffs
 
-    init(baseStats: Character, backpack: Backpack, maxHP: Int, weapon: Weapon, elixirBuffs: Buffs) {
+    init(baseStats: Character, backpack: Backpack, maxHP: Int, weapon: Weapon?, elixirBuffs: Buffs) {
         self.baseStats = baseStats
         self.backpack = backpack
         self.maxHP = maxHP 
@@ -27,44 +27,16 @@ class Player {
         let baseStats = Character(coords: Position(0, 0), health: 500, agility: 70, strength: 70)
         let backpack = Backpack()
         let maxHP = 500 
-        let weapon = Weapon(strength: 0, name: "")
         let elixirBuffs = Buffs(maxHealth: [], agility: [], strength: [])
-        self.init(baseStats: baseStats, backpack: backpack, maxHP: maxHP, weapon: weapon, elixirBuffs: elixirBuffs)
+        self.init(baseStats: baseStats, backpack: backpack, maxHP: maxHP, weapon: nil, elixirBuffs: elixirBuffs)
     }
 
-    func eatFood(food: Food) {
-        baseStats.health = (baseStats.health + food.toRegen > maxHP ? maxHP : baseStats.health + food.toRegen)
+    func useItem(index: Int, type: ItemType) {
+        backpack.useItem(self, type: type, index: index)
     }
 
-    func drinkElixir(elixir: Elixir) {
-        switch elixir.stat {
-            case .health:
-                elixirBuffs.maxHealth.append(Buf(statIncrease: elixir.increase, effectEnd: Date() + elixir.duration))
-                maxHP += elixir.increase
-                baseStats.health += elixir.increase
-            case .agility:
-                elixirBuffs.agility.append(Buf(statIncrease: elixir.increase, effectEnd: Date() + elixir.duration))
-                baseStats.agility += elixir.increase
-            case .strength:
-                elixirBuffs.strength.append(Buf(statIncrease: elixir.increase, effectEnd: Date() + elixir.duration))
-                baseStats.strength += elixir.increase
-            default: 
-                break
-        }
-    }
-
-    func readScroll(scroll: Scroll) {
-        switch scroll.stat {
-            case .health:
-                maxHP += scroll.increase
-                baseStats.health += scroll.increase
-            case .agility:
-                baseStats.agility += scroll.increase
-            case .strength:
-                baseStats.strength += scroll.increase
-            default:
-                break
-        }
+    func addItem(item: any Item) -> AddingCode {
+        backpack.addItem(item: item)
     }
 
     func checkTempEffectEnd() {
@@ -91,4 +63,12 @@ class Player {
             return true
         }
     }
+
+    // TODO 
+
+    func attack() {}
+    func checkHit() {}
+    func calculateDamage() {}
+    func checkPlayerAttack() {}
+    func move() {}
 }
