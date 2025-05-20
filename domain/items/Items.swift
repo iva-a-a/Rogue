@@ -1,121 +1,97 @@
+//
+//  items.swift
+//  rogue
+
 import Foundation
 
-enum ItemType: CaseIterable {
-    case food 
-    case weapon
-    case scroll 
-    case elixir 
-    case treasure
+public enum ItemType: Hashable, Equatable {
+    case food(FoodType)
+    case weapon(WeaponType)
+    case scroll(ScrollType)
+    case elixir(ElixirType)
+    case treasure(TreasureType)
+
+    var category: ItemCategory {
+        switch self {
+        case .food: return .food
+        case .weapon: return .weapon
+        case .scroll: return .scroll
+        case .elixir: return .elixir
+        case .treasure: return .treasure
+        }
+    }
 }
 
-enum ItemRandomGenerate {
-    case random 
-    case none
+public enum FoodType: Hashable, Equatable {
+    case apple, bread, meat
+
+    var healthRestore: Int {
+        switch self {
+        case .apple: return 10
+        case .bread: return 20
+        case .meat: return 30
+        }
+    }
 }
 
-protocol Item: Equatable {
+public enum ElixirType: Hashable, Equatable {
+    case health, agility, strength
+
+    var effectValue: Int {
+        switch self {
+        case .health: return 20
+        case .agility: return 5
+        case .strength: return 10
+        }
+    }
+}
+
+public enum ScrollType: Hashable, Equatable {
+    case health, agility, strength
+
+    var effectValue: Int {
+        Int.random(in: 1...5)
+    }
+}
+
+public enum WeaponType: Hashable, Equatable {
+    case sword, bow, dagger, staff
+
+    var baseDamage: Int {
+        switch self {
+        case .sword: return 15
+        case .bow: return 12
+        case .dagger: return 8
+        case .staff: return 10
+        }
+    }
+}
+
+public enum TreasureType: Hashable, Equatable {
+    case gold, gem, artifact
+
+    var baseValue: Int {
+        switch self {
+        case .gold: return 10
+        case .gem: return 50
+        case .artifact: return 100
+        }
+    }
+}
+
+public enum AddingCode {
+    case success
+    case isFull
+}
+
+public protocol Item {
     var type: ItemType { get }
-
-    func use(_ p: Player)
-    func pickUp(_ p: Player) -> AddingCode
+    func use(_ player: Player)
+    func pickUp(_ player: Player) -> AddingCode
 }
 
 extension Item {
-    func pickUp(_ p: Player) -> AddingCode {
-        return p.backpack.addItem(item: self)
-    }
-}
-
-struct Treasure: Item {
-    var type = ItemType.treasure
-
-    var value: Int
-
-    func use(_ p: Player) { }
-    func pickUp(_ p: Player) -> AddingCode {
-        p.backpack.treasure.value += self.value
-        return .success
-    }
-}
-
-struct Weapon: Item {
-    var type = ItemType.weapon
-    var strength: Int
-    var name: String
-    
-    func use(_ p: Player) 
-    {
-        if let buf = p.weapon {
-            _ = p.backpack.addItem(item: buf)
-        }
-        p.weapon = self
-    }
-}
-
-struct Scroll: Item {
-    var type = ItemType.scroll
-    var stat: StatType
-    var increase: Int
-    var name: String    
-
-    func use(_ p: Player) 
-    {
-        switch stat {
-            case .health:
-                p.maxHP += increase
-                p.baseStats.health += increase
-            case .agility:
-                p.baseStats.agility += increase
-            case .strength:
-                p.baseStats.strength += increase
-            default:
-                break
-        }
-    }
-}
-
-struct Elixir: Item {
-    var type = ItemType.elixir
-    var duration: TimeInterval
-    var stat: StatType
-    var increase: Int
-    var name: String    
-
-    func use(_ p: Player) 
-    {
-        switch stat {
-            case .health:
-                p.elixirBuffs.maxHealth.append(Buf(statIncrease: increase, effectEnd: Date() + duration))
-                p.maxHP += increase
-                p.baseStats.health += increase
-            case .agility:
-                p.elixirBuffs.agility.append(Buf(statIncrease: increase, effectEnd: Date() + duration))
-                p.baseStats.agility += increase
-            case .strength:
-                p.elixirBuffs.strength.append(Buf(statIncrease: increase, effectEnd: Date() + duration))
-                p.baseStats.strength += increase
-            default: 
-                break
-        }
-    }
-}
-
-struct Food: Item {
-    var type = ItemType.food
-    var toRegen: Int
-    var name: String
-
-    func use(_ p: Player) {
-        p.baseStats.health = (p.baseStats.health + toRegen > p.maxHP ? p.maxHP : p.baseStats.health + toRegen)
-    }
-}
-
-class ItemInRoom {
-    var item: any Item 
-    var geometry: Object
-
-    init(item: any Item, geometry: Object) {
-        self.item = item 
-        self.geometry = geometry
+    public func pickUp(_ player: Player) -> AddingCode {
+        return player.backpack.addItem(self)
     }
 }
