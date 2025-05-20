@@ -1,0 +1,6 @@
+//
+//  itemType.swift
+//  rogue
+
+
+
