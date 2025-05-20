@@ -1,41 +1,38 @@
-enum AddingCode {
-    case success
-    case isFull
+//
+//  backpack.swift
+//  rogue
+
+
+public enum ItemCategory: Hashable {
+    case food
+    case weapon
+    case scroll
+    case elixir
+    case treasure
 }
 
-class Backpack {
-    var backpack: [ItemType : [any Item]] = [:]
-    var treasure: Treasure
+public class Backpack {
+    var items: [ItemCategory: [any Item]] = [:]
+    public var totalTreasureValue: Int = 0
 
-    init(value: Int = 0) {
-        for item in ItemType.allCases {
-            self.backpack[item] = []
-        }
-        treasure = Treasure(value: value)
+    public init() {}
+
+    public func useItem(_ player: Player, category: ItemCategory, index: Int) {
+        guard var itemArray = items[category], itemArray.indices.contains(index) else { return }
+        itemArray[index].use(player)
+        itemArray.remove(at: index)
+        items[category] = itemArray.isEmpty ? [] : itemArray
     }
+    
+    public func addItem(_ item: any Item) -> AddingCode {
+        let category = item.type.category
+        var categoryItems = items[category] ?? []
 
-    func addItem(item: any Item) -> AddingCode{
-        if backpack[item.type]!.count < 9 {
-            backpack[item.type]!.append(item)
+        if categoryItems.count < Constants.Item.maxCount {
+            categoryItems.append(item)
+            items[category] = categoryItems
             return .success
         }
         return .isFull
-    }
-
-    // func useItem(_ p: Player, item: Item) {
-    //     item.use(p) 
-    //     // need to delete from backpack
-    //     backpack[item.type]!
-    // }
-
-    func useItem(_ p: Player, type: ItemType, index: Int) {
-        backpack[type]![index].use(p)
-        backpack[type]!.remove(at: index)
-    }
-
-    subscript (itemType: ItemType) -> [any Item]? {
-        get {
-            return backpack[itemType]
-        }
     }
 }
