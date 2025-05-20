@@ -27,4 +27,8 @@ enum Constants {
 
     static let indent: Int = 1
     static let doorOffset: Int = 2
+    
+    enum Item {
+        static let maxCount: Int = 9
+    }
 }
