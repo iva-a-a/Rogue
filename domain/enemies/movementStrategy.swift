@@ -5,6 +5,25 @@
 
 import Foundation
 
+enum DiagonalDirection {
+    case topLeftBottomRight
+    case topRightBottomLeft
+
+    var opposite: DiagonalDirection {
+        switch self {
+        case .topLeftBottomRight: return .topRightBottomLeft
+        case .topRightBottomLeft: return .topLeftBottomRight
+        }
+    }
+
+    var moves: (dx: Int, dy: Int) {
+        switch self {
+        case .topLeftBottomRight: return (1, 1)
+        case .topRightBottomLeft: return (-1, 1)
+        }
+    }
+}
+
 protocol MovementStrategy {
     func move(from position: (x: Int, y: Int), in room: Room, toward playerPosition: (x: Int, y: Int)) -> (x: Int, y: Int)
 }
@@ -31,17 +50,17 @@ struct PursueMovement: MovementStrategy {
 
 class DiagonalMovement: MovementStrategy {
     private var direction: DiagonalDirection = .topLeftBottomRight
-    
+
     func move(from position: (x: Int, y: Int), in room: Room, toward playerPosition: (x: Int, y: Int)) -> (x: Int, y: Int) {
         let moves = direction.moves
         let newPosition = Position(position.x + moves.dx, position.y + moves.dy)
-        
+
         // Если новая позиция валидна - двигаемся и меняем направление
         if room.isValidPosition(newPosition) {
             direction = direction.opposite
             return (newPosition.x, newPosition.y)
         }
-        
+
         // Если нельзя двигаться - остаемся на месте, но все равно меняем направление для следующего хода
         direction = direction.opposite
         return (position.x, position.y)
@@ -56,7 +75,7 @@ struct TeleportMovement: MovementStrategy {
             let newX = Int.random(in: room.lowLeft.x...room.topRight.x)
             let newY = Int.random(in: room.lowLeft.y...room.topRight.y)
             let newPosition = Position(newX, newY)
-            
+
             // Проверяем, что позиция валидна (не в стене и доступна для перемещения)
             if room.isValidPosition(newPosition) {
                 return (newX, newY)

@@ -69,6 +69,7 @@ class Enemy: EnemyProtocol {
         // Базовый урон на основе силы
         return characteristics.strength + Int.random(in: -2...2)
     }
+
     func randomMove(in room: Room, step: Int = 1) -> Position {
         let directions = [
             Position(step, 0),
@@ -76,11 +77,11 @@ class Enemy: EnemyProtocol {
             Position(0, step),
             Position(0, -step)
         ]
-        
+
         let possibleMoves = directions.map {
             Position(characteristics.position.x + $0.x, characteristics.position.y + $0.y)
         }.filter { room.isInsideRoom($0) }
-        
+
         return possibleMoves.randomElement() ?? characteristics.position
     }
 }

@@ -12,7 +12,7 @@ extension Enemy {
         guard let path = findPath(to: playerPosition, in: room) else {
             return randomMove(in: room, step: step) // Используем общий метод
         }
-        
+
         let nextStepIndex = min(step, path.count - 2)
         return path[nextStepIndex + 1]
     }
@@ -43,13 +43,3 @@ extension Enemy {
         return nil // Путь не найден
     }
 }
-
-// MARK: - Room (Simplified for Example)
-//struct Room {
-//    let bounds: (minX: Int, maxX: Int, minY: Int, maxY: Int)
-//
-//    func isValidPosition(_ point: Position) -> Bool {
-//        return point.x >= bounds.minX && point.x <= bounds.maxX &&
-//               point.y >= bounds.minY && point.y <= bounds.maxY
-//    }
-//}

@@ -61,10 +61,10 @@ class Vampire: Enemy {
 }
 
 class Ghost: Enemy {
-    
+
     init(position: Position) {
         let characteristics = Characteristics(position: position, maxHealth: 30, health: 30, agility: 90, strength: 20)
-        super.init(type: .ghost,characteristics: characteristics,hostility: 20,movementStrategy: TeleportMovement())
+        super.init(type: .ghost, characteristics: characteristics, hostility: 20, movementStrategy: TeleportMovement())
     }
 
     override func move(in room: Room, playerPosition: Position) -> Position {
@@ -90,20 +90,20 @@ class Ogre: Enemy {
         let characteristics = Characteristics(position: position, maxHealth: 150, health: 150, agility: 20, strength: 90)
         super.init(type: .ogre, characteristics: characteristics, hostility: 50, movementStrategy: RandomMovement())
     }
-    
+
     override func move(in room: Room, playerPosition: Position) -> Position {
         if isResting {
             isResting = false
             return characteristics.position
         }
-        
+
         // Для преследования
         if shouldPursue(playerPosition: playerPosition) {
             let newPosition = pursuePlayer(room: room, playerPosition: playerPosition, step: 2)
             characteristics.position = newPosition
             return newPosition
         }
-        
+
         // Для обычного движения (с шагом 2)
         let basePosition = super.move(in: room, playerPosition: playerPosition)
         let deltaX = basePosition.x - characteristics.position.x
@@ -112,7 +112,7 @@ class Ogre: Enemy {
             characteristics.position.x + deltaX * 2,
             characteristics.position.y + deltaY * 2
         )
-        
+
         characteristics.position = room.isValidPosition(finalPosition) ? finalPosition : basePosition
         return characteristics.position
     }
@@ -162,24 +162,5 @@ class SnakeMage: Enemy {
             player.isAsleep = true
         }
         return result
-    }
-}
-
-enum DiagonalDirection {
-    case topLeftBottomRight
-    case topRightBottomLeft
-
-    var opposite: DiagonalDirection {
-        switch self {
-        case .topLeftBottomRight: return .topRightBottomLeft
-        case .topRightBottomLeft: return .topLeftBottomRight
-        }
-    }
-
-    var moves: (dx: Int, dy: Int) {
-        switch self {
-        case .topLeftBottomRight: return (1, 1)
-        case .topRightBottomLeft: return (-1, 1)
-        }
     }
 }

@@ -85,9 +85,9 @@ public class Room {
     func setStartRoom() {
         self.isStartRoom = true
     }
-    
+
     func isInsideRoom(_ point: Position) -> Bool {
-            return point.x >= lowLeft.x && point.x <= topRight.x &&
+        return point.x >= lowLeft.x && point.x <= topRight.x &&
                    point.y >= lowLeft.y && point.y <= topRight.y
     }
 
