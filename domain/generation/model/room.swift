@@ -85,14 +85,29 @@ public class Room {
     func setStartRoom() {
         self.isStartRoom = true
     }
-
+// Удалить в будущем 
     func isInsideRoom(_ point: Position) -> Bool {
         return point.x >= lowLeft.x && point.x <= topRight.x &&
                    point.y >= lowLeft.y && point.y <= topRight.y
     }
-
+//Удалить в будущем
     func isValidPosition(_ point: Position) -> Bool {
         // нужно проверить что клетка комнаты свободна ?
         return isInsideRoom(point)
     }
+    
+    // Все внутренние точки комнаты (без границ)
+    public func interiorPositions() -> [Position] {
+        var positions: [Position] = []
+        guard topRight.x > lowLeft.x + 1 && topRight.y > lowLeft.y + 1 else {
+            return positions
+        }
+        for x in lowLeft.x+1..<topRight.x {
+            for y in lowLeft.y+1..<topRight.y {
+                positions.append(Position(x, y))
+            }
+        }
+        return positions
+    }
+    
 }
