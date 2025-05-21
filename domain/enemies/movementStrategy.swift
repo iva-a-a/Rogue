@@ -24,7 +24,7 @@ enum DiagonalDirection {
     }
 }
 
-protocol MovementStrategy {
+public protocol MovementStrategy {
     func move(from position: (x: Int, y: Int), in room: Room, toward playerPosition: (x: Int, y: Int)) -> (x: Int, y: Int)
 }
 

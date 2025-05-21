@@ -11,7 +11,7 @@ protocol EnemyProtocol {
     func attack(player: Player) -> AttackResult
 }
 
-enum EnemyType {
+public enum EnemyType {
     case zombie, vampire, ghost, ogre, snakeMage
 }
 
@@ -20,7 +20,7 @@ enum AttackResult {
     case hit(damage: Int)
 }
 
-class Enemy: EnemyProtocol {
+public class Enemy: EnemyProtocol {
     let type: EnemyType
     var characteristics: Characteristics
     let hostility: Int
@@ -28,7 +28,7 @@ class Enemy: EnemyProtocol {
     let movementStrategy: MovementStrategy
     var isResting: Bool = false
 
-    init(type: EnemyType, characteristics: Characteristics, hostility: Int, movementStrategy: MovementStrategy) {
+    public init(type: EnemyType, characteristics: Characteristics, hostility: Int, movementStrategy: MovementStrategy) {
         self.type = type
         self.characteristics = characteristics
         self.hostility = hostility
