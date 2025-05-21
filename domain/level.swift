@@ -5,6 +5,9 @@
 public class Level {
     public var rooms: [Room] = []
     public var corridors: [Corridor] = []
+//    public var player: Player
+//    public var enemies: [Enemy] = []
+//    public var items: [Position: Item] = [:]
 
     public let exitPosition: Position 
 

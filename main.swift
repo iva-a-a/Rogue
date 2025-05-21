@@ -1,5 +1,7 @@
 import Foundation
 import domain
 
-let map = LevelBuilder.buildLevel()
-map.draw()
+let (level, map) = LevelBuilder.buildLevel()
+level.draw()
+
+map.printMap()
