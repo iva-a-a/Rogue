@@ -19,7 +19,7 @@ public class Player {
     }
 
     public convenience init() {
-        let characteristics = Characteristics(position: Position(0, 0), maxHealth: 500, health: 500, agility: 70, strength: 70)
+        let characteristics = Characteristics(position: Position(0, 0), maxHealth: 100, health: 100, agility: 10, strength: 8)
         let backpack = Backpack()
         let buffManager = BuffManager()
         self.init(characteristics: characteristics, backpack: backpack, weapon: nil, buffManager: buffManager)

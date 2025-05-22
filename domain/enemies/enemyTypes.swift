@@ -4,8 +4,8 @@
 
 class Zombie: Enemy {
     init(position: Position) {
-        let characteristics = Characteristics(position: position, maxHealth: 100, health: 100, agility: 20, strength: 50)
-        super.init(type: .zombie, characteristics: characteristics, hostility: 50, movementStrategy: RandomMovement())
+        let characteristics = Characteristics(position: position, maxHealth: 80, health: 80, agility: 3, strength: 12)
+        super.init(type: .zombie, characteristics: characteristics, hostility: 7, movementStrategy: RandomMovement())
     }
 
     override func move(in room: Room, playerPosition: Position) -> Position {
@@ -33,8 +33,8 @@ class Vampire: Enemy {
     private var isFirstHit = true
     
     init(position: Position) {
-        let characteristics = Characteristics(position: position, maxHealth: 80, health: 80, agility: 80, strength: 40)
-        super.init(type: .vampire, characteristics: characteristics, hostility: 80, movementStrategy: RandomMovement())
+        let characteristics = Characteristics(position: position, maxHealth: 60, health: 60, agility: 15, strength: 10)
+        super.init(type: .vampire, characteristics: characteristics, hostility: 9, movementStrategy: RandomMovement())
     }
 
     override func attack(player: Player) -> AttackResult {
@@ -63,8 +63,8 @@ class Vampire: Enemy {
 class Ghost: Enemy {
 
     init(position: Position) {
-        let characteristics = Characteristics(position: position, maxHealth: 30, health: 30, agility: 90, strength: 20)
-        super.init(type: .ghost, characteristics: characteristics, hostility: 20, movementStrategy: TeleportMovement())
+        let characteristics = Characteristics(position: position, maxHealth: 40, health: 40, agility: 18, strength: 5)
+        super.init(type: .ghost, characteristics: characteristics, hostility: 6, movementStrategy: TeleportMovement())
     }
 
     override func move(in room: Room, playerPosition: Position) -> Position {
@@ -87,8 +87,8 @@ class Ghost: Enemy {
 class Ogre: Enemy {
 
     init(position: Position) {
-        let characteristics = Characteristics(position: position, maxHealth: 150, health: 150, agility: 20, strength: 90)
-        super.init(type: .ogre, characteristics: characteristics, hostility: 50, movementStrategy: RandomMovement())
+        let characteristics = Characteristics(position: position, maxHealth: 120, health: 120, agility: 2, strength: 25)
+        super.init(type: .ogre, characteristics: characteristics, hostility: 5, movementStrategy: RandomMovement())
     }
 
     override func move(in room: Room, playerPosition: Position) -> Position {
@@ -137,8 +137,8 @@ class Ogre: Enemy {
 class SnakeMage: Enemy {
 
     init(position: Position) {
-        let characteristics = Characteristics(position: position, maxHealth: 60, health: 60, agility: 95, strength: 30)
-        super.init(type: .snakeMage, characteristics: characteristics, hostility: 80, movementStrategy: DiagonalMovement())
+        let characteristics = Characteristics(position: position, maxHealth: 50, health: 50, agility: 20, strength: 8)
+        super.init(type: .snakeMage, characteristics: characteristics, hostility: 8, movementStrategy: DiagonalMovement())
     }
 
     override func move(in room: Room, playerPosition: Position) -> Position {

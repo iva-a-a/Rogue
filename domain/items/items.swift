@@ -50,7 +50,11 @@ public enum ScrollType: Hashable, Equatable {
     case health, agility, strength
 
     var effectValue: Int {
-        Int.random(in: 1...5)
+        switch self {
+        case .health: return Int.random(in: 5...10)
+        case .agility: return Int.random(in: 3...5)
+        case .strength: return Int.random(in: 5...8)
+        }
     }
 }
 
