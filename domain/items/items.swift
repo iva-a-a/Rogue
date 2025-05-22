@@ -84,13 +84,13 @@ public enum AddingCode {
     case isFull
 }
 
-public protocol Item {
+public protocol ItemProtocol {
     var type: ItemType { get }
     func use(_ player: Player)
     func pickUp(_ player: Player) -> AddingCode
 }
 
-extension Item {
+extension ItemProtocol {
     public func pickUp(_ player: Player) -> AddingCode {
         return player.backpack.addItem(self)
     }

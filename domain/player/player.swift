@@ -29,7 +29,7 @@ public class Player {
         backpack.useItem(self, category: category, index: index)
     }
     
-    public func pickUpItem(_ item: any Item) -> AddingCode {
+    public func pickUpItem(_ item: any ItemProtocol) -> AddingCode {
         return item.pickUp(self)
     }
 

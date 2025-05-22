@@ -12,7 +12,7 @@ public enum ItemCategory: Hashable {
 }
 
 public class Backpack {
-    var items: [ItemCategory: [any Item]] = [:]
+    var items: [ItemCategory: [any ItemProtocol]] = [:]
     public var totalTreasureValue: Int = 0
 
     public init() {}
@@ -24,7 +24,7 @@ public class Backpack {
         items[category] = itemArray.isEmpty ? [] : itemArray
     }
     
-    public func addItem(_ item: any Item) -> AddingCode {
+    public func addItem(_ item: any ItemProtocol) -> AddingCode {
         let category = item.type.category
         var categoryItems = items[category] ?? []
 

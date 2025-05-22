@@ -4,7 +4,7 @@
 
 import Foundation
 
-public struct Food: Item {
+public struct Food: ItemProtocol {
     let foodType: FoodType
 
     public var type: ItemType {
@@ -20,7 +20,7 @@ public struct Food: Item {
     }
 }
 
-public struct Scroll: Item {
+public struct Scroll: ItemProtocol {
     
     let scrollType: ScrollType
 
@@ -46,7 +46,7 @@ public struct Scroll: Item {
     }
 }
 
-public struct Elixir: Item {
+public struct Elixir: ItemProtocol {
     let elixirType: ElixirType
     let duration: TimeInterval
 
@@ -68,7 +68,7 @@ public struct Elixir: Item {
     }
 }
 
-public struct Treasure: Item {
+public struct Treasure: ItemProtocol {
     let treasureType: TreasureType
 
     public var type: ItemType { .treasure(treasureType) }
@@ -87,7 +87,7 @@ public struct Treasure: Item {
     }
 }
 
-public struct Weapon: Item {
+public struct Weapon: ItemProtocol {
     let weaponType: WeaponType
 
     public var type: ItemType { .weapon(weaponType) }
