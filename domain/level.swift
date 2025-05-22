@@ -5,16 +5,17 @@
 public class Level {
     public var rooms: [Room] = []
     public var corridors: [Corridor] = []
-//    public var player: Player
+    public var player: Player
 //    public var enemies: [Enemy] = []
 //    public var items: [Position: Item] = [:]
 
     public let exitPosition: Position 
 
-    public init(_ rooms: [Room], _ corridors: [Corridor], _ exitPosition: Position) {
+    public init(_ rooms: [Room], _ corridors: [Corridor], _ exitPosition: Position, _ player: Player) {
         self.rooms = rooms
         self.corridors = corridors
         self.exitPosition = exitPosition
+        self.player = player
     }
 
     public func draw() {
