@@ -1,9 +1,9 @@
 //
-//  map.swift
+//  gameMap.swift
 //  rogue
 
 
-public class Map {
+public class GameMap {
     var walkablePositions: Set<Position> = []
     
     public func addPositions(_ positions: [Position]) {
