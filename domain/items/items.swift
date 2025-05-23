@@ -63,10 +63,10 @@ public enum WeaponType: Hashable, Equatable {
 
     var baseDamage: Int {
         switch self {
-        case .sword: return 15
-        case .bow: return 12
-        case .dagger: return 8
-        case .staff: return 10
+        case .sword: return Int.random(in: 12...16)
+        case .bow: return Int.random(in: 9...13)
+        case .dagger: return Int.random(in: 5...9)
+        case .staff: return Int.random(in: 7...11)
         }
     }
 }

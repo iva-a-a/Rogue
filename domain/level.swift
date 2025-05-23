@@ -7,15 +7,18 @@ public class Level {
     public var corridors: [Corridor] = []
     public var player: Player
 //    public var enemies: [Enemy] = []
-//    public var items: [Position: Item] = [:]
+    public var items: [Position: ItemProtocol] = [:]
 
-    public let exitPosition: Position 
+    public let exitPosition: Position
+    public var levelNumber: Int
 
-    public init(_ rooms: [Room], _ corridors: [Corridor], _ exitPosition: Position, _ player: Player) {
+    public init(_ rooms: [Room], _ corridors: [Corridor], _ exitPosition: Position, _ player: Player, _ items: [Position: ItemProtocol], _ levelNumber: Int) {
         self.rooms = rooms
         self.corridors = corridors
         self.exitPosition = exitPosition
         self.player = player
+        self.items = items
+        self.levelNumber = levelNumber
     }
 
     public func draw() {
@@ -51,6 +54,26 @@ public class Level {
         }
 
         grid[exitPosition.x][exitPosition.y] = "E"
+    
+
+        for (position, item) in items {
+            let symbol: String
+            switch item.type {
+            case .food:
+                symbol = "f"
+            case .weapon:
+                symbol = "w"
+            case .scroll:
+                symbol = "s"
+            case .elixir:
+                symbol = "e"
+            case .treasure:
+                symbol = "t"
+            }
+            grid[position.x][position.y] = symbol
+        }
+
+        grid[player.characteristics.position.x][player.characteristics.position.y] = "P"
 
 
         for row in grid {
