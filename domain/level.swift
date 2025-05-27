@@ -11,14 +11,17 @@ public class Level {
 
     public let exitPosition: Position
     public var levelNumber: Int
+    
+    public var gameMap: GameMap
 
-    public init(_ rooms: [Room], _ corridors: [Corridor], _ exitPosition: Position, _ player: Player, _ items: [Position: ItemProtocol], _ levelNumber: Int) {
+    public init(_ rooms: [Room], _ corridors: [Corridor], _ exitPosition: Position, _ player: Player, _ items: [Position: ItemProtocol], _ levelNumber: Int, _ gameMap: GameMap) {
         self.rooms = rooms
         self.corridors = corridors
         self.exitPosition = exitPosition
         self.player = player
         self.items = items
         self.levelNumber = levelNumber
+        self.gameMap = gameMap
     }
 
     public func draw() {
@@ -79,5 +82,6 @@ public class Level {
         for row in grid {
             print(row.joined())
        }
+        gameMap.printMap()
     }
 }

@@ -6,7 +6,7 @@ public struct LevelBuilder {
     
     static private var levelNumber: Int = 0
     
-    static public func buildLevel(roomGenerator: RoomGeneratorProtocol = RoomGenerator(), corridorsGenerator: CorridorsGeneratorProtocol = CorridorsGenerator(), difficulty: GameDifficulty = .normal) -> (Level, GameMap) {
+    static public func buildLevel(roomGenerator: RoomGeneratorProtocol = RoomGenerator(), corridorsGenerator: CorridorsGeneratorProtocol = CorridorsGenerator(), difficulty: GameDifficulty = .normal) -> Level {
         levelNumber += 1
         let rooms = roomGenerator.generateRooms()
         let gameMap = GameMap()
@@ -17,7 +17,7 @@ public struct LevelBuilder {
         corridorsGenerator.removeUnusedDoors(rooms, corridors)
         addDooorsCoordToMap(rooms, gameMap)
         let (exitPosition, items) = setupStartRoomAndExit(rooms, graph, gameMap, player, difficulty)
-        return (Level(rooms, corridors, exitPosition, player, items, self.levelNumber), gameMap)
+        return Level(rooms, corridors, exitPosition, player, items, self.levelNumber, gameMap)
     }
     
     static private func generateConnections(_ rooms: [Room],
