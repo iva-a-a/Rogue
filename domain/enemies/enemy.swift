@@ -2,115 +2,68 @@
 //  enemy.swift
 //  rogue
 
+enum EnemyType {
+    case zombie, vampire, ghost, ogre, snakeMage
+}
+
 protocol EnemyProtocol {
     var type: EnemyType { get }
     var characteristics: Characteristics { get set }
     var hostility: Int { get }
     var isVisible: Bool { get set }
-    func move(in room: Room, map: GameMap, playerPosition: Position) -> Position
+    
+    var movementBehavior: MovementBehavior { get }
+    var pursuitBehavior: MovementBehavior { get }
+    var attackBehavior: AttackBehavior { get }
+    
     func attack(player: Player) -> AttackResult
+    func move(level: Level)
+    
+    var indexRoom: Int { get set }
+    
 }
 
-enum EnemyType {
-    case zombie, vampire, ghost, ogre, snakeMage
-}
 
 class Enemy: EnemyProtocol {
-    let type: EnemyType
+    
+    var type: EnemyType
     var characteristics: Characteristics
-    let hostility: Int
+    var hostility: Int = 0
     var isVisible: Bool = true
-    var isResting: Bool = false
-
-    let movementStrategy: MovementStrategy
-    let attackBehavior: AttackBehavior
-    let pursuitBehavior: PursuitBehavior
-
-    init(
-        type: EnemyType,
-        characteristics: Characteristics,
-        hostility: Int,
-        movementStrategy: MovementStrategy,
-        attackBehavior: AttackBehavior,
-        pursuitBehavior: PursuitBehavior
-    ) {
+    var movementBehavior: any MovementBehavior
+    var pursuitBehavior: any MovementBehavior
+    var attackBehavior: any AttackBehavior
+    var indexRoom: Int
+    
+    init(type: EnemyType, characteristics: Characteristics, hostility: Int, movementBehavior: any MovementBehavior, pursuitBehavior: any MovementBehavior, attackBehavior: any AttackBehavior, indexRoom: Int) {
         self.type = type
         self.characteristics = characteristics
         self.hostility = hostility
-        self.movementStrategy = movementStrategy
-        self.attackBehavior = attackBehavior
+        self.movementBehavior = movementBehavior
         self.pursuitBehavior = pursuitBehavior
+        self.attackBehavior = attackBehavior
+        self.indexRoom = indexRoom
     }
     
-    @discardableResult
-    func move(in room: Room, map: GameMap, playerPosition: Position) -> Position {
-        let oldPosition = characteristics.position
-        var newPosition: Position
-
-        if pursuitBehavior.shouldPursue(enemy: self, playerPosition: playerPosition) {
-            newPosition = pursuitBehavior.pursue(enemy: self, room: room, playerPosition: playerPosition, step: 1)
-        } else {
-            let newPosTuple = movementStrategy.move(
-                from: (characteristics.position.x, characteristics.position.y),
-                in: room,
-                toward: (playerPosition.x, playerPosition.y)
-            )
-            newPosition = Position(newPosTuple.x, newPosTuple.y)
+    func move(level: Level) {
+        var pos: Position?
+        if shouldPursue(player: level.player) {
+            pos = self.pursuitBehavior.move(from: characteristics.position, toward: level.player.characteristics.position, in: level.rooms[indexRoom], in: level.gameMap)
+            isVisible = true
         }
-
-        // Проверяем, доступна ли позиция
-        if map.isWalkable(newPosition) {
-            map.addPosition(oldPosition)
-            map.removePosition(newPosition)
-            characteristics.position = newPosition
+        if pos == nil {
+          pos = self.movementBehavior.move(from: characteristics.position, toward: level.player.characteristics.position, in: level.rooms[indexRoom], in: level.gameMap)
         }
-
-        return characteristics.position
+        level.gameMap.rewrite(from: characteristics.position, to: pos!)
+        characteristics.position = pos!
     }
     
     func attack(player: Player) -> AttackResult {
         attackBehavior.attack(attacker: self, player: player)
     }
-    @discardableResult
-    func randomMove(in room: Room, step: Int = 1) -> Position {
-        let directions = [
-            Position(step, 0),
-            Position(-step, 0),
-            Position(0, step),
-            Position(0, -step)
-        ]
-
-        let possibleMoves = directions.map {
-            Position(characteristics.position.x + $0.x, characteristics.position.y + $0.y)
-        }.filter { room.isInsideRoom($0) }
-
-        return possibleMoves.randomElement() ?? characteristics.position
+    
+    private func shouldPursue(player: Player) -> Bool {
+        let distance = abs(characteristics.position.x - player.characteristics.position.x) + abs(characteristics.position.y - player.characteristics.position.y)
+        return distance <= hostility / 10 // Радиус преследования зависит от враждебности
     }
-    func findPath(to target: Position, in room: Room) -> [Position]? {
-            var queue: [(Position, [Position])] = [(characteristics.position, [])]
-            var visited: Set<Position> = [characteristics.position]
-
-            while !queue.isEmpty {
-                let (current, path) = queue.removeFirst()
-
-                if current == target {
-                    return path + [current]
-                }
-
-                for direction in [
-                    Position(0, 1), Position(0, -1),
-                    Position(1, 0), Position(-1, 0)
-                ] {
-                    let next = Position(current.x + direction.x, current.y + direction.y)
-
-                    if room.isValidPosition(next),
-                       !visited.contains(next) {
-                        visited.insert(next)
-                        queue.append((next, path + [current]))
-                    }
-                }
-            }
-
-            return nil // путь не найден
-        }
 }
