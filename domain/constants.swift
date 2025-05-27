@@ -30,6 +30,5 @@ enum Constants {
 
     enum Item {
         static let maxCount: Int = 9
-        static let offset: Int = 1
     }
 }
