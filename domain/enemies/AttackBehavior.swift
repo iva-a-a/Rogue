@@ -7,9 +7,9 @@ protocol AttackBehavior {
     func attack(attacker: Enemy, player: Player) -> AttackResult
 }
 
-struct DefaultAttack: AttackBehavior {
+class DefaultAttack: AttackBehavior {
     func attack(attacker: Enemy, player: Player) -> AttackResult {
-        let hitChance = attacker.calculateHitChance(
+        let hitChance = calculateHitChance(
             agility: attacker.characteristics.agility,
             targetAgility: player.characteristics.agility
         )
@@ -22,23 +22,28 @@ struct DefaultAttack: AttackBehavior {
         player.characteristics.health -= damage
         return .hit(damage: damage)
     }
+    
+    private func calculateHitChance(agility: Int, targetAgility: Int) -> Int {
+        let baseChance = 70
+        let agilityDiff = agility - targetAgility
+        return max(20, min(95, baseChance + agilityDiff * 2))
+    }
 }
 
-class FirstMissAttack: AttackBehavior {
+class FirstMissAttack: DefaultAttack {
     private var didMiss = false
-
-    func attack(attacker: Enemy, player: Player) -> AttackResult {
+    override func attack(attacker: Enemy, player: Player) -> AttackResult {
         if !didMiss {
             didMiss = true
             return .miss
         }
-        return DefaultAttack().attack(attacker: attacker, player: player)
+        return super.attack(attacker: attacker, player: player)
     }
 }
 
-struct DrainHealthAttack: AttackBehavior {
-    func attack(attacker: Enemy, player: Player) -> AttackResult {
-        let result = DefaultAttack().attack(attacker: attacker, player: player)
+class DrainHealthAttack: DefaultAttack {
+    override func attack(attacker: Enemy, player: Player) -> AttackResult {
+        let result = super.attack(attacker: attacker, player: player)
         if case .hit = result {
             player.characteristics.maxHealth -= 5
             player.characteristics.health = min(player.characteristics.health, player.characteristics.maxHealth)
@@ -47,10 +52,12 @@ struct DrainHealthAttack: AttackBehavior {
     }
 }
 
-extension Enemy {
-    func calculateHitChance(agility: Int, targetAgility: Int) -> Int {
-        let baseChance = 70
-        let agilityDiff = agility - targetAgility
-        return max(20, min(95, baseChance + agilityDiff * 2))
+class WithSleepAttack: DefaultAttack {
+    override func attack(attacker: Enemy, player: Player) -> AttackResult {
+        let result = super.attack(attacker: attacker, player: player)
+        if case .hit = result, Int.random(in: 1...100) <= 30 {
+            player.isAsleep = true
+        }
+        return result
     }
 }
