@@ -1,5 +1,5 @@
 //
-//  generation.swift
+//  generateRoomCorr.swift
 //  rogue
 
 
