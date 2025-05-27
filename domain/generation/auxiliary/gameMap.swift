@@ -18,9 +18,19 @@ public class GameMap {
         walkablePositions.remove(position)
     }
     
+    public func clear() {
+        walkablePositions.removeAll()
+    }
+    
     public func isWalkable(_ position: Position) -> Bool {
         return walkablePositions.contains(position)
     }
+    
+    public func rewrite(from oldPosition: Position, to newPosition: Position) {
+        self.removePosition(oldPosition)
+        self.addPosition(newPosition)
+    }
+
     
     public func printMap() {
         for x in 0..<Constants.Map.height {
