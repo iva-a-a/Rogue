@@ -2,128 +2,175 @@
 //  generateItem.swift
 //  rogue
 
-enum ItemFactory {
-    static func randomItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
-        // Базовые вероятности для каждого типа предмета
-        var probabilities: [ItemCategory: Double] = [
+public final class ItemEntityFactory: EntityFactory {
+    public typealias EntityType = ItemProtocol
+    
+    public func generate(in rooms: [Room], excluding: Set<Position>, player: Player, level: Int, difficulty: GameDifficulty) -> [Position: ItemProtocol] {
+        var items: [Position: ItemProtocol] = [:]
+        let itemCount = SpawnBalancer.calculateEntityCount(
+                base: 21, level: level, difficulty: difficulty, player: player, maxCount: 21, modifier: 1)
+        let positions = GetterPositions.make(in: rooms, excluding: excluding, count: itemCount, offset: 1)
+        for i in 0..<positions.count {
+            let item = Self.randomItem(for: difficulty, player: player, level: level)
+            items[positions[i]] = item
+        }
+        return items
+    }
+    
+    private static func randomItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+        var probabilities = getBaseProbabilities()
+        adjustProbabilitiesByLevel(&probabilities, level: level)
+        adjustProbabilitiesByDifficulty(&probabilities, difficulty: difficulty)
+        normalizeProbabilities(&probabilities)
+        return selectItem(probabilities: probabilities, difficulty: difficulty, player: player, level: level)
+    }
+    
+    private static func getBaseProbabilities() -> [ItemCategory: Double] {
+        return [
             .food: 0.35,
-            .scroll: 0.25,
+            .scroll: 0.3,
             .elixir: 0.2,
-            .weapon: 0.15
+            .weapon: 0.15,
         ]
-        
-        // Корректировка в зависимости от уровня
+    }
+    
+    private static func adjustProbabilitiesByLevel(_ probabilities: inout [ItemCategory: Double], level: Int) {
         let levelFactor = Double(level) * 0.02
         probabilities[.food]? -= levelFactor
         probabilities[.scroll]? -= levelFactor * 0.5
         probabilities[.weapon]? += levelFactor * 0.7
         probabilities[.treasure]? += levelFactor * 0.8
-        
-        // Корректировка в зависимости от сложности
+    }
+    
+    private static func adjustProbabilitiesByDifficulty(_ probabilities: inout [ItemCategory: Double], difficulty: GameDifficulty) {
         switch difficulty {
         case .easy:
-            probabilities[.food]? *= 1.2
-            probabilities[.elixir]? *= 1.1
+            probabilities[.food]? *= 1.5
+            probabilities[.elixir]? *= 1.3
             probabilities[.weapon]? *= 0.8
         case .normal:
-            break // оставляем базовые вероятности
+            break
         case .hard:
             probabilities[.food]? *= 0.8
             probabilities[.weapon]? *= 1.2
         }
-        
-        // Корректировка в зависимости от здоровья игрока
-        let healthRatio = Double(player.characteristics.health) / Double(player.characteristics.maxHealth)
-        if healthRatio < 0.3 {
-            // Если у игрока мало здоровья, увеличиваем шанс еды и зелий
-            probabilities[.food]? *= 1.5
-            probabilities[.elixir]? *= 1.3
-        } else if healthRatio > 0.8 {
-            // Если у игрока много здоровья, уменьшаем шанс еды
-            probabilities[.food]? *= 0.7
-        }
-        
-        // Нормализуем вероятности (чтобы сумма была = 1)
+    }
+    
+    private static func normalizeProbabilities(_ probabilities: inout [ItemCategory: Double]) {
         let total = probabilities.values.reduce(0, +)
         for (category, _) in probabilities {
             probabilities[category]? /= total
         }
-        
-        // Выбираем тип предмета
+    }
+    
+    private static func selectItem(probabilities: [ItemCategory: Double], difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
         let random = Double.random(in: 0..<1)
         var runningSum = 0.0
         
         for (category, probability) in probabilities {
             runningSum += probability
             if random < runningSum {
-                return generateItem(of: category, for: difficulty, player: player, level: level)
+                return createItem(of: category, for: difficulty, player: player, level: level)
             }
         }
         return Food(foodType: .apple)
     }
     
-    private static func generateItem(of category: ItemCategory, for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+    private static func createItem(of category: ItemCategory, for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+        let factory: ItemFactory
         switch category {
         case .food:
-            let types: [FoodType]
-            switch difficulty {
-            case .easy:
-                types = [.apple, .bread, .bread] // больше хлеба
-            case .normal:
-                types = [.apple, .bread, .meat]
-            case .hard:
-                types = [.bread, .meat, .meat] // больше мяса
-            }
-            return Food(foodType: types.randomElement()!)
-            
+            factory = FoodFactory()
         case .scroll:
-            let scrollType: ScrollType = {
-                // На высоких уровнях чаще даем полезные свитки
-                if level > 3 {
-                    return [.health, .strength, .agility].randomElement()!
-                }
-                return .health
-            }()
-            return Scroll(scrollType: scrollType)
-            
+            factory = ScrollFactory()
         case .elixir:
-            let elixirType: ElixirType = {
-                let healthRatio = Double(player.characteristics.health) / Double(player.characteristics.maxHealth)
-                // Если у игрока мало здоровья, увеличиваем шанс зелья здоровья
-                if healthRatio < 0.4 || (difficulty == .hard && healthRatio < 0.6) {
-                    return .health
-                }
-                return [.health, .agility, .strength].randomElement()!
-            }()
-            
-            // Увеличиваем длительность и силу эффекта в зависимости от уровня и сложности
-            var duration = Double.random(in: 1...3) * 30
-            var effectBonus = 0
-            
-            if difficulty == .hard {
-                duration *= 1.2
-                effectBonus += 2
-            }
-            
-            if level > 10 {
-                duration *= 1.1
-                effectBonus += level / 2
-            }
-            
-            return Elixir(elixirType: elixirType, duration: duration)
-            
+            factory = ElixirFactory()
         case .weapon:
-       
-            let weaponType: WeaponType = {
-                if level > 10 {
-                    return [.sword, .bow].randomElement()!
-                }
-                return [.sword, .bow, .dagger, .staff].randomElement()!
-            }()
-            return Weapon(weaponType: weaponType)
-            
+            factory = WeaponFactory()
         case .treasure:
-            return Treasure(treasureType: .gold)
+            factory = TreasureFactory()
         }
+        return factory.createItem(for: difficulty, player: player, level: level)
+    }
+}
+
+
+public protocol ItemFactory {
+    func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol
+}
+
+
+public final class FoodFactory: ItemFactory {
+    public func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+        let types: [FoodType]
+        switch difficulty {
+        case .easy:
+            types = [.apple, .bread, .bread]
+        case .normal:
+            types = [.apple, .bread, .meat]
+        case .hard:
+            types = [.bread, .meat, .meat]
+        }
+        return Food(foodType: types.randomElement()!)
+    }
+}
+
+public final class ScrollFactory: ItemFactory {
+    public func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+        let scrollType: ScrollType = {
+            if level > 15 {
+                return [.strength, .agility].randomElement()!
+            }
+            if level > 7 {
+                return [.health, .strength, .agility].randomElement()!
+            }
+            return .health
+        }()
+        return Scroll(scrollType: scrollType)
+    }
+}
+
+public final class ElixirFactory: ItemFactory {
+    public func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+        let elixirType: ElixirType = {
+            let healthRatio = Double(player.characteristics.health) / Double(player.characteristics.maxHealth)
+            if healthRatio < 0.4 || (difficulty == .hard && healthRatio < 0.6) {
+                return .health
+            }
+            return [.health, .agility, .strength].randomElement()!
+        }()
+        var duration = Double.random(in: 1...3) * 30
+        var effectBonus = 0
+        if difficulty == .hard {
+            duration *= 1.2
+            effectBonus += 2
+        }
+        if level > 10 {
+            duration *= 1.1
+            effectBonus += level / 2
+        }
+        return Elixir(elixirType: elixirType, duration: duration)
+    }
+}
+
+public final class WeaponFactory: ItemFactory {
+    public func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+        let weaponType: WeaponType = {
+            if level < 7 {
+                return [.dagger, .staff].randomElement()!
+            }
+            if level > 15 {
+                return [.sword, .bow].randomElement()!
+            }
+            return [.sword, .bow, .dagger, .staff].randomElement()!
+        }()
+        return Weapon(weaponType: weaponType)
+    }
+}
+
+// дописать в зависимости от уровня
+public final class TreasureFactory: ItemFactory {
+    public func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+        return Treasure(treasureType: .gold)
     }
 }
