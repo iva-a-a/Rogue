@@ -24,7 +24,7 @@ protocol EnemyProtocol {
 }
 
 
-class Enemy: EnemyProtocol {
+public class Enemy: EnemyProtocol {
     
     var type: EnemyType
     var characteristics: Characteristics
@@ -56,10 +56,14 @@ class Enemy: EnemyProtocol {
         }
         level.gameMap.rewrite(from: characteristics.position, to: pos!)
         characteristics.position = pos!
+        if let newRoomIndex = level.rooms.firstIndex(where: { $0.isInsideRoom(pos!) }), newRoomIndex != indexRoom {
+            indexRoom = newRoomIndex
+        }
     }
     
     func attack(player: Player) -> AttackResult {
-        attackBehavior.attack(attacker: self, player: player)
+        isVisible = true
+        return attackBehavior.attack(attacker: self, player: player)
     }
     
     private func shouldPursue(player: Player) -> Bool {
