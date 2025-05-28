@@ -10,19 +10,37 @@ public final class ItemEntityFactory: EntityFactory {
         let itemCount = SpawnBalancer.calculateEntityCount(
                 base: 21, level: level, difficulty: difficulty, player: player, maxCount: 21, modifier: 1)
         let positions = GetterPositions.make(in: rooms, excluding: excluding, count: itemCount, offset: 1)
+        let probabilities = Self.getProbabilities(level, difficulty)
         for i in 0..<positions.count {
-            let item = Self.randomItem(for: difficulty, player: player, level: level)
+            let item = Self.randomItem(probabilities: probabilities, difficulty: difficulty, player: player, level: level)
             items[positions[i]] = item
         }
         return items
     }
     
-    private static func randomItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
-        var probabilities = getBaseProbabilities()
-        adjustProbabilitiesByLevel(&probabilities, level: level)
-        adjustProbabilitiesByDifficulty(&probabilities, difficulty: difficulty)
-        normalizeProbabilities(&probabilities)
-        return selectItem(probabilities: probabilities, difficulty: difficulty, player: player, level: level)
+    private static func randomItem(probabilities: [ItemCategory: Double], difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+        let random = Double.random(in: 0..<1)
+        var runningSum = 0.0
+        
+        for (category, probability) in probabilities {
+            runningSum += probability
+            if random < runningSum {
+                return createItem(of: category, for: difficulty, player: player, level: level)
+            }
+        }
+        return createItem(of: .food, for: difficulty, player: player, level: level)
+    }
+    
+    private static func createItem(of category: ItemCategory, for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+        let factory: ItemFactory
+        switch category {
+            case .food: factory = FoodFactory()
+            case .scroll: factory = ScrollFactory()
+            case .elixir: factory = ElixirFactory()
+            case .weapon: factory = WeaponFactory()
+            case .treasure: factory = TreasureFactory()
+        }
+        return factory.createItem(for: difficulty, player: player, level: level)
     }
     
     private static func getBaseProbabilities() -> [ItemCategory: Double] {
@@ -32,6 +50,14 @@ public final class ItemEntityFactory: EntityFactory {
             .elixir: 0.2,
             .weapon: 0.15,
         ]
+    }
+    
+    private static func getProbabilities(_ level: Int, _ difficulty: GameDifficulty) -> [ItemCategory: Double] {
+        var probabilities = getBaseProbabilities()
+        adjustProbabilitiesByLevel(&probabilities, level: level)
+        adjustProbabilitiesByDifficulty(&probabilities, difficulty: difficulty)
+        normalizeProbabilities(&probabilities)
+        return probabilities
     }
     
     private static func adjustProbabilitiesByLevel(_ probabilities: inout [ItemCategory: Double], level: Int) {
@@ -44,15 +70,14 @@ public final class ItemEntityFactory: EntityFactory {
     
     private static func adjustProbabilitiesByDifficulty(_ probabilities: inout [ItemCategory: Double], difficulty: GameDifficulty) {
         switch difficulty {
-        case .easy:
-            probabilities[.food]? *= 1.5
-            probabilities[.elixir]? *= 1.3
-            probabilities[.weapon]? *= 0.8
-        case .normal:
-            break
-        case .hard:
-            probabilities[.food]? *= 0.8
-            probabilities[.weapon]? *= 1.2
+            case .easy:
+                probabilities[.food]? *= 1.5
+                probabilities[.elixir]? *= 1.3
+                probabilities[.weapon]? *= 0.8
+            case .normal: break
+            case .hard:
+                probabilities[.food]? *= 0.8
+                probabilities[.weapon]? *= 1.2
         }
     }
     
@@ -62,54 +87,19 @@ public final class ItemEntityFactory: EntityFactory {
             probabilities[category]? /= total
         }
     }
-    
-    private static func selectItem(probabilities: [ItemCategory: Double], difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
-        let random = Double.random(in: 0..<1)
-        var runningSum = 0.0
-        
-        for (category, probability) in probabilities {
-            runningSum += probability
-            if random < runningSum {
-                return createItem(of: category, for: difficulty, player: player, level: level)
-            }
-        }
-        return Food(foodType: .apple)
-    }
-    
-    private static func createItem(of category: ItemCategory, for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
-        let factory: ItemFactory
-        switch category {
-        case .food:
-            factory = FoodFactory()
-        case .scroll:
-            factory = ScrollFactory()
-        case .elixir:
-            factory = ElixirFactory()
-        case .weapon:
-            factory = WeaponFactory()
-        case .treasure:
-            factory = TreasureFactory()
-        }
-        return factory.createItem(for: difficulty, player: player, level: level)
-    }
 }
-
 
 public protocol ItemFactory {
     func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol
 }
 
-
 public final class FoodFactory: ItemFactory {
     public func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
         let types: [FoodType]
         switch difficulty {
-        case .easy:
-            types = [.apple, .bread, .bread]
-        case .normal:
-            types = [.apple, .bread, .meat]
-        case .hard:
-            types = [.bread, .meat, .meat]
+            case .easy: types = [.apple, .bread, .bread]
+            case .normal: types = [.apple, .bread, .meat]
+            case .hard: types = [.bread, .meat, .meat]
         }
         return Food(foodType: types.randomElement()!)
     }
@@ -118,13 +108,11 @@ public final class FoodFactory: ItemFactory {
 public final class ScrollFactory: ItemFactory {
     public func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
         let scrollType: ScrollType = {
-            if level > 15 {
-                return [.strength, .agility].randomElement()!
+            switch level {
+                case 0..<5: return .health
+                case 5..<10: return [.health, .strength, .agility].randomElement()!
+                default: return [.strength, .agility].randomElement()!
             }
-            if level > 7 {
-                return [.health, .strength, .agility].randomElement()!
-            }
-            return .health
         }()
         return Scroll(scrollType: scrollType)
     }
@@ -133,10 +121,6 @@ public final class ScrollFactory: ItemFactory {
 public final class ElixirFactory: ItemFactory {
     public func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
         let elixirType: ElixirType = {
-            let healthRatio = Double(player.characteristics.health) / Double(player.characteristics.maxHealth)
-            if healthRatio < 0.4 || (difficulty == .hard && healthRatio < 0.6) {
-                return .health
-            }
             return [.health, .agility, .strength].randomElement()!
         }()
         var duration = Double.random(in: 1...3) * 30
@@ -156,13 +140,11 @@ public final class ElixirFactory: ItemFactory {
 public final class WeaponFactory: ItemFactory {
     public func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
         let weaponType: WeaponType = {
-            if level < 7 {
-                return [.dagger, .staff].randomElement()!
+            switch level {
+                case 0..<7: return [.dagger, .staff].randomElement()!
+                case 7..<15: return [.sword, .bow].randomElement()!
+                default: return [.sword, .bow, .dagger, .staff].randomElement()!
             }
-            if level > 15 {
-                return [.sword, .bow].randomElement()!
-            }
-            return [.sword, .bow, .dagger, .staff].randomElement()!
         }()
         return Weapon(weaponType: weaponType)
     }
