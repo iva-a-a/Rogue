@@ -9,15 +9,15 @@ public struct LevelBuilder {
     static public func buildLevel(roomGenerator: RoomGeneratorProtocol = RoomGenerator(), corridorsGenerator: CorridorsGeneratorProtocol = CorridorsGenerator(), difficulty: GameDifficulty = .normal) -> Level {
         levelNumber += 1
         let rooms = roomGenerator.generateRooms()
-        let gameMap = GameMap()
+        var gameMap = GameMap()
         let player = Player()
         addRoomsCoordToMap(rooms, gameMap)
         let (corridors, graph) = generateConnections(rooms, corridorsGenerator)
         addCoridorsCoordToMap(corridors, gameMap)
         corridorsGenerator.removeUnusedDoors(rooms, corridors)
         addDooorsCoordToMap(rooms, gameMap)
-        let (exitPosition, items) = setupStartRoomAndExit(rooms, graph, gameMap, player, difficulty)
-        return Level(rooms, corridors, exitPosition, player, items, self.levelNumber, gameMap)
+        let (exitPosition, items, enemies) = setupStartRoomAndExit(rooms, graph, &gameMap, player, difficulty)
+        return Level(rooms, corridors, exitPosition, player, enemies, items, self.levelNumber, gameMap)
     }
     
     static private func generateConnections(_ rooms: [Room],
@@ -42,7 +42,7 @@ public struct LevelBuilder {
         return (corridors, graph)
     }
 
-    static private func setupStartRoomAndExit(_ rooms: [Room], _ graph: Graph, _ gameMap: GameMap, _ player: Player, _ difficulty: GameDifficulty) -> (Position, [Position : ItemProtocol]) {
+    static private func setupStartRoomAndExit(_ rooms: [Room], _ graph: Graph, _ gameMap: inout GameMap, _ player: Player, _ difficulty: GameDifficulty) -> (Position, [Position : ItemProtocol], [Enemy]) {
         var mutableGraph = graph
         let indexStart = Int.random(in: 0..<rooms.count)
         rooms[indexStart].setStartRoom()
@@ -57,15 +57,38 @@ public struct LevelBuilder {
         let exitPosition = GetterPositions.make(in: [rooms[indexEnd]], excluding: occupiedPositions, count: 1, offset: GenerationConstants.exitOffset)
         occupiedPositions = Set(exitPosition)
         
+        let items = generateItems(rooms, &occupiedPositions, player, difficulty)
         
-        let factory = ItemEntityFactory()
-        let items = factory.generate(in: rooms, excluding: occupiedPositions, player: player, level: levelNumber, difficulty: difficulty)
+        let enemies = generateEnemies(rooms, occupiedPositions, player, difficulty, &gameMap)
         
-        occupiedPositions.formUnion(items.keys)
-        
-        return (exitPosition.first!, items)
+        return (exitPosition.first!, items, enemies)
     }
     
+    static private func generateItems(_ rooms: [Room], _ occupiedPositions: inout Set<Position>, _ player: Player, _ difficulty: GameDifficulty) -> [Position : ItemProtocol] {
+        let factory = ItemEntityFactory()
+        let items = factory.generate(in: rooms, excluding: occupiedPositions, player: player, level: levelNumber, difficulty: difficulty)
+        occupiedPositions.formUnion(items.keys)
+        return items
+    }
+    
+    static private func generateEnemies(_ rooms: [Room], _ occupiedPositions: Set<Position>, _ player: Player, _ difficulty: GameDifficulty, _ gameMap: inout GameMap) -> [Enemy] {
+        let factory = EnemyEntityFactory()
+        let enemiesWithPositions = factory.generate(in: rooms, excluding: occupiedPositions, player: player, level: levelNumber, difficulty: difficulty)
+        for position in enemiesWithPositions.keys {
+            gameMap.removePosition(position)
+        }
+        let enemies = recordPosToEnemy(enemiesWithPositions)
+        return enemies
+    }
+    
+    static private func recordPosToEnemy(_ enemies: [Position : Enemy]) -> [Enemy] {
+        return enemies.map { position, enemy in
+            let enemyCopy = enemy
+            enemyCopy.characteristics.position = position
+            return enemyCopy
+        }
+    }
+
     static private func addRoomsCoordToMap(_ rooms: [Room], _ gameMap: GameMap) {
         rooms.forEach { gameMap.addPositions($0.interiorPositions()) }
     }

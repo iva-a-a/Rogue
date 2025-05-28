@@ -6,7 +6,7 @@ public class Level {
     public var rooms: [Room] = []
     public var corridors: [Corridor] = []
     public var player: Player
-//    public var enemies: [Enemy] = []
+    public var enemies: [Enemy] = []
     public var items: [Position: ItemProtocol] = [:]
 
     public let exitPosition: Position
@@ -14,11 +14,12 @@ public class Level {
     
     public var gameMap: GameMap
 
-    public init(_ rooms: [Room], _ corridors: [Corridor], _ exitPosition: Position, _ player: Player, _ items: [Position: ItemProtocol], _ levelNumber: Int, _ gameMap: GameMap) {
+    public init(_ rooms: [Room], _ corridors: [Corridor], _ exitPosition: Position, _ player: Player, _ enemies: [Enemy],_ items: [Position: ItemProtocol], _ levelNumber: Int, _ gameMap: GameMap) {
         self.rooms = rooms
         self.corridors = corridors
         self.exitPosition = exitPosition
         self.player = player
+        self.enemies = enemies
         self.items = items
         self.levelNumber = levelNumber
         self.gameMap = gameMap
@@ -74,6 +75,23 @@ public class Level {
                 symbol = "t"
             }
             grid[position.x][position.y] = symbol
+        }
+
+        for enemy in enemies {
+            let symbol: String
+            switch enemy.type {
+            case .zombie:
+                symbol = "Z"
+            case .vampire:
+                symbol = "V"
+            case .ghost:
+                symbol = "G"
+            case .ogre:
+                symbol = "O"
+            case .snakeMage:
+                symbol = "S"
+            }
+            grid[enemy.characteristics.position.x][enemy.characteristics.position.y] = symbol
         }
 
         grid[player.characteristics.position.x][player.characteristics.position.y] = "P"

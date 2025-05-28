@@ -3,12 +3,11 @@
 //  rogue
 
 class Zombie: Enemy {
-    init() {
-        let characteristics = Characteristics(position: Position(0, 0), maxHealth: 80, health: 80, agility: 3, strength: 12)
+    init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .zombie,
             characteristics: characteristics,
-            hostility: 7,
+            hostility: hostility,
             movementBehavior: RandomMovement(step: 1),
             pursuitBehavior: PursueMovement(),
             attackBehavior: DefaultAttack(),
@@ -18,12 +17,11 @@ class Zombie: Enemy {
 }
 
 class Vampire: Enemy {
-    init() {
-        let characteristics = Characteristics(position: Position(0, 0), maxHealth: 60, health: 60, agility: 15, strength: 10)
+    init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .vampire,
             characteristics: characteristics,
-            hostility: 9,
+            hostility: hostility,
             movementBehavior: RandomMovement(step: 1),
             pursuitBehavior: PursueMovement(),
             attackBehavior: DrainHealthAttack(),
@@ -33,12 +31,11 @@ class Vampire: Enemy {
 }
 
 class Ghost: Enemy {
-    init() {
-        let characteristics = Characteristics(position: Position(0, 0), maxHealth: 40, health: 40, agility: 18, strength: 5)
+    init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .ghost,
             characteristics: characteristics,
-            hostility: 6,
+            hostility: hostility,
             movementBehavior: TeleportMovement(),
             pursuitBehavior: PursueMovement(),
             attackBehavior: DefaultAttack(),
@@ -56,12 +53,11 @@ class Ghost: Enemy {
 class Ogre: Enemy {
     var isResting: Bool = false
     
-    init() {
-        let characteristics = Characteristics(position: Position(0, 0), maxHealth: 120, health: 120, agility: 2, strength: 25)
+    init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .ogre,
             characteristics: characteristics,
-            hostility: 5,
+            hostility: hostility,
             movementBehavior: RandomMovement(step: 2),
             pursuitBehavior: PursueMovement(),
             attackBehavior: DefaultAttack(),
@@ -88,12 +84,11 @@ class Ogre: Enemy {
 }
 
 class SnakeMage: Enemy {
-    init() {
-        let characteristics = Characteristics(position: Position(0, 0), maxHealth: 50, health: 50, agility: 20, strength: 8)
+    init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .snakeMage,
             characteristics: characteristics,
-            hostility: 8,
+            hostility: hostility,
             movementBehavior: DiagonalMovement(),
             pursuitBehavior: PursueMovement(),
             attackBehavior: WithSleepAttack(),
