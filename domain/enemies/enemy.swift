@@ -23,11 +23,10 @@ protocol EnemyProtocol {
 
 }
 
-
 public class Enemy: EnemyProtocol {
 
     var type: EnemyType
-    var characteristics: Characteristics
+    public var characteristics: Characteristics
     var hostility: Int = 0
     var isVisible: Bool = true
     var movementBehavior: any MovementBehavior
@@ -69,5 +68,19 @@ public class Enemy: EnemyProtocol {
     private func shouldPursue(player: Player) -> Bool {
         let distance = abs(characteristics.position.x - player.characteristics.position.x) + abs(characteristics.position.y - player.characteristics.position.y)
         return distance <= hostility / 10 // Радиус преследования зависит от враждебности
+    }
+}
+
+extension Enemy: CombatUnit {
+    public var agility: Int { characteristics.agility }
+    public var strength: Int { characteristics.strength }
+
+    public func receiveDamage(_ damage: Int) {
+        characteristics.health -= damage
+        characteristics.health = max(0, characteristics.health)
+    }
+
+    public var isDead: Bool {
+        characteristics.health <= 0
     }
 }

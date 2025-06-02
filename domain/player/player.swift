@@ -32,8 +32,36 @@ public class Player {
     public func pickUpItem(_ item: any ItemProtocol) -> AddingCode {
         return item.pickUp(self)
     }
+    
+    @discardableResult
+    public func dropWeapon() -> Weapon? {
+        defer { self.weapon = nil }
+        return self.weapon
+    }
 
     public func updateBuffs() {
         buffManager.update(player: self)
+    }
+    
+    public func attack(_ target: Enemy) -> AttackResult {
+        return CombatSystem.performAttack(from: self, to: target)
+    }
+}
+
+extension Player: CombatUnit {
+    public var agility: Int { characteristics.agility }
+    public var strength: Int { characteristics.strength }
+
+    public var weaponDamage: Int? {
+        weapon?.weaponType.baseDamage
+    }
+
+    public func receiveDamage(_ damage: Int) {
+        characteristics.health -= damage
+        characteristics.health = max(0, characteristics.health)
+    }
+
+    public var isDead: Bool {
+        characteristics.health <= 0
     }
 }
