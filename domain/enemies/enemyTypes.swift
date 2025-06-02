@@ -66,7 +66,8 @@ class Ogre: Enemy {
     }
 
     override func move(level: Level) {
-        guard !isResting else {
+        if isResting {
+            isResting = false
             // eсли отдыхает - остаемся на месте
             return
         }
