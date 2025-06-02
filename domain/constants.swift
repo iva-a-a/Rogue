@@ -14,11 +14,11 @@ enum Constants {
     }
 
     enum Room {
-        static let minWidth: Int = 6
-        static let minHeight: Int = 5
+        static let minWidth: Int = 7
+        static let minHeight: Int = 6
 
-        static let maxWidth: Int = 10
-        static let maxHeight: Int = 7
+        static let maxWidth: Int = 12
+        static let maxHeight: Int = 9
     }
 
     enum Graph {
