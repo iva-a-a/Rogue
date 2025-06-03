@@ -3,8 +3,8 @@
 //  rogue
 
 public struct Position: Hashable, Equatable{
-    let x: Int
-    let y: Int
+    public let x: Int
+    public let y: Int
 
     init(_ x: Int, _ y: Int) {
         self.x = x

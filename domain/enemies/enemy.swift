@@ -16,8 +16,8 @@ protocol EnemyProtocol {
     var pursuitBehavior: MovementBehavior { get }
     var attackBehavior: AttackBehavior { get }
 
-    func attack(player: Player) -> AttackResult
-    func move(level: Level)
+    func attack(_ player: Player) -> AttackResult
+    func move(_ level: Level)
 
     var indexRoom: Int { get set }
 
@@ -44,7 +44,7 @@ public class Enemy: EnemyProtocol {
         self.indexRoom = indexRoom
     }
 
-    func move(level: Level) {
+    public func move(_ level: Level) {
         var pos: Position?
         if shouldPursue(player: level.player) {
             pos = self.pursuitBehavior.move(from: characteristics.position, toward: level.player.characteristics.position, in: level.rooms[indexRoom], in: level.gameMap)
@@ -60,7 +60,7 @@ public class Enemy: EnemyProtocol {
         }
     }
 
-    func attack(player: Player) -> AttackResult {
+    public func attack(_ player: Player) -> AttackResult {
         isVisible = true
         return attackBehavior.attack(attacker: self, player: player)
     }

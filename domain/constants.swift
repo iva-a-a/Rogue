@@ -31,4 +31,8 @@ enum Constants {
     enum Item {
         static let maxCount: Int = 9
     }
+    
+    enum Level {
+        static let max: Int = 21
+    }
 }

@@ -5,6 +5,7 @@
 import Foundation
 
 public class Player {
+    
     public var characteristics: Characteristics
     public var backpack: Backpack
     public var weapon: Weapon?
@@ -45,6 +46,14 @@ public class Player {
     
     public func attack(_ target: Enemy) -> AttackResult {
         return CombatSystem.performAttack(from: self, to: target)
+    }
+    
+    public func move(to position: Position, in gameMap: GameMap) {
+        if !gameMap.isWalkable(position) {
+            return
+        }
+        gameMap.rewrite(from: characteristics.position, to: position)
+        characteristics.position = position
     }
 }
 

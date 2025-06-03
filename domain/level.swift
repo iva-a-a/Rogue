@@ -24,6 +24,102 @@ public class Level {
         self.levelNumber = levelNumber
         self.gameMap = gameMap
     }
+    
+    public func defeatEnemy(_ enemy: Enemy) {
+        if enemy.isDead {
+            enemies.removeAll { $0 === enemy }
+        }
+        // сделать выпадение сокровищ
+    }
+    
+    public func deleteItem(at: Position) {
+        items[at] = nil
+    }
+    
+    func dropWeapon() {
+        let neighborPositions = findFreeNeighbor(around: player.characteristics.position)
+        if neighborPositions == nil { return }
+        let weapon = player.dropWeapon()
+
+        self.items[neighborPositions!] = weapon
+
+    }
+    
+    private func findFreeNeighbor(around pos: Position) -> Position? {
+        let neighbors = [
+            Position(pos.x, pos.y - 1),
+            Position(pos.x, pos.y + 1),
+            Position(pos.x - 1, pos.y),
+            Position(pos.x + 1, pos.y)
+        ].filter { gameMap.isWalkable($0) && items[$0] == nil }
+
+        return neighbors.randomElement()
+    }
+
+    public func playerTurn(_ dx: Int, _ dy: Int) {
+        guard player.isAsleep == false else {
+            player.isAsleep = false
+            return
+        }
+        let position = shiftToPosition(dx, dy)
+        if let indexEnemy = enemies.firstIndex(where: { $0.characteristics.position == position }) {
+            let result = player.attack(enemies[indexEnemy])
+            switch result {
+            case .miss: break
+                // можно добавить логгер для событий
+            case .hit(let damage):
+                enemies[indexEnemy].receiveDamage(damage)
+                defeatEnemy(enemies[indexEnemy])
+            }
+            return
+        }
+        player.move(to: position, in: gameMap)
+        if let item = items[position] {
+            let result = player.pickUpItem(item)
+            switch result {
+                case .success: deleteItem(at: position)
+                case .isFull: break //
+            }
+        }
+    }
+    
+    
+    public func enemiesTurn() {
+        for enemy in enemies {
+            let distance = abs(enemy.characteristics.position.x - player.characteristics.position.x) +
+                         abs(enemy.characteristics.position.y - player.characteristics.position.y)
+            if distance == 1 {
+                let result = enemy.attack(player)
+                switch result {
+                case .miss: break //
+                case .hit(let damage):
+                    player.receiveDamage(damage)
+                }
+            } else {
+                enemy.move(self)
+            }
+        }
+    }
+    
+    public func isWin() -> Bool {
+        return player.characteristics.position == exitPosition && levelNumber == Constants.Level.max
+    }
+    
+    public func isLose() -> Bool {
+        return player.isDead
+    }
+    
+    public func isLevelFinished() -> Bool {
+        return player.characteristics.position == exitPosition && levelNumber < Constants.Level.max
+    }
+    
+    public func getItemsList(_ category: ItemCategory) -> [ItemProtocol] {
+        return player.backpack.items[category] ?? []
+    }
+    
+    private func shiftToPosition(_ dx: Int, _ dy: Int) -> Position {
+        return Position(player.characteristics.position.x + dx, player.characteristics.position.y + dy)
+    }
 
     public func draw() {
         var grid = Array(repeating: Array(repeating: " ", count: Constants.Map.width), count: Constants.Map.height)
@@ -72,7 +168,7 @@ public class Level {
             case .elixir:
                 symbol = "e"
             case .treasure:
-                symbol = "t"
+                symbol = "*"
             }
             grid[position.x][position.y] = symbol
         }
