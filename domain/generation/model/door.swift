@@ -15,9 +15,9 @@ public enum Direction: CaseIterable {
     }
 }
 
-struct Door {
-    let position: Position
-    let direction: Direction
+public struct Door {
+    public let position: Position
+    public let direction: Direction
 
     init(_ position: Position, _ direction: Direction) {
         self.position = position

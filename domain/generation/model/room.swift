@@ -31,12 +31,12 @@ public enum Sector: Int, CaseIterable {
 }
 
 public class Room {
-    let topRight: Position
-    let lowLeft: Position
+    public let topRight: Position
+    public let lowLeft: Position
 
-    var doors: [Door] = []
+    public var doors: [Door] = []
 
-    var isStartRoom: Bool = false
+    public var isStartRoom: Bool = false
 
     init(_ topRight: Position, _ lowLeft: Position, _ sector: Sector) {
         self.topRight = topRight

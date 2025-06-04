@@ -3,9 +3,9 @@
 //  rogue
 
 public class Corridor {
-    var route: [Position] = []
+    public var route: [Position] = []
 
-    init(from: Position, to: Position) {
+    public init(from: Position, to: Position) {
         generateZShaped(from, to)
         addEndPoint(to)
     }
