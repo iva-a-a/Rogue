@@ -16,7 +16,7 @@ public enum PlayerAction {
 }
 
 public struct InputHandler {
-    static func getAction() -> PlayerAction {
+    public static func getAction() -> PlayerAction {
         let key = getch()
 
         switch key {
