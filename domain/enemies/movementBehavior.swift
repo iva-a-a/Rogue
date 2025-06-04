@@ -4,18 +4,18 @@
 
 import Foundation
 
-enum DiagonalDirection {
+public enum DiagonalDirection {
     case topLeftBottomRight
     case topRightBottomLeft
 
-    var opposite: DiagonalDirection {
+    public var opposite: DiagonalDirection {
         switch self {
         case .topLeftBottomRight: return .topRightBottomLeft
         case .topRightBottomLeft: return .topLeftBottomRight
         }
     }
 
-    var moves: Position {
+    public var moves: Position {
         switch self {
         case .topLeftBottomRight: return Position(1, 1)
         case .topRightBottomLeft: return Position(-1, 1)
@@ -27,14 +27,14 @@ public protocol MovementBehavior {
     func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position?
 }
 
-struct RandomMovement: MovementBehavior {
-    var step: Int
+public struct RandomMovement: MovementBehavior {
+    public var step: Int
     
-    init(step: Int = 1) {
+    public init(step: Int = 1) {
         self.step = step
     }
     
-    func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position? {
+    public func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position? {
         var attempts = 10
         while attempts > 0 {
             let directions = [(-step,0), (step,0), (0,-step), (0,step)]
@@ -49,8 +49,10 @@ struct RandomMovement: MovementBehavior {
     }
 }
 
-struct PursueMovement: MovementBehavior {
-    func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position? {
+public struct PursueMovement: MovementBehavior {
+    public init() {}
+
+    public func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position? {
         if let path = findPath(from: position, to: playerPosition, in: gameMap), path.count > 1 {
             return path[1]
         }
@@ -83,10 +85,12 @@ struct PursueMovement: MovementBehavior {
 }
 
 // движение по диагонали
-class DiagonalMovement: MovementBehavior {
+public class DiagonalMovement: MovementBehavior {
     private var direction: DiagonalDirection = .topLeftBottomRight
 
-    func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position? {
+    public init() {}
+
+    public func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position? {
         let moves = direction.moves
         let newPosition = Position(position.x + moves.x, position.y + moves.y)
 
@@ -103,8 +107,10 @@ class DiagonalMovement: MovementBehavior {
 }
 
 // рандомный телепорт 
-struct TeleportMovement: MovementBehavior {
-    func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position? {
+public struct TeleportMovement: MovementBehavior {
+    public init() {}
+
+    public func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position? {
         // Пытаемся найти валидную позицию за заданное число попыток
         var attempts = 10
         while attempts > 0 {
