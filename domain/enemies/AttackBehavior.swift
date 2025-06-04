@@ -3,7 +3,7 @@ public enum AttackResult {
     case hit(damage: Int)
 }
 
-protocol AttackBehavior {
+public protocol AttackBehavior {
     func attack(attacker: Enemy, player: Player) -> AttackResult
 }
 
