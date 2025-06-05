@@ -17,6 +17,7 @@ public struct Food: ItemProtocol {
 
     public func use(_ player: Player) {
         player.characteristics.health = min(player.characteristics.health + foodType.healthRestore, player.characteristics.maxHealth)
+        GameEventManager.shared.notify(.eatFood(food: foodType.name, amount: foodType.healthRestore))
     }
 }
 
@@ -43,6 +44,7 @@ public struct Scroll: ItemProtocol {
             case .strength:
                 player.characteristics.strength += value
         }
+        GameEventManager.shared.notify(.readScroll(scroll: scrollType.name, amount: value))
     }
 }
 
@@ -65,6 +67,7 @@ public struct Elixir: ItemProtocol {
         case .strength:
             player.characteristics.strength += effect
         }
+        GameEventManager.shared.notify(.drinkElixir(elixir: elixirType.name, duration: Int(duration)))
     }
 }
 
@@ -83,6 +86,7 @@ public struct Treasure: ItemProtocol {
 
     public func pickUp(_ player: Player) -> AddingCode {
         self.use(player)
+        GameEventManager.shared.notify(.pickUpTreasure(treasure: treasureType.name, amount: value))
         return .success
     }
 }
@@ -95,6 +99,7 @@ public struct Weapon: ItemProtocol {
     public func use(_ player: Player) {
         let currentWeapon = player.weapon
         player.weapon = self
+        GameEventManager.shared.notify(.useWeapon(weapon: weaponType.name, damage: weaponType.baseDamage))
         if var weapons = player.backpack.items[self.type.category],
            let index = weapons.firstIndex(where: { item in
                if case let .weapon(type) = item.type {

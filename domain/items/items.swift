@@ -20,6 +20,16 @@ public enum ItemType: Hashable, Equatable {
         case .treasure: return .treasure
         }
     }
+    
+    var name: String {
+        switch self {
+        case .food(let food): return food.name
+        case .weapon(let weapon): return weapon.name
+        case .scroll(let scroll): return scroll.name
+        case .elixir(let elixir): return elixir.name
+        case .treasure(let treasure): return treasure.name
+        }
+    }
 }
 
 public enum FoodType: Hashable, Equatable {
@@ -30,6 +40,14 @@ public enum FoodType: Hashable, Equatable {
         case .apple: return 10
         case .bread: return 20
         case .meat: return 30
+        }
+    }
+    
+    var name: String {
+        switch self {
+        case .apple: return "Apple"
+        case .bread: return "Bread"
+        case .meat: return "Meat"
         }
     }
 }
@@ -44,6 +62,14 @@ public enum ElixirType: Hashable, Equatable {
         case .strength: return 10
         }
     }
+
+    var name: String {
+        switch self {
+        case .health: return "Health Elixir"
+        case .agility: return "Agility Elixir"
+        case .strength: return "Strength Elixir"
+        }
+    }
 }
 
 public enum ScrollType: Hashable, Equatable {
@@ -54,6 +80,14 @@ public enum ScrollType: Hashable, Equatable {
         case .health: return Int.random(in: 5...10)
         case .agility: return Int.random(in: 3...5)
         case .strength: return Int.random(in: 5...8)
+        }
+    }
+    
+    var name: String {
+        switch self {
+        case .health: return "Health Scroll"
+        case .agility: return "Agility Scroll"
+        case .strength: return "Strength Scroll"
         }
     }
 }
@@ -69,6 +103,15 @@ public enum WeaponType: Hashable, Equatable {
         case .staff: return Int.random(in: 7...11)
         }
     }
+    
+    var name: String {
+        switch self {
+        case .sword: return "Sword"
+        case .bow: return "Bow"
+        case .dagger: return "Dagger"
+        case .staff: return "Staff"
+        }
+    }
 }
 
 public enum TreasureType: Hashable, Equatable {
@@ -79,6 +122,14 @@ public enum TreasureType: Hashable, Equatable {
         case .gold: return 10
         case .gem: return 50
         case .artifact: return 100
+        }
+    }
+    
+    var name: String {
+        switch self {
+        case .gold: return "Gold"
+        case .gem: return "Gem"
+        case .artifact: return "Artifact"
         }
     }
 }

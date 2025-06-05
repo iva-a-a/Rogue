@@ -40,6 +40,7 @@ class WithSleepAttack: DefaultAttack {
         let result = super.attack(attacker: attacker, player: player)
         if case .hit = result, Int.random(in: 1...100) <= 30 {
             player.isAsleep = true
+            GameEventManager.shared.notify(.playerSleep)
         }
         return result
     }

@@ -23,26 +23,57 @@ public class Level {
         self.items = items
         self.levelNumber = levelNumber
         self.gameMap = gameMap
+        GameEventManager.shared.addObserver(GameLogger.shared)
     }
     
     public func defeatEnemy(_ enemy: Enemy) {
-        if enemy.isDead {
-            enemies.removeAll { $0 === enemy }
+        if enemy.isDead, let index = enemies.firstIndex(where: { $0 === enemy }) {
+            GameEventManager.shared.notify(.enemyDefeated(enemy: enemy.type.name))
+            gameMap.addPosition(enemy.characteristics.position)
+            let treasureCount = Self.calculateTreasureCount(for: enemy)
+            
+            var positionsTried: Set<Position> = []
+            var dropped = 0
+            
+            var attempts = 0
+            let maxAttempts = 10
+            while dropped < treasureCount, attempts < maxAttempts {
+                let dropPosition = GetterPositions.randomPositionOnRoom(in: rooms[enemy.indexRoom], offset: 1)
+                positionsTried.insert(dropPosition)
+                if items[dropPosition] == nil {
+                    let treasure = TreasureFactory().createItem(for: .normal, player: player, level: levelNumber)
+                    items[dropPosition] = treasure
+                    dropped += 1
+                }
+                attempts += 1
+            }
+            enemies.remove(at: index)
         }
-        // сделать выпадение сокровищ
     }
-    
+
     public func deleteItem(at: Position) {
-        items[at] = nil
+        items.removeValue(forKey: at)
     }
     
     func dropWeapon() {
         let neighborPositions = findFreeNeighbor(around: player.characteristics.position)
         if neighborPositions == nil { return }
+        GameEventManager.shared.notify(.weaponDropped(weapon: player.weapon!.type.name))
         let weapon = player.dropWeapon()
-
         self.items[neighborPositions!] = weapon
+    }
+    
+    private static func calculateTreasureCount(for enemy: Enemy) -> Int {
+        let hostilityFactor = Double(enemy.hostility) * 0.3
+        let strengthFactor = Double(enemy.strength) * 0.25
+        let agilityFactor = Double(enemy.agility) * 0.2
+        let healthFactor = Double(enemy.characteristics.health) * 0.15
 
+        let base = hostilityFactor + strengthFactor + agilityFactor + healthFactor
+        let scaled = base / 10.0 // нормализация
+        let randomFactor = Double.random(in: 0.8...1.2)
+
+        return max(1, Int((scaled * randomFactor).rounded()))
     }
     
     private func findFreeNeighbor(around pos: Position) -> Position? {
@@ -59,26 +90,32 @@ public class Level {
     public func playerTurn(_ dx: Int, _ dy: Int) {
         guard player.isAsleep == false else {
             player.isAsleep = false
+            GameEventManager.shared.notify(.playerSkipMove)
             return
         }
         let position = shiftToPosition(dx, dy)
         if let indexEnemy = enemies.firstIndex(where: { $0.characteristics.position == position }) {
             let result = player.attack(enemies[indexEnemy])
             switch result {
-            case .miss: break
-                // можно добавить логгер для событий
+            case .miss:
+                GameEventManager.shared.notify(.playerMissed(target: enemies[indexEnemy].type.name))
             case .hit(let damage):
                 enemies[indexEnemy].receiveDamage(damage)
+                GameEventManager.shared.notify(.playerHit(target: enemies[indexEnemy].type.name, damage: damage))
                 defeatEnemy(enemies[indexEnemy])
             }
             return
         }
         player.move(to: position, in: gameMap)
+        GameEventManager.shared.notify(.playerMoved(to: position))
         if let item = items[position] {
             let result = player.pickUpItem(item)
             switch result {
-                case .success: deleteItem(at: position)
-                case .isFull: break //
+                case .success:
+                    GameEventManager.shared.notify(.itemPickedUp(item: item.type.name))
+                    deleteItem(at: position)
+                case .isFull:
+                    GameEventManager.shared.notify(.NotPickedUp)
             }
         }
     }
@@ -91,8 +128,10 @@ public class Level {
             if distance == 1 {
                 let result = enemy.attack(player)
                 switch result {
-                case .miss: break //
+                case .miss:
+                    GameEventManager.shared.notify(.enemyMissed(enemy: enemy.type.name))
                 case .hit(let damage):
+                    GameEventManager.shared.notify(.enemyHit(enemy: enemy.type.name, damage: damage))
                     player.receiveDamage(damage)
                 }
             } else {
@@ -121,6 +160,7 @@ public class Level {
         return Position(player.characteristics.position.x + dx, player.characteristics.position.y + dy)
     }
 
+    // для проверки, убрать позже
     public func draw() {
         var grid = Array(repeating: Array(repeating: " ", count: Constants.Map.width), count: Constants.Map.height)
 

@@ -65,7 +65,8 @@ public class Controller {
         // если из сохранки делаем стейт на плей
     }
     
-    private func generateLevel() {
+    // переделать на приватный
+    public func generateLevel() {
         // нужно получать сложность для игрока!!!
         self.level = LevelBuilder.buildLevel()
         state = .playing

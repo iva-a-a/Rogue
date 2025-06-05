@@ -4,6 +4,16 @@
 
 enum EnemyType {
     case zombie, vampire, ghost, ogre, snakeMage
+    
+    var name: String {
+        switch self {
+        case .zombie: return "Zombie"
+        case .vampire: return "Vampire"
+        case .ghost: return "Ghost"
+        case .ogre: return "Ogre"
+        case .snakeMage: return "Snake-Mage"
+        }
+    }
 }
 
 protocol EnemyProtocol {

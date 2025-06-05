@@ -150,9 +150,15 @@ public final class WeaponFactory: ItemFactory {
     }
 }
 
-// дописать в зависимости от уровня
 public final class TreasureFactory: ItemFactory {
     public func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
-        return Treasure(treasureType: .gold)
+        let type: TreasureType = {
+            switch level {
+                case 0..<5: return .gold
+                case 5..<10: return [.gold, .gem].randomElement()!
+                default: return [.gold, .gem, .artifact].randomElement()!
+            }
+        }()
+        return Treasure(treasureType: type)
     }
 }

@@ -1,5 +1,5 @@
 import Foundation
-import domain
+import controller
 
-let level = LevelBuilder.buildLevel()
-level.draw()
+let controller = Controller()
+controller.generateLevel()
