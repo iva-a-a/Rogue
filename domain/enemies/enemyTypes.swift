@@ -97,3 +97,17 @@ class SnakeMage: Enemy {
         )
     }
 }
+
+class Mimic: Enemy {
+    init(characteristics: Characteristics, hostility: Int) {
+        super.init(
+            type: .mimic,
+            characteristics: characteristics,
+            hostility: hostility,
+            movementBehavior: RandomMovement(step: 0),
+            pursuitBehavior: PursueMovement(),
+            attackBehavior: DefaultAttack(),
+            indexRoom: 9
+        )
+    }
+}

@@ -36,6 +36,8 @@ public final class EnemyEntityFactory: EntityFactory {
                 baseStats = (maxHealth: 120, health: 120, agility: 2, strength: 25, hostility: 5)
             case .snakeMage:
                 baseStats = (maxHealth: 50, health: 50, agility: 20, strength: 8, hostility: 8)
+            case .mimic:
+                baseStats = (maxHealth: 40, health: 40, agility: 25, strength: 8, hostility: 3)
         }
         return baseStats
     }
@@ -68,9 +70,10 @@ public final class EnemyEntityFactory: EntityFactory {
         return [
             .zombie: 0.4,
             .vampire: 0.25,
-            .ghost: 0.2,
+            .ghost: 0.17,
             .ogre: 0.1,
-            .snakeMage: 0.05
+            .snakeMage: 0.05,
+            .mimic: 0.03
         ]
     }
     
@@ -89,6 +92,7 @@ public final class EnemyEntityFactory: EntityFactory {
         probabilities[.ghost]? += levelFactor * 0.6
         probabilities[.ogre]? += levelFactor * 0.7
         probabilities[.snakeMage]? += levelFactor * 0.8
+        probabilities[.mimic]? += levelFactor * 0.3
     }
     
     private static func adjustProbabilitiesByDifficulty(_ probabilities: inout [EnemyType: Double], difficulty: GameDifficulty) {
@@ -97,11 +101,13 @@ public final class EnemyEntityFactory: EntityFactory {
                 probabilities[.zombie]? *= 1.3
                 probabilities[.ogre]? *= 0.5
                 probabilities[.snakeMage]? *= 0.3
+                probabilities[.mimic]? *= 0.3
             case .normal: break
             case .hard:
                 probabilities[.zombie]? *= 0.7
                 probabilities[.ogre]? *= 1.5
                 probabilities[.snakeMage]? *= 2.0
+                probabilities[.mimic]? *= 1.5
         }
     }
     
@@ -143,6 +149,7 @@ public final class EnemyEntityFactory: EntityFactory {
             case .ghost: return Ghost(characteristics: characteristics, hostility: baseStats.hostility)
             case .ogre: return Ogre(characteristics: characteristics, hostility: baseStats.hostility)
             case .snakeMage: return SnakeMage(characteristics: characteristics, hostility: baseStats.hostility)
+            case .mimic: return Mimic(characteristics: characteristics, hostility: baseStats.hostility)
         }
     }
 }

@@ -3,7 +3,7 @@
 //  rogue
 
 enum EnemyType {
-    case zombie, vampire, ghost, ogre, snakeMage
+    case zombie, vampire, ghost, ogre, snakeMage, mimic
     
     var name: String {
         switch self {
@@ -12,6 +12,7 @@ enum EnemyType {
         case .ghost: return "Ghost"
         case .ogre: return "Ogre"
         case .snakeMage: return "Snake-Mage"
+        case .mimic: return "Mimic"
         }
     }
 }

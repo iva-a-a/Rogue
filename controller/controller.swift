@@ -69,6 +69,7 @@ public class Controller {
     public func generateLevel() {
         // нужно получать сложность для игрока!!!
         self.level = LevelBuilder.buildLevel()
+        level?.draw()
         state = .playing
     }
 

@@ -226,6 +226,8 @@ public class Level {
                 symbol = "O"
             case .snakeMage:
                 symbol = "S"
+            case .mimic:
+                symbol = "M"
             }
             grid[enemy.characteristics.position.x][enemy.characteristics.position.y] = symbol
         }
