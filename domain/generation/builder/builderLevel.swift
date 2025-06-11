@@ -49,7 +49,7 @@ public struct LevelBuilder {
         let startPosition = GetterPositions.randomPositionOnRoom(in: rooms[indexStart], offset: Constants.doorOffset)
 
         player.characteristics.position = startPosition
-        gameMap.removePosition(startPosition)
+        // gameMap.removePosition(startPosition)
         
         
         var occupiedPositions: Set<Position> = []
@@ -74,9 +74,9 @@ public struct LevelBuilder {
     static private func generateEnemies(_ rooms: [Room], _ occupiedPositions: Set<Position>, _ player: Player, _ difficulty: GameDifficulty, _ gameMap: inout GameMap) -> [Enemy] {
         let factory = EnemyEntityFactory()
         let enemiesWithPositions = factory.generate(in: rooms, excluding: occupiedPositions, player: player, level: levelNumber, difficulty: difficulty)
-        for position in enemiesWithPositions.keys {
-            gameMap.removePosition(position)
-        }
+        // for position in enemiesWithPositions.keys {
+        //     gameMap.removePosition(position)
+        // }
         let enemies = recordPosToEnemy(enemiesWithPositions)
         return enemies
     }
@@ -90,15 +90,15 @@ public struct LevelBuilder {
     }
 
     static private func addRoomsCoordToMap(_ rooms: [Room], _ gameMap: GameMap) {
-        rooms.forEach { gameMap.addPositions($0.interiorPositions()) }
+        rooms.forEach { gameMap.addWalkablePositions($0.interiorPositions()) }
     }
     
     static private func addCoridorsCoordToMap(_ corridors: [Corridor], _ gameMap: GameMap) {
-        corridors.forEach { gameMap.addPositions($0.route) }
+        corridors.forEach { gameMap.addWalkablePositions($0.route) }
     }
     
     static private func addDooorsCoordToMap(_ rooms: [Room], _ gameMap: GameMap) {
-        rooms.flatMap { $0.doors }.forEach { gameMap.addPosition($0.position) }
+        rooms.flatMap { $0.doors }.forEach { gameMap.addWalkablePosition($0.position) }
     }
 }
 
