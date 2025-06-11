@@ -52,7 +52,7 @@ public class Player {
         if !gameMap.isWalkable(position) {
             return
         }
-        gameMap.rewrite(from: characteristics.position, to: position)
+        // gameMap.rewrite(from: characteristics.position, to: position)
         characteristics.position = position
     }
 }
