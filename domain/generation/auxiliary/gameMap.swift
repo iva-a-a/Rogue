@@ -27,8 +27,8 @@ public class GameMap {
     }
     
     public func rewrite(from oldPosition: Position, to newPosition: Position) {
-        self.removePosition(oldPosition)
-        self.addPosition(newPosition)
+        self.addPosition(oldPosition)
+        self.removePosition(newPosition)
     }
 
     
