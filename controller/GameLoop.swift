@@ -35,7 +35,7 @@ public final class GameLoop {
                 let newPos = Position(newX, newY)
 
                 if level.gameMap.isWalkable(newPos) {
-                    // level.gameMap.rewrite(from: level.player.characteristics.position, to: newPos)
+                    level.gameMap.rewrite(from: level.player.characteristics.position, to: newPos)
                     level.player.characteristics.position = newPos
                 }
 
