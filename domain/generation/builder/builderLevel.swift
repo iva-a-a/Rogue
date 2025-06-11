@@ -78,6 +78,10 @@ public struct LevelBuilder {
         //     gameMap.removePosition(position)
         // }
         let enemies = recordPosToEnemy(enemiesWithPositions)
+        for enemy in enemies {
+            gameMap.rewrite(from: enemy.characteristics.position, to: enemy.characteristics.position)
+        }
+
         return enemies
     }
     
