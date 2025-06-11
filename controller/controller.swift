@@ -71,6 +71,8 @@ public class Controller {
         self.level = LevelBuilder.buildLevel()
         level?.draw()
         state = .playing
+        level?.playerTurn(0, 1)
+        level?.draw()
     }
 
     private func gameLoop(_ input: PlayerAction) {
