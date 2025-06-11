@@ -26,10 +26,10 @@ public class GameMap {
         return walkablePositions.contains(position)
     }
     
-    public func rewrite(from oldPosition: Position, to newPosition: Position) {
-        self.removePosition(oldPosition)
-        self.addPosition(newPosition)
-    }
+    // public func rewrite(from oldPosition: Position, to newPosition: Position) {
+    //     self.removePosition(oldPosition)
+    //     self.addPosition(newPosition)
+    // }
 
     
     public func printMap() {
