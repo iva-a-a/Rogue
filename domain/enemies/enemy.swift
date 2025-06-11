@@ -63,7 +63,7 @@ public class Enemy: EnemyProtocol {
         if pos == nil {
           pos = self.movementBehavior.move(from: characteristics.position, toward: level.player.characteristics.position, in: level.rooms[indexRoom], in: level.gameMap)
         }
-        level.gameMap.rewrite(from: characteristics.position, to: pos!)
+        // level.gameMap.rewrite(from: characteristics.position, to: pos!)
         characteristics.position = pos!
         if let newRoomIndex = level.rooms.firstIndex(where: { $0.isInsideRoom(pos!) }), newRoomIndex != indexRoom {
             indexRoom = newRoomIndex
