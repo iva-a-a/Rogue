@@ -12,6 +12,8 @@ public class Player {
     public var isAsleep: Bool = false
     public var buffManager: BuffManager
 
+    
+
     public init(characteristics: Characteristics, backpack: Backpack, weapon: Weapon?, buffManager: BuffManager) {
         self.characteristics = characteristics
         self.backpack = backpack
@@ -52,7 +54,7 @@ public class Player {
         if !gameMap.isWalkable(position) {
             return
         }
-        // gameMap.rewrite(from: characteristics.position, to: position)
+        gameMap.rewrite(from: characteristics.position, to: position)
         characteristics.position = position
     }
 }
