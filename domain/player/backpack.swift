@@ -35,4 +35,7 @@ public class Backpack {
         }
         return .isFull
     }
+    public func getAllItems() -> [any ItemProtocol] {
+        return items.flatMap { $0.value } 
+    }
 }
