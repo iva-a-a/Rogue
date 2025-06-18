@@ -6,23 +6,30 @@ public struct LevelBuilder {
     
     static private var levelNumber: Int = 0
     
-    static public func buildLevel(roomGenerator: RoomGeneratorProtocol = RoomGenerator(), corridorsGenerator: CorridorsGeneratorProtocol = CorridorsGenerator(), difficulty: GameDifficulty = .normal) -> Level {
+    static public func buildLevel(
+        roomBuilder: RoomBuilderProtocol = RoomBuilder(),
+        corridorsBuilder: CorridorsBuilderProtocol = CorridorsBuilder(),
+        difficulty: GameDifficulty = .normal
+    ) -> Level {
+
         levelNumber += 1
-        let rooms = roomGenerator.generateRooms()
+        KeyFactory.usedColors = []
+        let rooms = roomBuilder.buildRooms()
         var gameMap = GameMap()
         let player = Player()
         addRoomsCoordToMap(rooms, gameMap)
-        let (corridors, graph) = generateConnections(rooms, corridorsGenerator)
+        let (corridors, graph) = buildCorridors(rooms, corridorsBuilder)
         addCoridorsCoordToMap(corridors, gameMap)
-        corridorsGenerator.removeUnusedDoors(rooms, corridors)
+        corridorsBuilder.removeUnusedDoors(rooms, corridors)
         addDooorsCoordToMap(rooms, gameMap)
-        let (exitPosition, items, enemies) = setupStartRoomAndExit(rooms, graph, &gameMap, player, difficulty)
+        let (exitPosition, items, enemies) = buildContent(rooms, graph, &gameMap, player, difficulty)
         return Level(rooms, corridors, exitPosition, player, enemies, items, self.levelNumber, gameMap)
     }
     
-    static private func generateConnections(_ rooms: [Room],
-                                            _ generator: CorridorsGeneratorProtocol) -> ([Corridor], Graph) {
-        var (graph, newCorridors) = generator.generateRandomCorridors(rooms: rooms)
+    static private func buildCorridors(_ rooms: [Room],
+                                       _ generator: CorridorsBuilderProtocol
+    ) -> ([Corridor], Graph) {
+        var (graph, newCorridors) = generator.buildRandomCorridors(rooms: rooms)
         var corridors = newCorridors
         graph.dfs(from: 0)
         while let disconnectedRoomIndex = graph.connectivity.firstIndex(where: { $0 == false }) {
@@ -31,7 +38,7 @@ public struct LevelBuilder {
             if generator.isVerticalAvailable(roomToConnect, disconnectedRoomIndex) {
                 direction =  Direction.down
             }
-            generator.generateMissingDoors(rooms, roomToConnect, disconnectedRoomIndex, direction)
+            generator.buildMissingDoors(rooms, roomToConnect, disconnectedRoomIndex, direction)
             if let cor = generator.connectTwoRooms(rooms[roomToConnect], rooms[disconnectedRoomIndex], direction) {
                 corridors.append(cor)
                 graph.addConnection(from: roomToConnect, to: disconnectedRoomIndex)
@@ -42,51 +49,91 @@ public struct LevelBuilder {
         return (corridors, graph)
     }
 
-    static private func setupStartRoomAndExit(_ rooms: [Room], _ graph: Graph, _ gameMap: inout GameMap, _ player: Player, _ difficulty: GameDifficulty) -> (Position, [Position : ItemProtocol], [Enemy]) {
-        var mutableGraph = graph
-        let indexStart = Int.random(in: 0..<rooms.count)
-        rooms[indexStart].setStartRoom()
-        let startPosition = GetterPositions.randomPositionOnRoom(in: rooms[indexStart], offset: Constants.doorOffset)
-
-        player.characteristics.position = startPosition
-        gameMap.removePosition(startPosition)
-        
+    static private func buildContent(_ rooms: [Room],
+                                              _ graph: Graph,
+                                              _ gameMap: inout GameMap,
+                                              _ player: Player,
+                                              _ difficulty: GameDifficulty
+    ) -> (Position, [Position : ItemProtocol], [Enemy]) {
         
         var occupiedPositions: Set<Position> = []
-        let indexEnd = mutableGraph.bfs(from: indexStart) ?? (0..<rooms.count).filter { $0 != indexStart }.randomElement()!
-        let exitPosition = GetterPositions.make(in: [rooms[indexEnd]], excluding: occupiedPositions, count: 1, offset: GenerationConstants.exitOffset)
-        occupiedPositions = Set(exitPosition)
         
-        let items = generateItems(rooms, &occupiedPositions, player, difficulty)
+        let (indexStart, _) = buildStart(rooms, &gameMap, player, &occupiedPositions)
+
+        let exitPosition = buildExit(rooms, graph, indexStart, &occupiedPositions)
+
+        let (items, enemies) = buildEntities(rooms, indexStart, player, difficulty,
+                                             graph, &occupiedPositions, levelNumber, &gameMap)
         
-        let enemies = generateEnemies(rooms, occupiedPositions, player, difficulty, &gameMap)
+        return (exitPosition, items, enemies)
+    }
+
+    static private func buildEntities(
+        _ rooms: [Room],
+        _ startRoomIndex: Int,
+        _ player: Player,
+        _ difficulty: GameDifficulty,
+        _ graph: Graph,
+        _ occupiedPositions: inout Set<Position>,
+        _ levelNumber: Int,
+        _ gameMap: inout GameMap
+    ) -> (items: [Position: ItemProtocol], enemies: [Enemy]) {
         
-        return (exitPosition.first!, items, enemies)
+        let entityBuilder: EntityBuilderProtocol = EntityBuilder()
+        
+        let keys = entityBuilder.generateColorDoorsKeys(in: rooms, startRoomIndex: startRoomIndex, player: player,
+                                                        difficulty: difficulty,graph: graph, excluding: &occupiedPositions,
+                                                        level: levelNumber)
+        var items = entityBuilder.generateItems(in: rooms, excluding: &occupiedPositions, player: player, difficulty: difficulty,
+                                                levelNumber: levelNumber)
+
+        items.merge(keys) { current, _ in current }
+
+        let enemies = entityBuilder.generateEnemies(in: rooms, excluding: occupiedPositions, player: player,
+                                                    difficulty: difficulty, gameMap: &gameMap, levelNumber: levelNumber)
+        
+        return (items, enemies)
     }
     
-    static private func generateItems(_ rooms: [Room], _ occupiedPositions: inout Set<Position>, _ player: Player, _ difficulty: GameDifficulty) -> [Position : ItemProtocol] {
-        let factory = ItemEntityFactory()
-        let items = factory.generate(in: rooms, excluding: occupiedPositions, player: player, level: levelNumber, difficulty: difficulty)
-        occupiedPositions.formUnion(items.keys)
-        return items
-    }
     
-    static private func generateEnemies(_ rooms: [Room], _ occupiedPositions: Set<Position>, _ player: Player, _ difficulty: GameDifficulty, _ gameMap: inout GameMap) -> [Enemy] {
-        let factory = EnemyEntityFactory()
-        let enemiesWithPositions = factory.generate(in: rooms, excluding: occupiedPositions, player: player, level: levelNumber, difficulty: difficulty)
-        for position in enemiesWithPositions.keys {
-            gameMap.removePosition(position)
-        }
-        let enemies = recordPosToEnemy(enemiesWithPositions)
-        return enemies
-    }
+    static private func buildStart(_ rooms: [Room],
+                                   _ gameMap: inout GameMap,
+                                   _ player: Player,
+                                   _ occupiedPositions: inout Set<Position>
+    ) -> (index: Int, position: Position) {
     
-    static private func recordPosToEnemy(_ enemies: [Position : Enemy]) -> [Enemy] {
-        return enemies.map { position, enemy in
-            let enemyCopy = enemy
-            enemyCopy.characteristics.position = position
-            return enemyCopy
-        }
+        let indexStart = Int.random(in: 0..<rooms.count)
+        rooms[indexStart].setStartRoom()
+        let startPosition = GetterPositions.randomPositionOnRoom(
+            in: rooms[indexStart],
+            offset: Constants.doorOffset
+        )
+        player.characteristics.position = startPosition
+        gameMap.removePosition(startPosition)
+        occupiedPositions.insert(startPosition)
+        return (indexStart, startPosition)
+    }
+
+    static private func buildExit(
+        _ rooms: [Room],
+        _ graph: Graph,
+        _ startRoomIndex: Int,
+        _ occupiedPositions: inout Set<Position>
+    ) -> Position {
+
+        var mutableGraph = graph
+        let indexEnd = mutableGraph.bfs(from: startRoomIndex) ??
+            (0..<rooms.count).filter { $0 != startRoomIndex }.randomElement()!
+        
+        let exitPosition = GetterPositions.make(
+            in: [rooms[indexEnd]],
+            excluding: occupiedPositions,
+            count: 1,
+            offset: GenerationConstants.exitOffset
+        ).first!
+        
+        occupiedPositions.insert(exitPosition)
+        return exitPosition
     }
 
     static private func addRoomsCoordToMap(_ rooms: [Room], _ gameMap: GameMap) {
@@ -108,4 +155,5 @@ public enum GenerationConstants {
     static let maxItemsPerRoom = 3
     static let itemOffset = 1
     static let exitOffset = 2
+    static let countColorDoors = 3
 }
