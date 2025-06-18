@@ -13,8 +13,18 @@ public class Level {
     public var levelNumber: Int
     
     public var gameMap: GameMap
+    
+    public var coloredDoors: [Door] = []
 
-    public init(_ rooms: [Room], _ corridors: [Corridor], _ exitPosition: Position, _ player: Player, _ enemies: [Enemy],_ items: [Position: ItemProtocol], _ levelNumber: Int, _ gameMap: GameMap) {
+    public init(_ rooms: [Room],
+                _ corridors: [Corridor],
+                _ exitPosition: Position,
+                _ player: Player,
+                _ enemies: [Enemy],
+                _ items: [Position: ItemProtocol],
+                _ levelNumber: Int,
+                _ gameMap: GameMap) {
+
         self.rooms = rooms
         self.corridors = corridors
         self.exitPosition = exitPosition
@@ -23,44 +33,52 @@ public class Level {
         self.items = items
         self.levelNumber = levelNumber
         self.gameMap = gameMap
+        self.addColoredDoors()
         GameEventManager.shared.addObserver(GameLogger.shared)
     }
     
     public func defeatEnemy(_ enemy: Enemy) {
-        if enemy.isDead, let index = enemies.firstIndex(where: { $0 === enemy }) {
+        if enemy.isDead {
             GameEventManager.shared.notify(.enemyDefeated(enemy: enemy.type.name))
             gameMap.addPosition(enemy.characteristics.position)
-            let treasureCount = Self.calculateTreasureCount(for: enemy)
-            
-            var positionsTried: Set<Position> = []
-            var dropped = 0
-            
-            var attempts = 0
-            let maxAttempts = 10
-            while dropped < treasureCount, attempts < maxAttempts {
-                let dropPosition = GetterPositions.randomPositionOnRoom(in: rooms[enemy.indexRoom], offset: 1)
-                positionsTried.insert(dropPosition)
-                if items[dropPosition] == nil {
-                    let treasure = TreasureFactory().createItem(for: .normal, player: player, level: levelNumber)
-                    items[dropPosition] = treasure
-                    dropped += 1
-                }
-                attempts += 1
+            self.dropTreasure(for: enemy)
+            if let index = enemies.firstIndex(where: { $0 === enemy }) {
+                enemies.remove(at: index)
             }
-            enemies.remove(at: index)
         }
     }
 
-    public func deleteItem(at: Position) {
-        items.removeValue(forKey: at)
-    }
-    
     func dropWeapon() {
         let neighborPositions = findFreeNeighbor(around: player.characteristics.position)
         if neighborPositions == nil { return }
         GameEventManager.shared.notify(.weaponDropped(weapon: player.weapon!.type.name))
         let weapon = player.dropWeapon()
         self.items[neighborPositions!] = weapon
+    }
+    
+    private func deleteItem(at: Position) {
+        items.removeValue(forKey: at)
+    }
+    
+    private func dropTreasure(for enemy: Enemy) {
+        let treasureCount = Self.calculateTreasureCount(for: enemy)
+        
+        var positionsTried: Set<Position> = []
+        var dropped = 0
+        
+        var attempts = 0
+        let maxAttempts = 10
+        while dropped < treasureCount, attempts < maxAttempts {
+            let dropPosition = GetterPositions.randomPositionOnRoom(in: rooms[enemy.indexRoom], offset: 1)
+            positionsTried.insert(dropPosition)
+            if items[dropPosition] == nil {
+                let treasure = ItemEntityFactory.createItem(of: .treasure, for: .normal,
+                                                            player: player, level: levelNumber)
+                items[dropPosition] = treasure
+                dropped += 1
+            }
+            attempts += 1
+        }
     }
     
     private static func calculateTreasureCount(for enemy: Enemy) -> Int {
@@ -95,38 +113,49 @@ public class Level {
         }
         let position = shiftToPosition(dx, dy)
         if let indexEnemy = enemies.firstIndex(where: { $0.characteristics.position == position }) {
-            let result = player.attack(enemies[indexEnemy])
-            switch result {
-            case .miss:
-                GameEventManager.shared.notify(.playerMissed(target: enemies[indexEnemy].type.name))
-            case .hit(let damage):
-                enemies[indexEnemy].receiveDamage(damage)
-                GameEventManager.shared.notify(.playerHit(target: enemies[indexEnemy].type.name, damage: damage))
-                defeatEnemy(enemies[indexEnemy])
-            }
+            self.attackEnemy(enemies[indexEnemy])
             return
         }
+        // перед ходом проверять есть ли цветная дверь
+
         player.move(to: position, in: gameMap)
         GameEventManager.shared.notify(.playerMoved(to: position))
         if let item = items[position] {
-            let result = player.pickUpItem(item)
-            switch result {
-                case .success:
-                    GameEventManager.shared.notify(.itemPickedUp(item: item.type.name))
-                    deleteItem(at: position)
-                case .isFull:
-                    GameEventManager.shared.notify(.NotPickedUp)
-            }
+            self.pickUpItem(item, at: position)
         }
     }
     
+    private func attackEnemy(_ enemy: Enemy) {
+        let result = player.attack(enemy)
+        switch result {
+        case .miss:
+            GameEventManager.shared.notify(.playerMissed(target: enemy.type.name))
+        case .hit(let damage):
+            enemy.receiveDamage(damage)
+            GameEventManager.shared.notify(.playerHit(target: enemy.type.name, damage: damage))
+            defeatEnemy(enemy)
+        }
+    }
+    
+    private func pickUpItem(_ item: ItemProtocol, at position: Position) {
+        let result = player.pickUpItem(item)
+        switch result {
+            case .success:
+                GameEventManager.shared.notify(.itemPickedUp(item: item.type.name))
+                deleteItem(at: position)
+            case .isFull:
+                GameEventManager.shared.notify(.NotPickedUp)
+        }
+    }
+    
+    // сделать приватный метод проверки доступности двери по ключу
     
     public func enemiesTurn() {
         for enemy in enemies {
             let distance = abs(enemy.characteristics.position.x - player.characteristics.position.x) +
                          abs(enemy.characteristics.position.y - player.characteristics.position.y)
             if distance == 1 {
-                let result = enemy.attack(player)
+                let result = enemy.attack(player: player)
                 switch result {
                 case .miss:
                     GameEventManager.shared.notify(.enemyMissed(enemy: enemy.type.name))
@@ -135,7 +164,17 @@ public class Level {
                     player.receiveDamage(damage)
                 }
             } else {
-                enemy.move(self)
+                enemy.move(level: self)
+            }
+        }
+    }
+    
+    private func addColoredDoors() {
+        for room in rooms {
+            for door in room.doors {
+                if door.color != .none {
+                    coloredDoors.append(door)
+                }
             }
         }
     }
@@ -168,19 +207,28 @@ public class Level {
             for x in room.lowLeft.x...room.topRight.x {
                 for y in room.lowLeft.y...room.topRight.y {
                     if x == room.lowLeft.x || x == room.topRight.x || y == room.lowLeft.y || y == room.topRight.y {
-                        grid[x][y] = "#"
+                        grid[x][y] = "."
                         if room.isStartRoom {
-                            grid[x][y] = "@"
+                            grid[x][y] = "*"
                         }
                     }
                 }
             }
             for door in room.doors {
                 switch door.direction {
-                case .up: grid[door.position.x][door.position.y] = "^"
-                case .left: grid[door.position.x][door.position.y] = "<"
-                case .down: grid[door.position.x][door.position.y] = "v"
-                case .right: grid[door.position.x][door.position.y] = ">"
+                case .up: grid[door.position.x][door.position.y] = "."
+                case .left: grid[door.position.x][door.position.y] = "."
+                case .down: grid[door.position.x][door.position.y] = "."
+                case .right: grid[door.position.x][door.position.y] = "."
+                }
+            }
+            
+            for door in room.doors {
+                switch door.color {
+                case .green: grid[door.position.x][door.position.y] = "G"
+                case .red: grid[door.position.x][door.position.y] = "R"
+                case .blue: grid[door.position.x][door.position.y] = "B"
+                case .none: break
                 }
             }
         }
@@ -209,6 +257,8 @@ public class Level {
                 symbol = "e"
             case .treasure:
                 symbol = "*"
+            case .key:
+                symbol = "k"
             }
             grid[position.x][position.y] = symbol
         }
@@ -233,7 +283,28 @@ public class Level {
         }
 
         grid[player.characteristics.position.x][player.characteristics.position.y] = "P"
-
+        for (position, item) in items {
+            var symbol: String
+            switch item.type {
+            case .food: symbol = "f"
+            case .weapon: symbol = "w"
+            case .scroll: symbol = "s"
+            case .elixir: symbol = "e"
+            case .treasure: symbol = "*"
+            case .key(let color):
+                if color == .red {
+                    symbol = "r"
+                } else if color == .blue {
+                    symbol = "b"
+                } else if color == .green {
+                    symbol = "g"
+                } else {
+                    symbol = "*"
+                }
+                
+            }
+            grid[position.x][position.y] = symbol
+        }
 
         for row in grid {
             print(row.joined())
