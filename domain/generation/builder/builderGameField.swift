@@ -3,22 +3,22 @@
 //  rogue
 
 
-public protocol RoomGeneratorProtocol {
-    func generateRooms() -> [Room]
+public protocol RoomBuilderProtocol {
+    func buildRooms() -> [Room]
 }
 
-public protocol CorridorsGeneratorProtocol {
+public protocol CorridorsBuilderProtocol {
     func connectTwoRooms(_ room1: Room, _ room2: Room, _ direction1: Direction) -> Corridor?
-    func generateRandomCorridors(rooms: [Room]) -> (Graph, [Corridor])
+    func buildRandomCorridors(rooms: [Room]) -> (Graph, [Corridor])
 
     func availableIndexRooms(for indexRoom: Int) -> [Int]
     func isVerticalAvailable(_ fromRoom: Int, _ toRoom: Int) -> Bool
 
-    func generateMissingDoors(_ rooms: [Room], _ indexFromRoom: Int, _ indexToRoom: Int, _ direction: Direction)
+    func buildMissingDoors(_ rooms: [Room], _ indexFromRoom: Int, _ indexToRoom: Int, _ direction: Direction)
     func removeUnusedDoors(_ rooms: [Room], _ corridors: [Corridor])
 }
 
-public class RoomGenerator: RoomGeneratorProtocol {
+public class RoomBuilder: RoomBuilderProtocol {
 
     public init() {}
 
@@ -46,7 +46,7 @@ public class RoomGenerator: RoomGeneratorProtocol {
         return (top, bottom, left, right)
     }
 
-    public func generateRooms() -> [Room] {
+    public func buildRooms() -> [Room] {
         var rooms: [Room] = []
         var sectorIndex: Int = 0
         let sectors = Sector.allCases
@@ -61,7 +61,7 @@ public class RoomGenerator: RoomGeneratorProtocol {
     }
 }
 
-public class CorridorsGenerator: CorridorsGeneratorProtocol {
+public class CorridorsBuilder: CorridorsBuilderProtocol {
 
     public init() {}
 
@@ -73,13 +73,15 @@ public class CorridorsGenerator: CorridorsGeneratorProtocol {
             return nil
         }
         switch directionFrom {
-        case .right: return Corridor(from: Position(door1.position.x, door1.position.y + Constants.indent), to: Position(door2.position.x, door2.position.y - Constants.indent))
-        case .down: return Corridor(from: Position(door1.position.x + Constants.indent, door1.position.y), to: Position(door2.position.x - Constants.indent, door2.position.y))
+        case .right: return Corridor(from: Position(door1.position.x, door1.position.y + Constants.indent),
+                                     to: Position(door2.position.x, door2.position.y - Constants.indent))
+        case .down: return Corridor(from: Position(door1.position.x + Constants.indent, door1.position.y),
+                                    to: Position(door2.position.x - Constants.indent, door2.position.y))
         default: return nil
         }
     }
 
-    public func generateRandomCorridors(rooms: [Room]) -> (Graph, [Corridor]) {
+    public func buildRandomCorridors(rooms: [Room]) -> (Graph, [Corridor]) {
         let size = Constants.Grid.size
         var graph = Graph()
         var corridors: [Corridor] = []
@@ -121,7 +123,7 @@ public class CorridorsGenerator: CorridorsGeneratorProtocol {
         return neighbors.sorted()
     }
 
-    public func generateMissingDoors(_ rooms: [Room], _ indexFromRoom: Int, _ indexToRoom: Int, _ direction: Direction) {
+    public func buildMissingDoors(_ rooms: [Room], _ indexFromRoom: Int, _ indexToRoom: Int, _ direction: Direction) {
         if rooms[indexFromRoom].doors.first(where: { $0.direction == direction }) == nil {
             rooms[indexFromRoom].doors.append(rooms[indexFromRoom].createDoor(direction))
         }
