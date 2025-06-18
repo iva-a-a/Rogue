@@ -19,5 +19,7 @@ enum GameEvent {
     case readScroll(scroll: String, amount: Int)
     case useWeapon(weapon: String, damage: Int)
     case pickUpTreasure(treasure: String, amount: Int)
+    case openColorDoor(color: String)
+    case NotOpenColorDoor
 }
 

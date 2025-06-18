@@ -3,7 +3,7 @@
 //  rogue
 
 protocol GameEventObserver: AnyObject {
-    func didReceiveEvent(_ event: GameEvent)
+    func didReceiveEvent(event: GameEvent)
 }
 
 class GameEventManager {
@@ -22,7 +22,7 @@ class GameEventManager {
     }
 
     func notify(_ event: GameEvent) {
-        observers.forEach { $0.didReceiveEvent(event) }
+        observers.forEach { $0.didReceiveEvent(event: event) }
     }
 }
 
@@ -33,7 +33,7 @@ class GameLogger: GameEventObserver {
     
     private init() {}
     
-    func didReceiveEvent(_ event: GameEvent) {
+    func didReceiveEvent(event: GameEvent) {
         switch event {
         case .playerMissed(let target):
             log = "You missed the enemy \(target)!"
@@ -67,6 +67,10 @@ class GameLogger: GameEventObserver {
             log = "You used \(weapon), dealing \(damage) damage"
         case .pickUpTreasure(let treasure, let amount):
             log = "You found \(treasure) worth \(amount) gold"
+        case .openColorDoor(let color):
+            log = "You opened the door with a \(color)"
+        case .NotOpenColorDoor:
+            log = "You can't open that door. Find the key of the door color"
         }
     }
 }
