@@ -43,8 +43,8 @@ class Ghost: Enemy {
         )
     }
 
-    override func move(_ level: Level) {
-        super.move(level)
+    override func move(level: Level) {
+        super.move(level: level)
         // добавляем изменение видимости
         isVisible = Int.random(in: 1...100) > 20
     }
@@ -65,16 +65,16 @@ class Ogre: Enemy {
         )
     }
 
-    override func move(_ level: Level) {
+    override func move(level: Level) {
         if isResting {
             isResting = false
             // eсли отдыхает - остаемся на месте
             return
         }
-        super.move(level)
+        super.move(level: level)
     }
 
-    override func attack(_ player: Player) -> AttackResult {
+    override func attack(player: Player) -> AttackResult {
         var result = AttackResult.miss
         if !isResting {
             result = attackBehavior.attack(attacker: self, player: player)
