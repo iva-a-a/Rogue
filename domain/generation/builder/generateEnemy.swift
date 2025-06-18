@@ -6,7 +6,13 @@ public final class EnemyEntityFactory: EntityFactory {
 
     public typealias EntityType = Enemy
     
-    public func generate(in rooms: [Room], excluding: Set<Position>, player: Player, level: Int, difficulty: GameDifficulty) -> [Position : Enemy] {
+    public func generate(in rooms: [Room],
+                         excluding: Set<Position>,
+                         player: Player,
+                         level: Int,
+                         difficulty: GameDifficulty
+    ) -> [Position : EntityType] {
+
         var enemies: [Position: Enemy] = [:]
         let enemyCount = SpawnBalancer.calculateEntityCount(
                 base: 15, level: level, difficulty: difficulty, player: player, maxCount: 10, modifier: -1)
@@ -20,10 +26,10 @@ public final class EnemyEntityFactory: EntityFactory {
             enemies[pos] = enemy
         }
         return enemies
-
     }
 
-    private static func getBaseCharacteristics(type: EnemyType) -> (maxHealth: Int, health: Int, agility: Int, strength: Int, hostility: Int) {
+    private static func getBaseCharacteristics(type: EnemyType) -> (maxHealth: Int, health: Int,
+                                                                    agility: Int, strength: Int, hostility: Int) {
         let baseStats: (maxHealth: Int, health: Int, agility: Int, strength: Int, hostility: Int)
         switch type {
             case .zombie:
@@ -37,12 +43,13 @@ public final class EnemyEntityFactory: EntityFactory {
             case .snakeMage:
                 baseStats = (maxHealth: 50, health: 50, agility: 20, strength: 8, hostility: 8)
             case .mimic:
-                baseStats = (maxHealth: 40, health: 40, agility: 25, strength: 8, hostility: 3)
+                baseStats = (maxHealth: 60, health: 60, agility: 25, strength: 8, hostility: 3)
         }
         return baseStats
     }
     
-    static private func getModifiers(for difficulty: GameDifficulty, level: Int) -> (difficultyModifier: Double, levelModifier: Double) {
+    static private func getModifiers(for difficulty: GameDifficulty, level: Int) -> (difficultyModifier: Double,
+                                                                                     levelModifier: Double) {
         let difficultyModifier: Double
         switch difficulty {
             case .easy: difficultyModifier = 0.8
@@ -69,8 +76,8 @@ public final class EnemyEntityFactory: EntityFactory {
     private static func getBaseProbabilities() -> [EnemyType: Double] {
         return [
             .zombie: 0.4,
-            .vampire: 0.25,
-            .ghost: 0.17,
+            .vampire: 0.27,
+            .ghost: 0.15,
             .ogre: 0.1,
             .snakeMage: 0.05,
             .mimic: 0.03
@@ -95,7 +102,8 @@ public final class EnemyEntityFactory: EntityFactory {
         probabilities[.mimic]? += levelFactor * 0.3
     }
     
-    private static func adjustProbabilitiesByDifficulty(_ probabilities: inout [EnemyType: Double], difficulty: GameDifficulty) {
+    private static func adjustProbabilitiesByDifficulty(_ probabilities: inout [EnemyType: Double],
+                                                        difficulty: GameDifficulty) {
         switch difficulty {
             case .easy:
                 probabilities[.zombie]? *= 1.3
@@ -118,7 +126,11 @@ public final class EnemyEntityFactory: EntityFactory {
         }
     }
     
-    private static func randomEnemy(probabilities: [EnemyType: Double], difficulty: GameDifficulty, player: Player, level: Int) -> Enemy {
+    private static func randomEnemy(probabilities: [EnemyType: Double],
+                                    difficulty: GameDifficulty,
+                                    player: Player,
+                                    level: Int
+    ) -> Enemy {
         let random = Double.random(in: 0..<1)
         var runningSum = 0.0
         
