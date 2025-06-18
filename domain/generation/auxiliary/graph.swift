@@ -36,10 +36,10 @@ extension Graph {
         var queue: [Int] = [startNode]
         connectivity[startNode] = true
 
-        var furthestRoom = startNode
+        var furthestNode = startNode
         while !queue.isEmpty {
             let current = queue.removeFirst()
-            furthestRoom = current
+            furthestNode = current
             for neighbor in adjacencyList[current] ?? [] {
                 if !connectivity[neighbor] {
                     connectivity[neighbor] = true
@@ -47,7 +47,7 @@ extension Graph {
                 }
             }
         }
-        return furthestRoom
+        return furthestNode
     }
 
     mutating func resetConnectivity() {
@@ -57,4 +57,18 @@ extension Graph {
     private func isValidNode(_ node: Int) -> Bool {
         return node >= 0 && node < Constants.Graph.countNode
     }
+    
+    mutating func removeAllConnections(for node: Int) {
+            guard isValidNode(node) else { return }
+
+            if let connectedNodes = adjacencyList[node] {
+                for connectedNode in connectedNodes {
+                    adjacencyList[connectedNode]?.remove(node)
+                }
+            }
+
+            adjacencyList[node]?.removeAll()
+
+            self.resetConnectivity()
+        }
 }
