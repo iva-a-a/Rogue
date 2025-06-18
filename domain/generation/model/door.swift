@@ -15,12 +15,29 @@ public enum Direction: CaseIterable {
     }
 }
 
-struct Door {
+public enum Color {
+    case red, green, blue, none
+    
+    var name: String {
+        switch self {
+        case .red: return "Red"
+        case .green: return "Green"
+        case .blue: return "Blue"
+        case .none: return "None"
+        }
+    }
+}
+
+public class Door {
     let position: Position
     let direction: Direction
-
-    init(_ position: Position, _ direction: Direction) {
+    public var color: Color
+    var isUnlocked: Bool
+    
+    init(_ position: Position, _ direction: Direction, _ color: Color = .none, isUnlocked: Bool = true) {
         self.position = position
         self.direction = direction
+        self.color = color
+        self.isUnlocked = isUnlocked
     }
 }

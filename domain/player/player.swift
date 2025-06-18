@@ -34,6 +34,15 @@ public class Player {
         return item.pickUp(self)
     }
     
+    public func hasKey(for color: Color) -> Bool {
+        return backpack.items[.key]?.contains { item in
+            if case let .key(keyColor) = item.type, keyColor == color {
+                return true
+            }
+            return false
+        } ?? false
+    }
+    
     @discardableResult
     public func dropWeapon() -> Weapon? {
         defer { self.weapon = nil }

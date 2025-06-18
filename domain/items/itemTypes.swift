@@ -16,7 +16,8 @@ public struct Food: ItemProtocol {
     }
 
     public func use(_ player: Player) {
-        player.characteristics.health = min(player.characteristics.health + foodType.healthRestore, player.characteristics.maxHealth)
+        player.characteristics.health = min(player.characteristics.health + foodType.healthRestore,
+                                            player.characteristics.maxHealth)
         GameEventManager.shared.notify(.eatFood(food: foodType.name, amount: foodType.healthRestore))
     }
 }
@@ -114,5 +115,15 @@ public struct Weapon: ItemProtocol {
         if let current = currentWeapon {
             player.backpack.items[self.type.category, default: []].append(current)
         }
+    }
+}
+
+public struct Key: ItemProtocol {
+    let keyColor: Color
+    
+    public var type: ItemType { .key(keyColor) }
+    
+    public func use(_ player: Player) {
+        GameEventManager.shared.notify(.openColorDoor(color: keyColor.name))
     }
 }

@@ -9,6 +9,7 @@ public enum ItemCategory: Hashable {
     case scroll
     case elixir
     case treasure
+    case key
 }
 
 public class Backpack {

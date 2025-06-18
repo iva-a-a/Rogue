@@ -5,7 +5,13 @@
 public final class ItemEntityFactory: EntityFactory {
     public typealias EntityType = ItemProtocol
     
-    public func generate(in rooms: [Room], excluding: Set<Position>, player: Player, level: Int, difficulty: GameDifficulty) -> [Position: ItemProtocol] {
+    public func generate(in rooms: [Room],
+                         excluding: Set<Position>,
+                         player: Player,
+                         level: Int,
+                         difficulty: GameDifficulty
+    ) -> [Position: EntityType] {
+
         var items: [Position: ItemProtocol] = [:]
         let itemCount = SpawnBalancer.calculateEntityCount(
                 base: 21, level: level, difficulty: difficulty, player: player, maxCount: 21, modifier: 1)
@@ -18,7 +24,12 @@ public final class ItemEntityFactory: EntityFactory {
         return items
     }
     
-    private static func randomItem(probabilities: [ItemCategory: Double], difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+    private static func randomItem(probabilities: [ItemCategory: Double],
+                                   difficulty: GameDifficulty,
+                                   player: Player,
+                                   level: Int
+    ) -> any ItemProtocol {
+
         let random = Double.random(in: 0..<1)
         var runningSum = 0.0
         
@@ -31,7 +42,12 @@ public final class ItemEntityFactory: EntityFactory {
         return createItem(of: .food, for: difficulty, player: player, level: level)
     }
     
-    private static func createItem(of category: ItemCategory, for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+    public static func createItem(of category: ItemCategory,
+                                  for difficulty: GameDifficulty,
+                                  player: Player,
+                                  level: Int
+    ) -> any ItemProtocol {
+
         let factory: ItemFactory
         switch category {
             case .food: factory = FoodFactory()
@@ -39,6 +55,7 @@ public final class ItemEntityFactory: EntityFactory {
             case .elixir: factory = ElixirFactory()
             case .weapon: factory = WeaponFactory()
             case .treasure: factory = TreasureFactory()
+            case .key: factory = KeyFactory()
         }
         return factory.createItem(for: difficulty, player: player, level: level)
     }
@@ -68,7 +85,8 @@ public final class ItemEntityFactory: EntityFactory {
         probabilities[.treasure]? += levelFactor * 0.8
     }
     
-    private static func adjustProbabilitiesByDifficulty(_ probabilities: inout [ItemCategory: Double], difficulty: GameDifficulty) {
+    private static func adjustProbabilitiesByDifficulty(_ probabilities: inout [ItemCategory: Double],
+                                                        difficulty: GameDifficulty) {
         switch difficulty {
             case .easy:
                 probabilities[.food]? *= 1.5
@@ -160,5 +178,24 @@ public final class TreasureFactory: ItemFactory {
             }
         }()
         return Treasure(treasureType: type)
+    }
+}
+
+public final class KeyFactory: ItemFactory {
+    static var usedColors: Set<Color> = []
+    private static let allColors: [Color] = [.red, .green, .blue]
+
+    public func createItem(for difficulty: GameDifficulty, player: Player, level: Int) -> any ItemProtocol {
+
+        if KeyFactory.usedColors.count == KeyFactory.allColors.count {
+            KeyFactory.usedColors.removeAll()
+        }
+        let availableColors = KeyFactory.allColors.filter { !KeyFactory.usedColors.contains($0) }
+        guard let color = availableColors.randomElement() else {
+            fatalError("No available colors for key generation")
+        }
+
+        KeyFactory.usedColors.insert(color)
+        return Key(keyColor: color)
     }
 }

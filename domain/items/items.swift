@@ -10,6 +10,7 @@ public enum ItemType: Hashable, Equatable {
     case scroll(ScrollType)
     case elixir(ElixirType)
     case treasure(TreasureType)
+    case key(Color)
 
     var category: ItemCategory {
         switch self {
@@ -18,9 +19,10 @@ public enum ItemType: Hashable, Equatable {
         case .scroll: return .scroll
         case .elixir: return .elixir
         case .treasure: return .treasure
+        case .key: return .key
         }
     }
-    
+
     var name: String {
         switch self {
         case .food(let food): return food.name
@@ -28,6 +30,7 @@ public enum ItemType: Hashable, Equatable {
         case .scroll(let scroll): return scroll.name
         case .elixir(let elixir): return elixir.name
         case .treasure(let treasure): return treasure.name
+        case .key(let color): return color.name + " Key"
         }
     }
 }
@@ -42,7 +45,7 @@ public enum FoodType: Hashable, Equatable {
         case .meat: return 30
         }
     }
-    
+
     var name: String {
         switch self {
         case .apple: return "Apple"
@@ -82,7 +85,7 @@ public enum ScrollType: Hashable, Equatable {
         case .strength: return Int.random(in: 5...8)
         }
     }
-    
+
     var name: String {
         switch self {
         case .health: return "Health Scroll"
@@ -103,7 +106,7 @@ public enum WeaponType: Hashable, Equatable {
         case .staff: return Int.random(in: 7...11)
         }
     }
-    
+
     var name: String {
         switch self {
         case .sword: return "Sword"
@@ -124,7 +127,7 @@ public enum TreasureType: Hashable, Equatable {
         case .artifact: return 100
         }
     }
-    
+
     var name: String {
         switch self {
         case .gold: return "Gold"
