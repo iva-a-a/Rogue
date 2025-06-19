@@ -116,7 +116,7 @@ public class Level {
             self.attackEnemy(enemies[indexEnemy])
             return
         }
-        // перед ходом проверять есть ли цветная дверь
+        guard tryOpenDoor(at: position) else { return }
 
         player.move(to: position, in: gameMap)
         GameEventManager.shared.notify(.playerMoved(to: position))
@@ -125,6 +125,37 @@ public class Level {
         }
     }
     
+    private func tryOpenDoor(at position: Position) -> Bool {
+        guard let door = coloredDoors.first(where: { $0.position == position }) else {
+            return true
+        }
+        
+        if door.isUnlocked {
+            return true
+        }
+        guard let keyIndex = findKeyIndex(for: door.color) else {
+            GameEventManager.shared.notify(.notOpenColorDoor)
+            return false
+        }
+        player.useItem(category: .key, index: keyIndex)
+        door.isUnlocked = true
+        GameEventManager.shared.notify(.openColorDoor(color: door.color.name))
+        return true
+        
+    }
+    
+    private func findKeyIndex(for color: Color) -> Int? {
+        guard let keys = player.backpack.items[.key] else {
+            return nil
+        }
+        return keys.firstIndex(where: { item in
+            if case let .key(itemColor) = item.type {
+                return itemColor == color
+            }
+            return false
+        })
+    }
+
     private func attackEnemy(_ enemy: Enemy) {
         let result = player.attack(enemy)
         switch result {
@@ -144,11 +175,9 @@ public class Level {
                 GameEventManager.shared.notify(.itemPickedUp(item: item.type.name))
                 deleteItem(at: position)
             case .isFull:
-                GameEventManager.shared.notify(.NotPickedUp)
+                GameEventManager.shared.notify(.notPickedUp)
         }
     }
-    
-    // сделать приватный метод проверки доступности двери по ключу
     
     public func enemiesTurn() {
         for enemy in enemies {
@@ -263,24 +292,24 @@ public class Level {
             grid[position.x][position.y] = symbol
         }
 
-        for enemy in enemies {
-            let symbol: String
-            switch enemy.type {
-            case .zombie:
-                symbol = "Z"
-            case .vampire:
-                symbol = "V"
-            case .ghost:
-                symbol = "G"
-            case .ogre:
-                symbol = "O"
-            case .snakeMage:
-                symbol = "S"
-            case .mimic:
-                symbol = "M"
-            }
-            grid[enemy.characteristics.position.x][enemy.characteristics.position.y] = symbol
-        }
+//        for enemy in enemies {
+//            let symbol: String
+//            switch enemy.type {
+//            case .zombie:
+//                symbol = "Z"
+//            case .vampire:
+//                symbol = "V"
+//            case .ghost:
+//                symbol = "G"
+//            case .ogre:
+//                symbol = "O"
+//            case .snakeMage:
+//                symbol = "S"
+//            case .mimic:
+//                symbol = "M"
+//            }
+//            grid[enemy.characteristics.position.x][enemy.characteristics.position.y] = symbol
+//        }
 
         grid[player.characteristics.position.x][player.characteristics.position.y] = "P"
         for (position, item) in items {
