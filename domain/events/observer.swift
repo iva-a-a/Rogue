@@ -51,12 +51,14 @@ class GameLogger: GameEventObserver {
             log = "You defeated \(enemy)!"
         case .itemPickedUp(let item):
             log = "You picked up: \(item)"
-        case .NotPickedUp:
+        case .notPickedUp:
             log = "You can't pick that up, the backpack is full"
         case .weaponDropped(let weapon):
             log = "You dropped: \(weapon)"
         case .playerMoved(let position):
             log = "Moved to position: (\(position.x), \(position.y))"
+        case .playerNotMoved:
+            log = "This movement is not possible"
         case .eatFood(let food, let amount):
             log = "You ate \(food), restored \(amount) health"
         case .drinkElixir(let elixir, let duration):
@@ -69,7 +71,7 @@ class GameLogger: GameEventObserver {
             log = "You found \(treasure) worth \(amount) gold"
         case .openColorDoor(let color):
             log = "You opened the door with a \(color)"
-        case .NotOpenColorDoor:
+        case .notOpenColorDoor:
             log = "You can't open that door. Find the key of the door color"
         }
     }

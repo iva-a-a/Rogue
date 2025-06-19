@@ -59,6 +59,7 @@ public class Player {
     
     public func move(to position: Position, in gameMap: GameMap) {
         if !gameMap.isWalkable(position) {
+            GameEventManager.shared.notify(.playerNotMoved)
             return
         }
         gameMap.rewrite(from: characteristics.position, to: position)

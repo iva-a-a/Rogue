@@ -11,15 +11,16 @@ enum GameEvent {
     case enemyHit(enemy: String, damage: Int)
     case enemyDefeated(enemy: String)
     case itemPickedUp(item: String)
-    case NotPickedUp
+    case notPickedUp
     case weaponDropped(weapon: String)
     case playerMoved(to: Position)
+    case playerNotMoved
     case eatFood(food: String, amount: Int)
     case drinkElixir(elixir: String, duration: Int)
     case readScroll(scroll: String, amount: Int)
     case useWeapon(weapon: String, damage: Int)
     case pickUpTreasure(treasure: String, amount: Int)
     case openColorDoor(color: String)
-    case NotOpenColorDoor
+    case notOpenColorDoor
 }
 
