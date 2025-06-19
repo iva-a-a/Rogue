@@ -6,22 +6,23 @@ public struct LevelBuilder {
     
     static private var levelNumber: Int = 0
     
-    static public func buildLevel(
-        roomBuilder: RoomBuilderProtocol = RoomBuilder(),
-        corridorsBuilder: CorridorsBuilderProtocol = CorridorsBuilder(),
-        difficulty: GameDifficulty = .normal
+    static public func buildLevel(roomBuilder: RoomBuilderProtocol = RoomBuilder(),
+                                  corridorsBuilder: CorridorsBuilderProtocol = CorridorsBuilder(),
+                                  difficulty: GameDifficulty = .normal
     ) -> Level {
 
         levelNumber += 1
-        KeyFactory.usedColors = []
-        let rooms = roomBuilder.buildRooms()
         var gameMap = GameMap()
-        let player = Player()
+        
+        let rooms = roomBuilder.buildRooms()
         addRoomsCoordToMap(rooms, gameMap)
+
         let (corridors, graph) = buildCorridors(rooms, corridorsBuilder)
         addCoridorsCoordToMap(corridors, gameMap)
         corridorsBuilder.removeUnusedDoors(rooms, corridors)
         addDooorsCoordToMap(rooms, gameMap)
+    
+        let player = Player()
         let (exitPosition, items, enemies) = buildContent(rooms, graph, &gameMap, player, difficulty)
         return Level(rooms, corridors, exitPosition, player, enemies, items, self.levelNumber, gameMap)
     }
@@ -50,11 +51,13 @@ public struct LevelBuilder {
     }
 
     static private func buildContent(_ rooms: [Room],
-                                              _ graph: Graph,
-                                              _ gameMap: inout GameMap,
-                                              _ player: Player,
-                                              _ difficulty: GameDifficulty
+                                     _ graph: Graph,
+                                     _ gameMap: inout GameMap,
+                                     _ player: Player,
+                                     _ difficulty: GameDifficulty
     ) -> (Position, [Position : ItemProtocol], [Enemy]) {
+        
+        KeyFactory.usedColors = []
         
         var occupiedPositions: Set<Position> = []
         
@@ -68,15 +71,14 @@ public struct LevelBuilder {
         return (exitPosition, items, enemies)
     }
 
-    static private func buildEntities(
-        _ rooms: [Room],
-        _ startRoomIndex: Int,
-        _ player: Player,
-        _ difficulty: GameDifficulty,
-        _ graph: Graph,
-        _ occupiedPositions: inout Set<Position>,
-        _ levelNumber: Int,
-        _ gameMap: inout GameMap
+    static private func buildEntities(_ rooms: [Room],
+                                      _ startRoomIndex: Int,
+                                      _ player: Player,
+                                      _ difficulty: GameDifficulty,
+                                      _ graph: Graph,
+                                      _ occupiedPositions: inout Set<Position>,
+                                      _ levelNumber: Int,
+                                      _ gameMap: inout GameMap
     ) -> (items: [Position: ItemProtocol], enemies: [Enemy]) {
         
         let entityBuilder: EntityBuilderProtocol = EntityBuilder()
@@ -114,11 +116,10 @@ public struct LevelBuilder {
         return (indexStart, startPosition)
     }
 
-    static private func buildExit(
-        _ rooms: [Room],
-        _ graph: Graph,
-        _ startRoomIndex: Int,
-        _ occupiedPositions: inout Set<Position>
+    static private func buildExit(_ rooms: [Room],
+                                  _ graph: Graph,
+                                  _ startRoomIndex: Int,
+                                  _ occupiedPositions: inout Set<Position>
     ) -> Position {
 
         var mutableGraph = graph
