@@ -97,7 +97,7 @@ private struct DifficultyWeights {
             agilityWeight: 1.5,
             hardThreshold: 12.0 + Double(levelNumber) * 1.2,
             normalThreshold: 28.0 + Double(levelNumber) * 1.5,
-            itemsWeight: 0.8,
+            itemsWeight: 0.8
         )
     }
 }

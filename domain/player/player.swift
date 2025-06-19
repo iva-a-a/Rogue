@@ -12,6 +12,8 @@ public class Player {
     public var isAsleep: Bool = false
     public var buffManager: BuffManager
 
+    
+
     public init(characteristics: Characteristics, backpack: Backpack, weapon: Weapon?, buffManager: BuffManager) {
         self.characteristics = characteristics
         self.backpack = backpack

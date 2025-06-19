@@ -15,9 +15,18 @@ enum EnemyType {
         case .mimic: return "Mimic"
         }
     }
+    public var symbol: Character {
+        switch self {
+        case .zombie: return "Z"
+        case .vampire: return "V"
+        case .ghost: return "G"
+        case .ogre: return "O"
+        case .snakeMage: return "S"
+        }
+    }
 }
 
-protocol EnemyProtocol {
+public protocol EnemyProtocol {
     var type: EnemyType { get }
     var characteristics: Characteristics { get set }
     var hostility: Int { get }
@@ -36,14 +45,14 @@ protocol EnemyProtocol {
 
 public class Enemy: EnemyProtocol {
 
-    var type: EnemyType
+    public var type: EnemyType
     public var characteristics: Characteristics
-    var hostility: Int = 0
-    var isVisible: Bool = true
-    var movementBehavior: any MovementBehavior
-    var pursuitBehavior: any MovementBehavior
-    var attackBehavior: any AttackBehavior
-    var indexRoom: Int
+    public var hostility: Int = 0
+    public var isVisible: Bool = true
+    public var movementBehavior: any MovementBehavior
+    public var pursuitBehavior: any MovementBehavior
+    public var attackBehavior: any AttackBehavior
+    public var indexRoom: Int
 
     init(type: EnemyType,
          characteristics: Characteristics,
