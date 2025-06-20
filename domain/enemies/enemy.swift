@@ -2,7 +2,7 @@
 //  enemy.swift
 //  rogue
 
-enum EnemyType {
+public enum EnemyType {
     case zombie, vampire, ghost, ogre, snakeMage, mimic
     
     var name: String {
@@ -15,13 +15,14 @@ enum EnemyType {
         case .mimic: return "Mimic"
         }
     }
-    public var symbol: Character {
+     public var symbol: Character {
         switch self {
         case .zombie: return "Z"
         case .vampire: return "V"
         case .ghost: return "G"
         case .ogre: return "O"
         case .snakeMage: return "S"
+        case .mimic: return "M"
         }
     }
 }
