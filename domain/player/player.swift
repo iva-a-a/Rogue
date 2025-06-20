@@ -22,7 +22,7 @@ public class Player {
     }
 
     public convenience init() {
-        let characteristics = Characteristics(position: Position(0, 0), maxHealth: 100, health: 100, agility: 10, strength: 8)
+        let characteristics = Characteristics(position: Position(0, 0), maxHealth: 200, health: 200, agility: 10, strength: 8)
         let backpack = Backpack()
         let buffManager = BuffManager()
         self.init(characteristics: characteristics, backpack: backpack, weapon: nil, buffManager: buffManager)
