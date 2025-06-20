@@ -119,7 +119,6 @@ public class Level {
         guard tryOpenDoor(at: position) else { return }
 
         player.move(to: position, in: gameMap)
-        GameEventManager.shared.notify(.playerMoved(to: position))
         if let item = items[position] {
             self.pickUpItem(item, at: position)
         }
