@@ -1,8 +1,6 @@
 import Foundation
 import Darwin.ncurses
 import domain
-import presentation
-
 
 public class LevelRenderer {
     public init() {}
