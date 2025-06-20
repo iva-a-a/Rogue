@@ -2,6 +2,7 @@ import domain
 import presentation
 
 public struct TileAssembler {
+    
     public static func buildTiles(from level: Level) -> [DrawableObject] {
         var tiles: [DrawableObject] = []
 
@@ -24,7 +25,18 @@ public struct TileAssembler {
         
         for room in level.rooms {
             for door in room.doors {
-                let tile = Tile(position: door.position, char: "D", isVisible: true, colorPair: 3)
+                let color: Int
+                switch door.color {
+                case .red:
+                    color = 2
+                case .green:
+                    color = 6
+                case .blue:
+                    color = 5
+                case .none:
+                    color = 1
+                }
+                let tile = Tile(position: door.position, char: "D", isVisible: true, colorPair: color)
                 tiles.append(tile)
             }
         }
@@ -33,18 +45,40 @@ public struct TileAssembler {
             let char: Character
             let color: Int
             switch item.type {
-            case .food:     char = "f"; color = 1
-            case .weapon:   char = "w"; color = 4
-            case .scroll:   char = "s"; color = 4
-            case .elixir:   char = "e"; color = 4
-            case .treasure: char = "*"; color = 4
+            case .food:
+                char = "f"
+                color = 1
+            case .weapon:
+                char = "w"
+                color = 4
+            case .scroll:
+                char = "s"
+                color = 4
+            case .elixir:
+                char = "e"
+                color = 4
+            case .treasure: 
+                char = "*"
+                color = 4
+            case .key(let colorKey):
+                char = "k"
+                switch colorKey {
+                case .red:
+                    color = 2
+                case .green:
+                    color = 6
+                case .blue:
+                    color = 5
+                case .none:
+                    color = 1
+                }
             }
             tiles.append(Tile(position: pos, char: char, isVisible: true, colorPair: color))
         }
 
         for enemy in level.enemies {
             let char = enemy.type.symbol
-            tiles.append(Tile(position: enemy.characteristics.position, char: char, isVisible: true, colorPair: 2))
+            tiles.append(Tile(position: enemy.characteristics.position, char: char, isVisible: true, colorPair: 1))
         }
 
         let player = level.player
