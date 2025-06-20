@@ -66,6 +66,7 @@ public class Player {
         }
         gameMap.rewrite(from: characteristics.position, to: position)
         characteristics.position = position
+        GameEventManager.shared.notify(.playerMoved(to: position))
     }
 }
 
