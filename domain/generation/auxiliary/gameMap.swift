@@ -32,19 +32,19 @@ public class GameMap {
     }
 
     
-    public func printMap() {
-        for x in 0..<Constants.Map.height {
-            for y in 0..<Constants.Map.width {
-                let pos = Position(x, y)
-                if isWalkable(pos) {
-                    print(".", terminator: "")
-                } else {
-                    print(" ", terminator: "")
-                }
-            }
-            print()
-            }
-        }
+//    public func printMap() {
+//        for x in 0..<Constants.Map.height {
+//            for y in 0..<Constants.Map.width {
+//                let pos = Position(x, y)
+//                if isWalkable(pos) {
+//                    print(".", terminator: "")
+//                } else {
+//                    print(" ", terminator: "")
+//                }
+//            }
+//            print()
+//            }
+//        }
     }
 
 
