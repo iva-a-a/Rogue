@@ -29,7 +29,7 @@ public enum Color {
 }
 
 public class Door {
-    let position: Position
+    public let position: Position
     let direction: Direction
     public var color: Color
     var isUnlocked: Bool
