@@ -26,10 +26,10 @@ class GameEventManager {
     }
 }
 
-class GameLogger: GameEventObserver {
-    static let shared = GameLogger()
+public class GameLogger: GameEventObserver {
+    public static let shared = GameLogger()
     
-    private(set) var log: String = ""
+    public private(set) var log: String = ""
     
     private init() {}
     
