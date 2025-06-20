@@ -4,25 +4,6 @@
 
 import Foundation
 
-public enum DiagonalDirection {
-    case topLeftBottomRight
-    case topRightBottomLeft
-
-    public var opposite: DiagonalDirection {
-        switch self {
-        case .topLeftBottomRight: return .topRightBottomLeft
-        case .topRightBottomLeft: return .topLeftBottomRight
-        }
-    }
-
-    public var moves: Position {
-        switch self {
-        case .topLeftBottomRight: return Position(1, 1)
-        case .topRightBottomLeft: return Position(-1, 1)
-        }
-    }
-}
-
 public protocol MovementBehavior {
     func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position?
 }
@@ -84,47 +65,46 @@ public struct PursueMovement: MovementBehavior {
     }
 }
 
-// движение по диагонали
 public class DiagonalMovement: MovementBehavior {
-    private var direction: DiagonalDirection = .topLeftBottomRight
+    private var movingRight = true
+    private var goingDownNext = true
 
     public init() {}
 
     public func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position? {
-        let moves = direction.moves
-        let newPosition = Position(position.x + moves.x, position.y + moves.y)
+        let dy = movingRight ? 1 : -1
+        let dx = goingDownNext ? 1 : -1
 
-        // Если новая позиция валидна - двигаемся и меняем направление
-        if room.isInsideRoom(newPosition) && gameMap.isWalkable(newPosition) {
-            direction = direction.opposite
-            return newPosition
+        let candidate = Position(position.x + dx, position.y + dy)
+
+        goingDownNext.toggle()
+        if room.isInsideRoom(candidate) && gameMap.isWalkable(candidate) {
+            return candidate
         }
-
-        // Если нельзя двигаться - остаемся на месте, но все равно меняем направление для следующего хода
-        direction = direction.opposite
+        let testY = Position(position.x, position.y + dy)
+        if !room.isInsideRoom(testY) || !gameMap.isWalkable(testY) {
+            movingRight.toggle()
+        }
         return position
     }
 }
-
-// рандомный телепорт 
+ 
 public struct TeleportMovement: MovementBehavior {
     public init() {}
 
     public func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position? {
-        // Пытаемся найти валидную позицию за заданное число попыток
+
         var attempts = 10
         while attempts > 0 {
             let newX = Int.random(in: room.lowLeft.x...room.topRight.x)
             let newY = Int.random(in: room.lowLeft.y...room.topRight.y)
             let newPosition = Position(newX, newY)
 
-            // Проверяем, что позиция валидна (не в стене и доступна для перемещения)
             if room.isInsideRoom(newPosition) && gameMap.isWalkable(newPosition) {
                 return newPosition
             }
             attempts -= 1
         }
-        // Если не удалось найти валидную позицию, остаёмся на месте
         return position
     }
 }
