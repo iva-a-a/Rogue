@@ -13,6 +13,7 @@ public enum PlayerAction {
     case openElixir
     case openScroll
     case showStats
+    case start
 }
 
 public struct InputHandler {
@@ -30,6 +31,8 @@ public struct InputHandler {
         case Int32(Character("k").asciiValue!): return .openElixir
         case Int32(Character("e").asciiValue!): return .openScroll
         case Int32(Character("i").asciiValue!): return .showStats
+        case Int32(10): return .start
+        case Int32(13): return .start
         default: return .none
         }
     }
