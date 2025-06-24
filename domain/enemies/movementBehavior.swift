@@ -10,11 +10,11 @@ public protocol MovementBehavior {
 
 public struct RandomMovement: MovementBehavior {
     public var step: Int
-    
+
     public init(step: Int = 1) {
         self.step = step
     }
-    
+
     public func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position? {
         var attempts = 10
         while attempts > 0 {
@@ -41,24 +41,28 @@ public struct PursueMovement: MovementBehavior {
     }
     
     private func findPath(from start: Position, to target: Position, in gameMap: GameMap) -> [Position]? {
-        var queue: [(Position, [Position])] = [(start, [start])]
+        let directions = [
+            Position(0, 1),
+            Position(1, 0),
+            Position(0, -1),
+            Position(-1, 0)
+        ]
+        
         var visited: Set<Position> = [start]
+        var queue: [(position: Position, path: [Position])] = [(start, [start])]
+
         while !queue.isEmpty {
             let (current, path) = queue.removeFirst()
             if current == target {
                 return path
             }
 
-            let neighbors = [
-                Position(current.x + 1, current.y),
-                Position(current.x - 1, current.y),
-                Position(current.x, current.y + 1),
-                Position(current.x, current.y - 1)
-            ].filter { gameMap.isWalkable($0) && !visited.contains($0) }
-
-            for neighbor in neighbors {
-                visited.insert(neighbor)
-                queue.append((neighbor, path + [neighbor]))
+            for dir in directions {
+                let neighbor = Position(current.x + dir.x, current.y + dir.y)
+                if (gameMap.isWalkable(neighbor) || neighbor == target) && !visited.contains(neighbor) {
+                    visited.insert(neighbor)
+                    queue.append((neighbor, path + [neighbor]))
+                }
             }
         }
         return nil

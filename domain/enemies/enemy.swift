@@ -99,8 +99,9 @@ public class Enemy: EnemyProtocol {
 
     private func shouldPursue(player: Player) -> Bool {
         let distance = abs(characteristics.position.x - player.characteristics.position.x)
-        + abs(characteristics.position.y - player.characteristics.position.y)
-        return distance <= hostility / 10 // Радиус преследования зависит от враждебности
+                    + abs(characteristics.position.y - player.characteristics.position.y)
+        let pursuitRadius = max(1, hostility * 2 / 3)
+        return distance <= pursuitRadius
     }
 }
 
