@@ -79,6 +79,14 @@ public class Enemy: EnemyProtocol {
                                             toward: level.player.characteristics.position, in: level.rooms[indexRoom],
                                             in: level.gameMap)
             isVisible = true
+            if let targetPos = pos {
+                for door in level.coloredDoors {
+                    if door.position == targetPos && door.isUnlocked == false {
+                        pos = nil
+                        break
+                    }
+                }
+            }
         }
         if pos == nil {
           pos = self.movementBehavior.move(from: characteristics.position,
