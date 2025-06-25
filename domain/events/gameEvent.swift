@@ -2,7 +2,7 @@
 //  gameEvent.swift
 //  rogue
 
-enum GameEvent {
+public enum GameEvent {
     case playerMissed(target: String)
     case playerSleep
     case playerSkipMove
@@ -22,5 +22,8 @@ enum GameEvent {
     case pickUpTreasure(treasure: String, amount: Int)
     case openColorDoor(color: String)
     case notOpenColorDoor
+    case levelComplete(number: Int)
+    case gameOver
+    case gameWon
 }
 

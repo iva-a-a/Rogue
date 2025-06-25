@@ -6,8 +6,8 @@ protocol GameEventObserver: AnyObject {
     func didReceiveEvent(event: GameEvent)
 }
 
-class GameEventManager {
-    static let shared = GameEventManager()
+public class GameEventManager {
+    public static let shared = GameEventManager()
     
     private var observers: [GameEventObserver] = []
 
@@ -21,7 +21,7 @@ class GameEventManager {
         observers.removeAll { $0 === observer }
     }
 
-    func notify(_ event: GameEvent) {
+    public func notify(_ event: GameEvent) {
         observers.forEach { $0.didReceiveEvent(event: event) }
     }
 }
@@ -73,6 +73,12 @@ public class GameLogger: GameEventObserver {
             log = "You opened the door with a \(color)"
         case .notOpenColorDoor:
             log = "You can't open that door. Find the key of the door color"
+        case .levelComplete(let number):
+            log = "You completed level \(number)"
+        case .gameOver:
+            log = "YOU DIED! Game over."
+        case .gameWon:
+            log = "YOU WON! Congratulations!"
         }
     }
 }
