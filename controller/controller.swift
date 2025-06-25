@@ -117,9 +117,30 @@ public class Controller {
         guard let level = level else { return }
         
         if state == .inventory, let category = inventoryCategory {
-            renderInventory(for: category, items: level.getItemsList(category))
-            return
-        }
+    let items = level.getItemsList(category)
+    clear()
+    
+    renderer.drawString("Inventory: \(category)", atY: 0, x: 0)
+    
+    if items.isEmpty {
+        renderer.drawString("There are no items in this category", atY: 2, x: 0)
+        renderer.drawString("Press Esc to return", atY: 4, x: 0)
+        return
+    }
+
+    for (i, item) in items.prefix(9).enumerated() {
+        let line = "\(i + 1). \(item.type.name)"
+        renderer.drawString(line, atY: i + 1, x: 0)
+    }
+
+    if category == .weapon {
+        renderer.drawString("0. Remove the weapon from your hands", atY: 10, x: 0)
+    }
+
+    renderer.drawString("Press 1-9 to use, Esc — back", atY: 12, x: 0)
+    return
+}
+
         
         let tiles = TileAssembler.buildTiles(from: level)
         renderer.drawTiles(tiles)
