@@ -4,6 +4,7 @@
 
 public enum GameState {
     case beginning
+    // добавить загрузку из файла
     case generating
     case playing
     case inventory

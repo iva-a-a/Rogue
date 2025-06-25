@@ -10,84 +10,85 @@ public class Controller {
     private var level: Level?
     public var state: GameState = .beginning
     private let renderer = LevelRenderer()
+    private var inventoryCategory: ItemCategory? = nil
     
     public init() { }
     
     public func update(_ input: PlayerAction) {
-        handleInput(input)
+        updateState(input)
+        act(for: input)
+    }
+    
+    private func updateState(_ input: PlayerAction) {
         switch state {
         case .beginning:
-            startGame()
+            if input == .start { state = .generating }
+        case .generating:
+            state = .playing
+            break
+        case .playing:
+            if input == .exit { state = .quit }
+
+            if input == .openWeapon { state = .inventory; inventoryCategory = .weapon }
+            if input == .openFood { state = .inventory; inventoryCategory = .food }
+            if input == .openElixir { state = .inventory; inventoryCategory = .elixir }
+            if input == .openScroll { state = .inventory; inventoryCategory = .scroll }
+        case .inventory:
+            if input == .exit { state = .playing; inventoryCategory = nil }
+        case .levelComplete:
+            state = .generating
+        case .won, .lose:
+            if input == .start { state = .beginning }
+            if input == .exit { state = .quit }
+        case .quit:
+            break
+        }
+    }
+    
+    private func act(for input: PlayerAction) {
+        switch state {
         case .generating:
             generateLevel()
         case .playing:
-            tick(input)
-        case .inventory:
-            // Обработка инвентаря
-            break
+            motion(input)
         case .levelComplete:
-//            generateLevel()
+            // можно показать сообщение и ждать нажатие кнопки !!
             break
-        case .won, .lose:
-            // Отрисовка экрана победы/поражения
+        case .won:
+            // показать окно выигрыша
             break
+        case .lose:
+            // показать окно проигрыша
+            break
+        case .inventory:
+            itemAction(input)
         case .quit:
             // Выход из игры
             break
-        }
-    }
-    
-    public func handleInput(_ input: PlayerAction) {
-        switch input {
-        case .move(let dx, let dy):
-            if state == .generating || state == .beginning {
-                state = .playing
-            } else if state == .playing {
-                // Обработка движения уже в gameLoop
-            }
-        case .exit:
-            state = .quit
-        case .openElixir, .openFood, .openWeapon, .openScroll:
-            if state == .playing {
-                state = .inventory
-            }
-        case .showStats:
-            // Показать статистику
+        case .beginning:
             break
-        case .none:
-            break
-        case .start:
-            state = .generating
         }
-    }
-    
-    private func startGame() {
-        state = .generating
+        
     }
     
     private func generateLevel() {
         self.level = LevelBuilder.buildLevel()
-        state = .playing
     }
-
-    private func tick(_ input: PlayerAction) {
-        guard let level = level else { return }
+    
+    private func motion(_ input: PlayerAction) {
+        guard let level = level else  { return }
         
         if case .move(let dx, let dy) = input {
             level.playerTurn(dx, dy)
-            
             if level.isWin() {
                 state = .won
                 return
             }
-            
             if level.isLevelFinished() {
                 state = .levelComplete
                 return
             }
-            
             level.enemiesTurn()
-            
             if level.isLose() {
                 state = .lose
                 return
@@ -95,8 +96,28 @@ public class Controller {
         }
     }
     
+    private func itemAction(_ input: PlayerAction) {
+        guard let level = level else  { return }
+        if case .useItem(let index) = input {
+            level.player.useItem(category: inventoryCategory!, index: index)
+            state = .playing
+            inventoryCategory = nil
+        } else if input == .dropWeapon {
+            level.dropWeapon()
+            state = .playing
+            inventoryCategory = nil
+        }
+
+    }
+    
     public func renderLevel() {
         guard let level = level else { return }
+        
+        if state == .inventory, let category = inventoryCategory {
+            renderInventory(for: category, items: level.getItemsList(category))
+            return
+        }
+        
         let tiles = TileAssembler.buildTiles(from: level)
         renderer.drawTiles(tiles)
         let log = GameLogger.shared.log
@@ -105,5 +126,17 @@ public class Controller {
         renderer.drawString(String(repeating: " ", count: 80), atY: logY, x: 0)
         // Печатаем лог
         renderer.drawString(log, atY: logY, x: 0)
+    }
+    
+    private func renderInventory(for category: ItemCategory, items: [ItemProtocol]) {
+        clear()
+        renderer.drawString("Inventory: \(category)", atY: 0, x: 0)
+        
+        for (i, item) in items.prefix(9).enumerated() {
+            let line = "\(i + 1). \(item.type.name)"
+            renderer.drawString(line, atY: i + 1, x: 0)
+        }
+        
+        renderer.drawString("Press 1-9 to use, Esc to return", atY: 11, x: 0)
     }
 }

@@ -23,7 +23,7 @@ public enum ItemType: Hashable, Equatable {
         }
     }
 
-    var name: String {
+    public var name: String {
         switch self {
         case .food(let food): return food.name
         case .weapon(let weapon): return weapon.name
