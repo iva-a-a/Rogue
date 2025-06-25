@@ -23,7 +23,7 @@ public struct Tile: DrawableObject {
 
     public init(posX: Int, posY: Int, char: Character, isVisible: Bool = true, colorPair: Int = 1) {
         self.posX = posX
-        self.posY = posX
+        self.posY = posY
         self.char = char
         self.isVisible = isVisible
         self.colorPair = colorPair
