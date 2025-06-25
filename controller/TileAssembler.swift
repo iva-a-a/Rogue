@@ -4,88 +4,120 @@ import presentation
 public struct TileAssembler {
     
     public static func buildTiles(from level: Level) -> [DrawableObject] {
-        var tiles: [DrawableObject] = []
-
-        for room in level.rooms {
+        var tiles = [DrawableObject]()
+        
+        tiles.append(contentsOf: buildRoomTiles(rooms: level.rooms))
+        tiles.append(contentsOf: buildCorridorTiles(corridors: level.corridors))
+        tiles.append(contentsOf: buildDoorTiles(rooms: level.rooms))
+        tiles.append(contentsOf: buildItemTiles(items: level.items))
+        tiles.append(buildExitTile(position: level.exitPosition))
+        tiles.append(contentsOf: buildEnemyTiles(enemies: level.enemies))
+        tiles.append(buildPlayerTile(player: level.player))
+        
+        return tiles
+    }
+    
+    private static func buildRoomTiles(rooms: [Room]) -> [DrawableObject] {
+        var tiles = [DrawableObject]()
+        
+        for room in rooms {
             for x in room.lowLeft.x...room.topRight.x {
                 for y in room.lowLeft.y...room.topRight.y {
-                    let char: Character = (x == room.lowLeft.x || x == room.topRight.x || y == room.lowLeft.y || y == room.topRight.y) ? "#" : "."
-                    let tile = Tile(position: Position(x, y), char: char, isVisible: true, colorPair: 1)
-                    tiles.append(tile)
+                    let isWall = (x == room.lowLeft.x || x == room.topRight.x ||
+                                 y == room.lowLeft.y || y == room.topRight.y)
+                    let char: Character = isWall ? "#" : "."
+                    tiles.append(Tile(position: Position(x, y), char: char, isVisible: true, colorPair: 1))
                 }
-            }
-        }
-
-        for corridor in level.corridors {
-            for pos in corridor.route {
-                let tile = Tile(position: pos, char: "+", isVisible: true, colorPair: 1)
-                tiles.append(tile)
             }
         }
         
-        for room in level.rooms {
-            for door in room.doors {
-                let color: Int
-                switch door.color {
-                case .red:
-                    color = 2
-                case .green:
-                    color = 6
-                case .blue:
-                    color = 5
-                case .none:
-                    color = 1
-                }
-                let tile = Tile(position: door.position, char: "D", isVisible: true, colorPair: color)
-                tiles.append(tile)
+        return tiles
+    }
+    
+    private static func buildCorridorTiles(corridors: [Corridor]) -> [DrawableObject] {
+        var tiles = [DrawableObject]()
+        
+        for corridor in corridors {
+            for pos in corridor.route {
+                tiles.append(Tile(position: pos, char: "+", isVisible: true, colorPair: 1))
             }
         }
-
-        for (pos, item) in level.items {
-            let char: Character
-            let color: Int
-            switch item.type {
-            case .food:
-                char = "f"
-                color = 1
-            case .weapon:
-                char = "w"
-                color = 4
-            case .scroll:
-                char = "s"
-                color = 4
-            case .elixir:
-                char = "e"
-                color = 4
-            case .treasure: 
-                char = "*"
-                color = 4
-            case .key(let colorKey):
-                char = "k"
-                switch colorKey {
-                case .red:
-                    color = 2
-                case .green:
-                    color = 6
-                case .blue:
-                    color = 5
-                case .none:
-                    color = 1
-                }
+        
+        return tiles
+    }
+    
+    private static func buildDoorTiles(rooms: [Room]) -> [DrawableObject] {
+        var tiles = [DrawableObject]()
+        
+        for room in rooms {
+            for door in room.doors {
+                let color = colorForDoor(door.color)
+                tiles.append(Tile(position: door.position, char: "D", isVisible: true, colorPair: color))
             }
+        }
+        
+        return tiles
+    }
+    
+    private static func buildItemTiles(items: [Position: ItemProtocol]) -> [DrawableObject] {
+        var tiles = [DrawableObject]()
+        
+        for (pos, item) in items {
+            let (char, color) = symbolAndColorForItem(item)
             tiles.append(Tile(position: pos, char: char, isVisible: true, colorPair: color))
         }
-
-        for enemy in level.enemies {
-            let char = enemy.type.symbol
-            tiles.append(Tile(position: enemy.characteristics.position, char: char, isVisible: true, colorPair: 1))
-        }
-
-        tiles.append(Tile(position: level.exitPosition, char: "E", isVisible: true, colorPair: 1))
         
-        let player = level.player
-        tiles.append(Tile(position: player.characteristics.position, char: "@", isVisible: true, colorPair: 1))
-
         return tiles
+    }
+    
+    private static func buildExitTile(position: Position) -> DrawableObject {
+        return Tile(position: position, char: "E", isVisible: true, colorPair: 1)
+    }
+    
+    private static func buildEnemyTiles(enemies: [Enemy]) -> [DrawableObject] {
+        var tiles = [DrawableObject]()
+        for enemy in enemies {
+            let (char, color) = symbolAndColorForEnemy(enemy)
+            tiles.append(Tile(position: enemy.characteristics.position, char: char, isVisible: enemy.isVisible, colorPair: color))
+        }
+        return tiles
+    }
+    
+    private static func buildPlayerTile(player: Player) -> DrawableObject {
+        return Tile(position: player.characteristics.position,
+                   char: "@",
+                   isVisible: true,
+                   colorPair: 1)
+    }
+    
+    private static func colorForDoor(_ color: Color) -> Int {
+        switch color {
+        case .red: return 2
+        case .green: return 6
+        case .blue: return 5
+        case .none: return 1
+        }
+    }
+    
+    private static func symbolAndColorForItem(_ item: ItemProtocol) -> (Character, Int) {
+        switch item.type {
+        case .food: return ("f", 1)
+        case .weapon: return ("w", 4)
+        case .scroll: return ("s", 4)
+        case .elixir: return ("e", 4)
+        case .treasure: return ("*", 4)
+        case .key(let colorKey): return ("k", colorForDoor(colorKey))
+        }
+    }
+    
+    private static func symbolAndColorForEnemy(_ enemy: Enemy) -> (Character, Int) {
+        switch enemy.type {
+        case .zombie: return ("Z", 6)
+        case .vampire: return ("V", 2)
+        case .ghost: return ("G", 1)
+        case .ogre: return ("O", 4)
+        case .snakeMage: return ("S", 1)
+        case .mimic: return ("M", 1)
+        }
     }
 }

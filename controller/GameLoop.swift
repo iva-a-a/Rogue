@@ -17,7 +17,7 @@ public final class GameLoop {
             refresh()
             
             let action = InputHandler.getAction()
-            controller.update(action)
+            controller.update(for: action)
             
             if case .quit = controller.state {
                 isRunning = false

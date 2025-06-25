@@ -15,16 +15,6 @@ public enum EnemyType {
         case .mimic: return "Mimic"
         }
     }
-     public var symbol: Character {
-        switch self {
-        case .zombie: return "Z"
-        case .vampire: return "V"
-        case .ghost: return "G"
-        case .ogre: return "O"
-        case .snakeMage: return "S"
-        case .mimic: return "M"
-        }
-    }
 }
 
 public protocol EnemyProtocol {
