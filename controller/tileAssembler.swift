@@ -39,6 +39,7 @@ public struct TileAssembler {
 
     private static func buildCorridorTiles(corridors: [Corridor]) -> [DrawableObject] {
         var tiles = [DrawableObject]()
+
         for corridor in corridors {
             for pos in corridor.route {
                 tiles.append(Tile(posX: pos.x, posY: pos.y, char: "+", isVisible: true, colorPair: 1))
@@ -101,8 +102,8 @@ public struct TileAssembler {
     private static func colorForDoor(_ color: Color) -> Int {
         switch color {
         case .red: return 2
-        case .green: return 6
-        case .blue: return 5
+        case .green: return 5
+        case .blue: return 4
         case .none: return 1
         }
     }
@@ -110,20 +111,20 @@ public struct TileAssembler {
     private static func symbolAndColorForItem(_ item: ItemProtocol) -> (Character, Int) {
         switch item.type {
         case .food: return ("f", 1)
-        case .weapon: return ("w", 4)
-        case .scroll: return ("s", 4)
-        case .elixir: return ("e", 4)
-        case .treasure: return ("*", 4)
+        case .weapon: return ("w", 1)
+        case .scroll: return ("s", 1)
+        case .elixir: return ("e", 1)
+        case .treasure: return ("*", 3)
         case .key(let colorKey): return ("k", colorForDoor(colorKey))
         }
     }
 
     private static func symbolAndColorForEnemy(_ enemy: Enemy) -> (Character, Int) {
         switch enemy.type {
-        case .zombie: return ("Z", 6)
+        case .zombie: return ("Z", 5)
         case .vampire: return ("V", 2)
         case .ghost: return ("G", 1)
-        case .ogre: return ("O", 4)
+        case .ogre: return ("O", 3)
         case .snakeMage: return ("S", 1)
         case .mimic: return ("M", 1)
         }
