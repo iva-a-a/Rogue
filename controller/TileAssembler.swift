@@ -81,10 +81,10 @@ public struct TileAssembler {
             tiles.append(Tile(position: enemy.characteristics.position, char: char, isVisible: true, colorPair: 1))
         }
 
+        tiles.append(Tile(position: level.exitPosition, char: "E", isVisible: true, colorPair: 1))
+        
         let player = level.player
         tiles.append(Tile(position: player.characteristics.position, char: "@", isVisible: true, colorPair: 1))
-
-        tiles.append(Tile(position: level.exitPosition, char: "E", isVisible: true, colorPair: 1))
 
         return tiles
     }
