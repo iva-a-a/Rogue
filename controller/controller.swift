@@ -14,12 +14,12 @@ public class Controller {
     
     public init() { }
     
-    public func update(_ input: PlayerAction) {
-        updateState(input)
+    public func update(for input: PlayerAction) {
+        updateState(for: input)
         act(for: input)
     }
     
-    private func updateState(_ input: PlayerAction) {
+    private func updateState(for input: PlayerAction) {
         switch state {
         case .beginning:
             if input == .start { state = .generating }
@@ -72,7 +72,8 @@ public class Controller {
     }
     
     private func generateLevel() {
-        self.level = LevelBuilder.buildLevel()
+        let player = level?.player ?? Player()
+        self.level = LevelBuilder.buildLevel(player: player)
     }
     
     private func motion(_ input: PlayerAction) {
@@ -82,15 +83,18 @@ public class Controller {
             level.playerTurn(dx, dy)
             if level.isWin() {
                 state = .won
+                GameEventManager.shared.notify(.gameWon)
                 return
             }
             if level.isLevelFinished() {
+                GameEventManager.shared.notify(.levelComplete(number: level.levelNumber))
                 state = .levelComplete
                 return
             }
             level.enemiesTurn()
             if level.isLose() {
                 state = .lose
+                GameEventManager.shared.notify(.gameOver)
                 return
             }
         }
@@ -107,7 +111,6 @@ public class Controller {
             state = .playing
             inventoryCategory = nil
         }
-
     }
     
     public func renderLevel() {

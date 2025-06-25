@@ -8,6 +8,7 @@ public struct LevelBuilder {
     
     static public func buildLevel(roomBuilder: RoomBuilderProtocol = RoomBuilder(),
                                   corridorsBuilder: CorridorsBuilderProtocol = CorridorsBuilder(),
+                                  player: Player,
                                   difficulty: GameDifficulty = .normal
     ) -> Level {
 
@@ -21,8 +22,6 @@ public struct LevelBuilder {
         addCoridorsCoordToMap(corridors, gameMap)
         corridorsBuilder.removeUnusedDoors(rooms, corridors)
         addDooorsCoordToMap(rooms, gameMap)
-    
-        let player = Player()
         let (exitPosition, items, enemies) = buildContent(rooms, graph, &gameMap, player, difficulty)
         return Level(rooms, corridors, exitPosition, player, enemies, items, self.levelNumber, gameMap)
     }
