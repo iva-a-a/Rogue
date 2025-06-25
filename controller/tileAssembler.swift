@@ -30,7 +30,7 @@ public struct TileAssembler {
                     let isWall = (x == room.lowLeft.x || x == room.topRight.x ||
                                  y == room.lowLeft.y || y == room.topRight.y)
                     let char: Character = isWall ? "#" : "."
-                    tiles.append(Tile(posX: x, posY: y, char: char, isVisible: true, colorPair: 1))
+                    tiles.append(Tile(posX: x, posY: y, char: char, isVisible: true, colorPair: ColorCode.white))
                 }
             }
         }
@@ -42,7 +42,7 @@ public struct TileAssembler {
 
         for corridor in corridors {
             for pos in corridor.route {
-                tiles.append(Tile(posX: pos.x, posY: pos.y, char: "+", isVisible: true, colorPair: 1))
+                tiles.append(Tile(posX: pos.x, posY: pos.y, char: "+", isVisible: true, colorPair: ColorCode.white))
             }
         }
         return tiles
@@ -75,7 +75,11 @@ public struct TileAssembler {
     }
 
     private static func buildExitTile(position: Position) -> DrawableObject {
-        return Tile(posX: position.x, posY: position.y, char: "E", isVisible: true, colorPair: 1)
+        return Tile(posX: position.x,
+                    posY: position.y,
+                    char: "E",
+                    isVisible: true,
+                    colorPair: ColorCode.white)
     }
 
     private static func buildEnemyTiles(enemies: [Enemy]) -> [DrawableObject] {
@@ -96,37 +100,45 @@ public struct TileAssembler {
                     posY: player.characteristics.position.y,
                     char: "@",
                     isVisible: true,
-                    colorPair: 1)
+                    colorPair: ColorCode.white)
     }
 
     private static func colorForDoor(_ color: Color) -> Int {
         switch color {
-        case .red: return 2
-        case .green: return 5
-        case .blue: return 4
-        case .none: return 1
+        case .red: return ColorCode.red
+        case .green: return ColorCode.green
+        case .blue: return ColorCode.blue
+        case .none: return ColorCode.white
         }
     }
 
     private static func symbolAndColorForItem(_ item: ItemProtocol) -> (Character, Int) {
         switch item.type {
-        case .food: return ("f", 1)
-        case .weapon: return ("w", 1)
-        case .scroll: return ("s", 1)
-        case .elixir: return ("e", 1)
-        case .treasure: return ("*", 3)
+        case .food: return ("f", ColorCode.white)
+        case .weapon: return ("w", ColorCode.white)
+        case .scroll: return ("s", ColorCode.white)
+        case .elixir: return ("e", ColorCode.white)
+        case .treasure: return ("*", ColorCode.yellow)
         case .key(let colorKey): return ("k", colorForDoor(colorKey))
         }
     }
 
     private static func symbolAndColorForEnemy(_ enemy: Enemy) -> (Character, Int) {
         switch enemy.type {
-        case .zombie: return ("Z", 5)
-        case .vampire: return ("V", 2)
-        case .ghost: return ("G", 1)
-        case .ogre: return ("O", 3)
-        case .snakeMage: return ("S", 1)
-        case .mimic: return ("M", 1)
+        case .zombie: return ("Z", ColorCode.green)
+        case .vampire: return ("V", ColorCode.red)
+        case .ghost: return ("G", ColorCode.white)
+        case .ogre: return ("O", ColorCode.yellow)
+        case .snakeMage: return ("S", ColorCode.white)
+        case .mimic: return ("M", ColorCode.white)
         }
     }
+}
+
+enum ColorCode {
+    static let white = 1
+    static let red = 2
+    static let yellow = 3
+    static let blue = 4
+    static let green = 5
 }
