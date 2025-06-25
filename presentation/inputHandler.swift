@@ -1,7 +1,7 @@
 //
 //  inputHandler.swift
 //  rogue
-//
+
 import Darwin.ncurses
 
 public enum PlayerAction: Equatable {
@@ -60,7 +60,6 @@ public struct InputHandler {
             return .useItem(index: index)
         case Int32(UnicodeScalar("0").value): return .dropWeapon
         default: return .none
-            
         }
     }
 }

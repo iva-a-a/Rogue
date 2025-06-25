@@ -2,8 +2,6 @@
 //  movementBehavior.swift
 //  rogue
 
-import Foundation
-
 public protocol MovementBehavior {
     func move(from position: Position, toward playerPosition: Position, in room: Room, in gameMap: GameMap) -> Position?
 }
@@ -39,7 +37,7 @@ public struct PursueMovement: MovementBehavior {
         }
         return nil
     }
-    
+
     private func findPath(from start: Position, to target: Position, in gameMap: GameMap) -> [Position]? {
         let directions = [
             Position(0, 1),
@@ -47,7 +45,7 @@ public struct PursueMovement: MovementBehavior {
             Position(0, -1),
             Position(-1, 0)
         ]
-        
+
         var visited: Set<Position> = [start]
         var queue: [(position: Position, path: [Position])] = [(start, [start])]
 
@@ -92,7 +90,7 @@ public class DiagonalMovement: MovementBehavior {
         return position
     }
 }
- 
+
 public struct TeleportMovement: MovementBehavior {
     public init() {}
 

@@ -1,7 +1,6 @@
 //
-//  generateRoomCorr.swift
+//  builderGameField.swift
 //  rogue
-
 
 public protocol RoomBuilderProtocol {
     func buildRooms() -> [Room]

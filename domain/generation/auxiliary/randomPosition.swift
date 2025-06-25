@@ -1,5 +1,5 @@
 //
-//  random.swift
+//  randomPosition.swift
 //  rogue
 
 struct GetterPositions {
@@ -41,7 +41,7 @@ struct GetterPositions {
         }
         return results
     }
-    
+
     static func randomPositionOnRoom(in room: Room, offset: Int) -> Position {
         Position(
             Int.random(in: room.lowLeft.x + offset...room.topRight.x - offset),

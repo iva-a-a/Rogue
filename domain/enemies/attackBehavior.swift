@@ -1,3 +1,7 @@
+//
+//  attackBehavior.swift
+//  rogue
+
 public enum AttackResult {
     case miss
     case hit(damage: Int)

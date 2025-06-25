@@ -1,5 +1,6 @@
-import Foundation
-
+//
+//  factory.swift
+//  rogue
 
 public protocol EntityFactory {
     associatedtype EntityType

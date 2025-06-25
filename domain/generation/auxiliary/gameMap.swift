@@ -2,7 +2,6 @@
 //  gameMap.swift
 //  rogue
 
-
 public class GameMap {
     var walkablePositions: Set<Position> = []
     
@@ -30,21 +29,4 @@ public class GameMap {
         self.addPosition(oldPosition)
         self.removePosition(newPosition)
     }
-
-    
-//    public func printMap() {
-//        for x in 0..<Constants.Map.height {
-//            for y in 0..<Constants.Map.width {
-//                let pos = Position(x, y)
-//                if isWalkable(pos) {
-//                    print(".", terminator: "")
-//                } else {
-//                    print(" ", terminator: "")
-//                }
-//            }
-//            print()
-//            }
-//        }
-    }
-
-
+}

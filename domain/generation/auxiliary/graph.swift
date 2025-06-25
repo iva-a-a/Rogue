@@ -57,18 +57,17 @@ extension Graph {
     private func isValidNode(_ node: Int) -> Bool {
         return node >= 0 && node < Constants.Graph.countNode
     }
-    
+
     mutating func removeAllConnections(for node: Int) {
-            guard isValidNode(node) else { return }
+        guard isValidNode(node) else { return }
 
-            if let connectedNodes = adjacencyList[node] {
-                for connectedNode in connectedNodes {
-                    adjacencyList[connectedNode]?.remove(node)
-                }
+        if let connectedNodes = adjacencyList[node] {
+            for connectedNode in connectedNodes {
+                adjacencyList[connectedNode]?.remove(node)
             }
-
-            adjacencyList[node]?.removeAll()
-
-            self.resetConnectivity()
         }
+
+        adjacencyList[node]?.removeAll()
+        self.resetConnectivity()
+    }
 }

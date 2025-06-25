@@ -2,7 +2,6 @@
 //  backpack.swift
 //  rogue
 
-
 public enum ItemCategory: Hashable {
     case food
     case weapon
@@ -24,7 +23,7 @@ public class Backpack {
         itemArray.remove(at: index)
         items[category] = itemArray.isEmpty ? [] : itemArray
     }
-    
+
     public func addItem(_ item: any ItemProtocol) -> AddingCode {
         let category = item.type.category
         var categoryItems = items[category] ?? []

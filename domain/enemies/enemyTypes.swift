@@ -1,5 +1,5 @@
 //
-// enemyTypes.swift
+//  enemyTypes.swift
 //  rogue
 
 class Zombie: Enemy {
@@ -52,7 +52,7 @@ class Ghost: Enemy {
 
 class Ogre: Enemy {
     var isResting: Bool = false
-    
+
     init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .ogre,

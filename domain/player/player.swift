@@ -2,17 +2,13 @@
 //  player.swift
 //  rogue
 
-import Foundation
-
 public class Player {
-    
+
     public var characteristics: Characteristics
     public var backpack: Backpack
     public var weapon: Weapon?
     public var isAsleep: Bool = false
     public var buffManager: BuffManager
-
-    
 
     public init(characteristics: Characteristics, backpack: Backpack, weapon: Weapon?, buffManager: BuffManager) {
         self.characteristics = characteristics
@@ -31,11 +27,11 @@ public class Player {
     public func useItem(category: ItemCategory, index: Int) {
         backpack.useItem(self, category: category, index: index)
     }
-    
+
     public func pickUpItem(_ item: any ItemProtocol) -> AddingCode {
         return item.pickUp(self)
     }
-    
+
     public func hasKey(for color: Color) -> Bool {
         return backpack.items[.key]?.contains { item in
             if case let .key(keyColor) = item.type, keyColor == color {
@@ -44,7 +40,7 @@ public class Player {
             return false
         } ?? false
     }
-    
+
     @discardableResult
     public func dropWeapon() -> Weapon? {
         defer { self.weapon = nil }
@@ -54,11 +50,11 @@ public class Player {
     public func updateBuffs() {
         buffManager.update(player: self)
     }
-    
+
     public func attack(_ target: Enemy) -> AttackResult {
         return CombatSystem.performAttack(from: self, to: target)
     }
-    
+
     public func move(to position: Position, in gameMap: GameMap) {
         if !gameMap.isWalkable(position) {
             GameEventManager.shared.notify(.playerNotMoved)

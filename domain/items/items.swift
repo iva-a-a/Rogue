@@ -2,8 +2,6 @@
 //  items.swift
 //  rogue
 
-import Foundation
-
 public enum ItemType: Hashable, Equatable {
     case food(FoodType)
     case weapon(WeaponType)

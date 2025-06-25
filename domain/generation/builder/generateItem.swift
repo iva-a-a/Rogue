@@ -3,8 +3,9 @@
 //  rogue
 
 public final class ItemEntityFactory: EntityFactory {
+
     public typealias EntityType = ItemProtocol
-    
+
     public func generate(in rooms: [Room],
                          excluding: Set<Position>,
                          player: Player,
@@ -23,7 +24,7 @@ public final class ItemEntityFactory: EntityFactory {
         }
         return items
     }
-    
+
     private static func randomItem(probabilities: [ItemCategory: Double],
                                    difficulty: GameDifficulty,
                                    player: Player,
@@ -32,7 +33,7 @@ public final class ItemEntityFactory: EntityFactory {
 
         let random = Double.random(in: 0..<1)
         var runningSum = 0.0
-        
+
         for (category, probability) in probabilities {
             runningSum += probability
             if random < runningSum {
@@ -41,7 +42,7 @@ public final class ItemEntityFactory: EntityFactory {
         }
         return createItem(of: .food, for: difficulty, player: player, level: level)
     }
-    
+
     public static func createItem(of category: ItemCategory,
                                   for difficulty: GameDifficulty,
                                   player: Player,
@@ -59,7 +60,7 @@ public final class ItemEntityFactory: EntityFactory {
         }
         return factory.createItem(for: difficulty, player: player, level: level)
     }
-    
+
     private static func getBaseProbabilities() -> [ItemCategory: Double] {
         return [
             .food: 0.35,
@@ -68,7 +69,7 @@ public final class ItemEntityFactory: EntityFactory {
             .weapon: 0.15,
         ]
     }
-    
+
     private static func getProbabilities(_ level: Int, _ difficulty: GameDifficulty) -> [ItemCategory: Double] {
         var probabilities = getBaseProbabilities()
         adjustProbabilitiesByLevel(&probabilities, level: level)
@@ -76,7 +77,7 @@ public final class ItemEntityFactory: EntityFactory {
         normalizeProbabilities(&probabilities)
         return probabilities
     }
-    
+
     private static func adjustProbabilitiesByLevel(_ probabilities: inout [ItemCategory: Double], level: Int) {
         let levelFactor = Double(level) * 0.02
         probabilities[.food]? -= levelFactor
@@ -84,7 +85,7 @@ public final class ItemEntityFactory: EntityFactory {
         probabilities[.weapon]? += levelFactor * 0.7
         probabilities[.treasure]? += levelFactor * 0.8
     }
-    
+
     private static func adjustProbabilitiesByDifficulty(_ probabilities: inout [ItemCategory: Double],
                                                         difficulty: GameDifficulty) {
         switch difficulty {
@@ -98,7 +99,7 @@ public final class ItemEntityFactory: EntityFactory {
                 probabilities[.weapon]? *= 1.2
         }
     }
-    
+
     private static func normalizeProbabilities(_ probabilities: inout [ItemCategory: Double]) {
         let total = probabilities.values.reduce(0, +)
         for (category, _) in probabilities {

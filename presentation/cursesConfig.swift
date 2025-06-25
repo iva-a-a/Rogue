@@ -1,3 +1,7 @@
+//
+//  cursesConfig.swift
+//  rogue
+
 import Darwin.ncurses
 
 public func configureCurses() {

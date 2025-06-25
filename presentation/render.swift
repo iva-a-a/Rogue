@@ -1,6 +1,8 @@
-import Foundation
+//
+//  render.swift
+//  rogue
+
 import Darwin.ncurses
-import domain
 
 public class LevelRenderer {
     public init() {}
