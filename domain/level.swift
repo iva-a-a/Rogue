@@ -49,6 +49,7 @@ public class Level {
     }
 
     public func dropWeapon() {
+        guard player.weapon != nil else { return }
         let neighborPositions = findFreeNeighbor(around: player.characteristics.position)
         if neighborPositions == nil { return }
         GameEventManager.shared.notify(.weaponDropped(weapon: player.weapon!.type.name))
