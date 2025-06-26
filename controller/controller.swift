@@ -52,7 +52,6 @@ public class Controller {
         case .playing:
             motion(input)
         case .levelComplete:
-            // можно показать сообщение и ждать нажатие кнопки !!
             break
         case .won:
             // показать окно выигрыша
@@ -73,6 +72,7 @@ public class Controller {
     
     private func generateLevel() {
         let player = level?.player ?? Player()
+        player.deleteAllKeys()
         self.level = LevelBuilder.buildLevel(player: player)
     }
     
@@ -123,23 +123,55 @@ public class Controller {
         
         let tiles = TileAssembler.buildTiles(from: level)
         renderer.drawTiles(tiles)
-        let log = GameLogger.shared.log
-        // Получаем высоту экрана (LINES — глобальная переменная из ncurses)
-        let logY = Int(LINES) - 1
-        renderer.drawString(String(repeating: " ", count: 80), atY: logY, x: 0)
-        // Печатаем лог
-        renderer.drawString(log, atY: logY, x: 0)
+        renderInfo()
+        renderLog()
     }
-    
+
+    // переделать
     private func renderInventory(for category: ItemCategory, items: [ItemProtocol]) {
         clear()
-        renderer.drawString("Inventory: \(category)", atY: 0, x: 0)
+        renderer.drawString("Inventory: \(category)", atY: 0, atX: 0)
         
         for (i, item) in items.prefix(9).enumerated() {
             let line = "\(i + 1). \(item.type.name)"
-            renderer.drawString(line, atY: i + 1, x: 0)
+            renderer.drawString(line, atY: i + 1, atX: 0)
         }
         
-        renderer.drawString("Press 1-9 to use, Esc to return", atY: 11, x: 0)
+        renderer.drawString("Press 1-9 to use, Esc to return", atY: 11, atX: 0)
     }
+    
+    private func renderLog() {
+        let log = GameLogger.shared.log
+
+        renderer.drawString(String(repeating: " ", count: RenderPadding.length),
+                            atY: RenderPadding.logTop, atX: RenderPadding.null)
+        renderer.drawString(log, atY: RenderPadding.logTop, atX: RenderPadding.null)
+    }
+    
+    private func renderInfo() {
+        guard let level = level else { return }
+        
+        let player = level.player
+        let stats = player.characteristics
+
+        let infoString = String(format: "Level: %d | HP: %d/%d | STR: %d | AGI: %d | Weapon: %@",
+                                level.levelNumber,
+                                stats.maxHealth,
+                                stats.health,
+                                stats.strength,
+                                stats.agility,
+                                player.weapon?.weaponType.name ?? "None")
+        
+        renderer.drawString(String(repeating: " ", count: RenderPadding.length),
+                            atY: RenderPadding.infoTop,
+                            atX: RenderPadding.null)
+        renderer.drawString(infoString, atY: RenderPadding.infoTop, atX: RenderPadding.null)
+    }
+}
+
+enum RenderPadding {
+    static let logTop = 26
+    static let null = 0
+    static let infoTop = 25
+    static let length = 80
 }
