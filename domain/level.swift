@@ -34,7 +34,6 @@ public class Level {
         self.levelNumber = levelNumber
         self.gameMap = gameMap
         self.addColoredDoors()
-        GameEventManager.shared.addObserver(GameLogger.shared)
     }
     
     public func defeatEnemy(_ enemy: Enemy) {
@@ -107,7 +106,6 @@ public class Level {
     }
 
     public func playerTurn(_ dx: Int, _ dy: Int) {
-        GameLogger.shared.clearCombatLog()
         guard player.isAsleep == false else {
             player.isAsleep = false
             GameEventManager.shared.notify(.playerSkipMove)

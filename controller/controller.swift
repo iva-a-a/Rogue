@@ -12,9 +12,12 @@ public class Controller {
     private let renderer = LevelRenderer()
     private var inventoryCategory: ItemCategory? = nil
     
-    public init() { }
+    public init() {
+        GameEventManager.shared.addObserver(GameLogger.shared)
+    }
     
     public func update(for input: PlayerAction) {
+        GameLogger.shared.clearCombatLog()
         updateState(for: input)
         act(for: input)
     }

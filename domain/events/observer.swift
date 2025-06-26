@@ -2,7 +2,7 @@
 //  observer.swift
 //  rogue
 
-protocol GameEventObserver: AnyObject {
+public protocol GameEventObserver: AnyObject {
     func didReceiveEvent(event: GameEvent)
 }
 
@@ -13,7 +13,7 @@ public class GameEventManager {
 
     private init() {}
 
-    func addObserver(_ observer: GameEventObserver) {
+    public func addObserver(_ observer: GameEventObserver) {
         observers.append(observer)
     }
 
@@ -34,7 +34,7 @@ public class GameLogger: GameEventObserver {
     
     private init() {}
     
-    func didReceiveEvent(event: GameEvent) {
+    public func didReceiveEvent(event: GameEvent) {
         switch event {
         case .playerMissed(let target):
             combatLog.append("You missed the enemy \(target)!")
