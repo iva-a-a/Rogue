@@ -15,6 +15,9 @@ public class Level {
     public var gameMap: GameMap
     
     public var coloredDoors: [Door] = []
+    
+    public var exploredPositions: Set<Position> = []
+
 
     public init(_ rooms: [Room],
                 _ corridors: [Corridor],
@@ -122,6 +125,8 @@ public class Level {
         if let item = items[position] {
             self.pickUpItem(item, at: position)
         }
+
+        gameMap.updateVisibility(from: player.characteristics.position)
     }
     
     private func tryOpenDoor(at position: Position) -> Bool {
