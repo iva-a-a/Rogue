@@ -98,7 +98,13 @@ class SnakeMage: Enemy {
     }
 }
 
+public protocol DepictsItem {
+    var depictsItem: Bool { get set }
+}
+
 class Mimic: Enemy {
+    var depictsItem: Bool = true
+    
     init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .mimic,
@@ -110,4 +116,11 @@ class Mimic: Enemy {
             indexRoom: 9
         )
     }
+    
+    override func attack(player: Player) -> AttackResult {
+        depictsItem = false
+        return attackBehavior.attack(attacker: self, player: player)
+    }
 }
+
+extension Mimic: DepictsItem {}

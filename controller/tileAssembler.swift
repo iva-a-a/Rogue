@@ -68,7 +68,7 @@ public struct TileAssembler {
         var tiles = [DrawableObject]()
 
         for (pos, item) in items {
-            let (char, color) = symbolAndColorForItem(item)
+            let (char, color) = symbolAndColorForItem(item.type)
             tiles.append(Tile(posX: pos.x, posY: pos.y, char: char, isVisible: true, colorPair: color))
         }
         return tiles
@@ -112,8 +112,8 @@ public struct TileAssembler {
         }
     }
 
-    private static func symbolAndColorForItem(_ item: ItemProtocol) -> (Character, Int) {
-        switch item.type {
+    private static func symbolAndColorForItem(_ type: ItemType) -> (Character, Int) {
+        switch type {
         case .food: return ("f", ColorCode.white)
         case .weapon: return ("w", ColorCode.white)
         case .scroll: return ("s", ColorCode.white)
@@ -130,8 +130,22 @@ public struct TileAssembler {
         case .ghost: return ("G", ColorCode.white)
         case .ogre: return ("O", ColorCode.yellow)
         case .snakeMage: return ("S", ColorCode.white)
-        case .mimic: return ("M", ColorCode.white)
+        case .mimic:
+            if let itemDepicting = enemy as? DepictsItem, itemDepicting.depictsItem {
+                return symbolAndColorForItem(getRandomItemType())
+            }
+            return ("M", ColorCode.white)
         }
+    }
+
+    private static func getRandomItemType() -> ItemType {
+        let possibleItems: [ItemType] = [
+            .food(.apple),
+            .weapon(.dagger),
+            .scroll(.agility),
+            .elixir(.agility),
+        ]
+        return possibleItems.randomElement() ?? .food(.apple)
     }
 }
 

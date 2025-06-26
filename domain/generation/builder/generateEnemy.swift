@@ -43,7 +43,7 @@ public final class EnemyEntityFactory: EntityFactory {
             case .snakeMage:
                 baseStats = (maxHealth: 50, health: 50, agility: 20, strength: 8, hostility: 8)
             case .mimic:
-                baseStats = (maxHealth: 60, health: 60, agility: 25, strength: 8, hostility: 3)
+                baseStats = (maxHealth: 60, health: 60, agility: 25, strength: 8, hostility: 1)
         }
         return baseStats
     }
