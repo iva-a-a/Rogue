@@ -114,43 +114,49 @@ public class Controller {
     }
     
     public func renderLevel() {
-        guard let level = level else { return }
+    guard let level = level else { return }
+
+    if state == .inventory, let category = inventoryCategory {
+        let items = level.getItemsList(category)
+        clear()
         
-        if state == .inventory, let category = inventoryCategory {
-    let items = level.getItemsList(category)
-    clear()
-    
-    renderer.drawString("Inventory: \(category)", atY: 0, x: 0)
-    
-    if items.isEmpty {
-        renderer.drawString("There are no items in this category", atY: 2, x: 0)
-        renderer.drawString("Press Esc to return", atY: 4, x: 0)
+        renderer.drawString("Inventory: \(category)", atY: 0, x: 0)
+        
+        if items.isEmpty {
+            renderer.drawString("There are no items in this category", atY: 2, x: 0)
+            renderer.drawString("Press Esc to return", atY: 4, x: 0)
+            return
+        }
+
+        for (i, item) in items.prefix(9).enumerated() {
+            let line = "\(i + 1). \(item.type.name)"
+            renderer.drawString(line, atY: i + 1, x: 0)
+        }
+
+        if category == .weapon {
+            renderer.drawString("0. Remove the weapon from your hands", atY: 10, x: 0)
+        }
+
+        renderer.drawString("Press 1-9 to use, Esc — back", atY: 12, x: 0)
         return
     }
 
-    for (i, item) in items.prefix(9).enumerated() {
-        let line = "\(i + 1). \(item.type.name)"
-        renderer.drawString(line, atY: i + 1, x: 0)
-    }
+    let visible = VisibilityEngine.computeVisiblePositions(from: level.player.characteristics.position, in: level)
+    level.exploredPositions.formUnion(visible)
 
-    if category == .weapon {
-        renderer.drawString("0. Remove the weapon from your hands", atY: 10, x: 0)
-    }
+    let tiles = TileAssembler.buildTiles(
+        from: level,
+        visiblePositions: visible,
+        exploredPositions: level.exploredPositions
+    )
 
-    renderer.drawString("Press 1-9 to use, Esc — back", atY: 12, x: 0)
-    return
+    renderer.drawTiles(tiles)
+
+    let log = GameLogger.shared.log
+    let logY = Int(LINES) - 1
+    renderer.drawString(String(repeating: " ", count: 80), atY: logY, x: 0)
+    renderer.drawString(log, atY: logY, x: 0)
 }
-
-        
-        let tiles = TileAssembler.buildTiles(from: level)
-        renderer.drawTiles(tiles)
-        let log = GameLogger.shared.log
-        // Получаем высоту экрана (LINES — глобальная переменная из ncurses)
-        let logY = Int(LINES) - 1
-        renderer.drawString(String(repeating: " ", count: 80), atY: logY, x: 0)
-        // Печатаем лог
-        renderer.drawString(log, atY: logY, x: 0)
-    }
     
     private func renderInventory(for category: ItemCategory, items: [ItemProtocol]) {
         clear()
