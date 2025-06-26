@@ -93,7 +93,7 @@ public struct Treasure: ItemProtocol {
 }
 
 public struct Weapon: ItemProtocol {
-    let weaponType: WeaponType
+    public let weaponType: WeaponType
 
     public var type: ItemType { .weapon(weaponType) }
 

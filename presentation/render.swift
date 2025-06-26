@@ -13,7 +13,7 @@ public class LevelRenderer {
         }
     }
 
-    public func drawString(_ string: String, atY y: Int, x: Int) {
+    public func drawString(_ string: String, atY y: Int, atX x: Int) {
         move(Int32(y), Int32(x))
         addstr(string)
     }

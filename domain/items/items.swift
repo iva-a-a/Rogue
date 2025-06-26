@@ -105,7 +105,7 @@ public enum WeaponType: Hashable, Equatable {
         }
     }
 
-    var name: String {
+    public var name: String {
         switch self {
         case .sword: return "Sword"
         case .bow: return "Bow"
