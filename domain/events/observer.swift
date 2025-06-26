@@ -38,9 +38,9 @@ public class GameLogger: GameEventObserver {
         case .playerMissed(let target):
             log = "You missed the enemy \(target)!"
         case .playerSleep:
-            log =  "You've been drugged - skipping your turn"
+            log =  "You've been drugged - skipping your turn..."
         case .playerSkipMove:
-            log = "You skipped your turn"
+            log = "You skipped your turn!"
         case .playerHit(let target, let damage):
             log = "You hit \(target) for \(damage) damage!"
         case .enemyMissed(let enemy):
@@ -50,33 +50,33 @@ public class GameLogger: GameEventObserver {
         case .enemyDefeated(let enemy):
             log = "You defeated \(enemy)!"
         case .itemPickedUp(let item):
-            log = "You picked up: \(item)"
+            log = "You picked up: \(item)."
         case .notPickedUp:
-            log = "You can't pick that up, the backpack is full"
+            log = "You can't pick that up, the backpack is full."
         case .weaponDropped(let weapon):
-            log = "You dropped: \(weapon)"
+            log = "You dropped: \(weapon)."
         case .playerMoved(let position):
-            log = "Moved to position: (\(position.x), \(position.y))"
+            log = "Moved to position: (\(position.x), \(position.y))."
         case .playerNotMoved:
-            log = "This movement is not possible"
+            log = "This movement is not possible."
         case .eatFood(let food, let amount):
-            log = "You ate \(food), restored \(amount) health"
+            log = "You ate \(food), restored \(amount) health."
         case .drinkElixir(let elixir, let duration):
-            log = "You drank \(elixir), effect lasts \(duration) seconds"
+            log = "You drank \(elixir), effect lasts \(duration) seconds."
         case .readScroll(let scroll, let amount):
-            log = "You read \(scroll), stat increased by \(amount)"
+            log = "You read \(scroll), stat increased by \(amount)."
         case .useWeapon(let weapon, let damage):
-            log = "You used \(weapon), dealing \(damage) damage"
+            log = "You used \(weapon), dealing \(damage) damage."
         case .pickUpTreasure(let treasure, let amount):
-            log = "You found \(treasure) worth \(amount) gold"
+            log = "You found \(treasure) worth \(amount) gold!"
         case .openColorDoor(let color):
-            log = "You opened the door with a \(color)"
+            log = "You opened the door with a \(color)."
         case .notOpenColorDoor:
-            log = "You can't open that door. Find the key of the door color"
+            log = "You can't open that door. Find the key of the door color."
         case .levelComplete(let number):
-            log = "You completed level \(number)"
+            log = "You completed level \(number). Press any key to continue."
         case .gameOver:
-            log = "YOU DIED! Game over."
+            log = "YOU DIED! Game over!"
         case .gameWon:
             log = "YOU WON! Congratulations!"
         }
