@@ -107,6 +107,7 @@ public class Level {
     }
 
     public func playerTurn(_ dx: Int, _ dy: Int) {
+        GameLogger.shared.clearCombatLog()
         guard player.isAsleep == false else {
             player.isAsleep = false
             GameEventManager.shared.notify(.playerSkipMove)
@@ -162,8 +163,9 @@ public class Level {
         case .miss:
             GameEventManager.shared.notify(.playerMissed(target: enemy.type.name))
         case .hit(let damage):
-            enemy.receiveDamage(damage)
-            GameEventManager.shared.notify(.playerHit(target: enemy.type.name, damage: damage))
+            GameEventManager.shared.notify(.playerHit(target: enemy.type.name,
+                                                      damage: damage,
+                                                      remainingHealth: enemy.characteristics.health))
             defeatEnemy(enemy)
         }
     }
@@ -190,7 +192,6 @@ public class Level {
                     GameEventManager.shared.notify(.enemyMissed(enemy: enemy.type.name))
                 case .hit(let damage):
                     GameEventManager.shared.notify(.enemyHit(enemy: enemy.type.name, damage: damage))
-                    player.receiveDamage(damage)
                 }
             } else {
                 enemy.move(level: self)

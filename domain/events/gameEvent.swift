@@ -6,7 +6,7 @@ public enum GameEvent {
     case playerMissed(target: String)
     case playerSleep
     case playerSkipMove
-    case playerHit(target: String, damage: Int)
+    case playerHit(target: String, damage: Int, remainingHealth: Int)
     case enemyMissed(enemy: String)
     case enemyHit(enemy: String, damage: Int)
     case enemyDefeated(enemy: String)

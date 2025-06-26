@@ -30,25 +30,27 @@ public class GameLogger: GameEventObserver {
     public static let shared = GameLogger()
     
     public private(set) var log: String = ""
+    public private(set) var combatLog: [String] = []
     
     private init() {}
     
     func didReceiveEvent(event: GameEvent) {
         switch event {
         case .playerMissed(let target):
-            log = "You missed the enemy \(target)!"
-        case .playerSleep:
-            log =  "You've been drugged - skipping your turn..."
-        case .playerSkipMove:
-            log = "You skipped your turn!"
-        case .playerHit(let target, let damage):
-            log = "You hit \(target) for \(damage) damage!"
+            combatLog.append("You missed the enemy \(target)!")
+        case .playerHit(let target, let damage, let remainingHealth):
+            combatLog.append("You hit \(target) for \(damage) damage! He has \(remainingHealth) health left.")
         case .enemyMissed(let enemy):
-            log = "\(enemy) missed you!"
+            combatLog.append("\(enemy) missed you!")
         case .enemyHit(let enemy, let damage):
-            log = "\(enemy) hit you for \(damage) damage!"
+            combatLog.append("\(enemy) hit you for \(damage) damage!")
         case .enemyDefeated(let enemy):
-            log = "You defeated \(enemy)!"
+            combatLog.append("You defeated \(enemy)!")
+        case .playerSleep:
+            combatLog.append("You've been drugged - skipping your turn...")
+        case .playerSkipMove:
+            combatLog.append("You skipped your turn!")
+
         case .itemPickedUp(let item):
             log = "You picked up: \(item)."
         case .notPickedUp:
@@ -81,5 +83,8 @@ public class GameLogger: GameEventObserver {
             log = "YOU WON! Congratulations!"
         }
     }
-}
 
+    public func clearCombatLog() {
+        combatLog.removeAll()
+    }
+}

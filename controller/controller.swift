@@ -139,13 +139,25 @@ public class Controller {
         
         renderer.drawString("Press 1-9 to use, Esc to return", atY: 11, atX: 0)
     }
-    
-    private func renderLog() {
-        let log = GameLogger.shared.log
 
-        renderer.drawString(String(repeating: " ", count: RenderPadding.length),
-                            atY: RenderPadding.logTop, atX: RenderPadding.null)
-        renderer.drawString(log, atY: RenderPadding.logTop, atX: RenderPadding.null)
+    private func renderLog() {
+        let logger = GameLogger.shared
+        
+        for i in 0..<RenderPadding.logCombatStr {
+            renderer.drawString(String(repeating: " ", count: RenderPadding.length),
+                                atY: RenderPadding.logTop + i, atX: RenderPadding.null)
+        }
+
+        if logger.combatLog.isEmpty {
+            renderer.drawString(logger.log,
+                                atY: RenderPadding.logTop, atX: RenderPadding.null)
+        } else {
+            for (i, line) in logger.combatLog.enumerated() {
+                renderer.drawString(line,
+                                    atY: RenderPadding.logTop + i,
+                                    atX: RenderPadding.null)
+            }
+        }
     }
     
     private func renderInfo() {
@@ -170,8 +182,9 @@ public class Controller {
 }
 
 enum RenderPadding {
-    static let logTop = 26
+    static let logTop = 27
     static let null = 0
     static let infoTop = 25
     static let length = 80
+    static let logCombatStr = 5
 }
