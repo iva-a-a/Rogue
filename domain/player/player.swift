@@ -40,6 +40,10 @@ public class Player {
             return false
         } ?? false
     }
+    
+    public func deleteAllKeys() {
+        backpack.items[.key] = []
+    }
 
     @discardableResult
     public func dropWeapon() -> Weapon? {
