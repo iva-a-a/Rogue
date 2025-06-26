@@ -98,23 +98,11 @@ public struct Weapon: ItemProtocol {
     public var type: ItemType { .weapon(weaponType) }
 
     public func use(_ player: Player) {
-        let currentWeapon = player.weapon
+        if let current = player.weapon {
+            _ = player.backpack.addItem(current)
+        }
         player.weapon = self
         GameEventManager.shared.notify(.useWeapon(weapon: weaponType.name, damage: weaponType.baseDamage))
-        if var weapons = player.backpack.items[self.type.category],
-           let index = weapons.firstIndex(where: { item in
-               if case let .weapon(type) = item.type {
-                   return type == self.weaponType
-               }
-               return false
-           }) {
-            weapons.remove(at: index)
-            player.backpack.items[.weapon] = weapons
-        }
-        
-        if let current = currentWeapon {
-            player.backpack.items[self.type.category, default: []].append(current)
-        }
     }
 }
 
