@@ -42,10 +42,17 @@ struct GetterPositions {
         return results
     }
 
-    static func randomPositionOnRoom(in room: Room, offset: Int) -> Position {
-        Position(
-            Int.random(in: room.lowLeft.x + offset...room.topRight.x - offset),
-            Int.random(in: room.lowLeft.y + offset...room.topRight.y - offset)
-        )
+    static func randomPositionOnRoom(in room: Room,
+                                     offset: Int,
+                                     excluding excludedPositions: Set<Position> = []
+    ) -> Position {
+        var position: Position
+        repeat {
+            position = Position(
+                Int.random(in: room.lowLeft.x + offset...room.topRight.x - offset),
+                Int.random(in: room.lowLeft.y + offset...room.topRight.y - offset)
+            )
+        } while excludedPositions.contains(position)
+        return position
     }
 }

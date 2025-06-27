@@ -87,7 +87,8 @@ public class EntityBuilder: EntityBuilderProtocol {
                                                                    startRoom: rooms[startRoomIndex],
                                                                    player: player,
                                                                    difficulty: difficulty,
-                                                                   level: level,occupiedPositions: occupiedPositions
+                                                                   level: level,
+                                                                   occupiedPositions: occupiedPositions
             ), case let .key(color) = keyItem.type else {
                 continue
             }
@@ -147,7 +148,10 @@ public class EntityBuilder: EntityBuilderProtocol {
             excluding: occupiedPositions,
             count: 1,
             offset: GenerationConstants.itemOffset
-        ).first ?? GetterPositions.randomPositionOnRoom(in: startRoom, offset: GenerationConstants.itemOffset)
+        ).first ?? GetterPositions.randomPositionOnRoom(
+            in: startRoom,
+            offset: GenerationConstants.itemOffset,
+            excluding: occupiedPositions)
         
         return (keyItem, keyPosition)
     }
