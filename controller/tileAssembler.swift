@@ -132,20 +132,10 @@ public struct TileAssembler {
         case .snakeMage: return ("S", ColorCode.white)
         case .mimic:
             if let itemDepicting = enemy as? DepictsItem, itemDepicting.depictsItem {
-                return symbolAndColorForItem(getRandomItemType())
+                return symbolAndColorForItem(itemDepicting.disguisedItemType)
             }
             return ("M", ColorCode.white)
         }
-    }
-
-    private static func getRandomItemType() -> ItemType {
-        let possibleItems: [ItemType] = [
-            .food(.apple),
-            .weapon(.dagger),
-            .scroll(.agility),
-            .elixir(.agility),
-        ]
-        return possibleItems.randomElement() ?? .food(.apple)
     }
 }
 

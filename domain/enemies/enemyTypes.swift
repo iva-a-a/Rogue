@@ -107,12 +107,15 @@ class SnakeMage: Enemy {
 
 public protocol DepictsItem {
     var depictsItem: Bool { get set }
+    var disguisedItemType: ItemType { get set }
 }
 
 class Mimic: Enemy {
     var depictsItem: Bool = true
+    var disguisedItemType: ItemType = Mimic.randomDisguisedItem()
     
     init(characteristics: Characteristics, hostility: Int) {
+
         super.init(
             type: .mimic,
             characteristics: characteristics,
@@ -127,6 +130,16 @@ class Mimic: Enemy {
     override func attack(player: Player) -> AttackResult {
         depictsItem = false
         return attackBehavior.attack(attacker: self, player: player)
+    }
+    
+    private static func randomDisguisedItem() -> ItemType {
+        let possibleItems: [ItemType] = [
+            .food(.apple),
+            .weapon(.dagger),
+            .scroll(.agility),
+            .elixir(.agility)
+        ]
+        return possibleItems.randomElement() ?? .food(.apple)
     }
 }
 
