@@ -34,6 +34,10 @@ public protocol EnemyProtocol {
 
 }
 
+public protocol AttackInterceptable: EnemyProtocol {
+    func interceptAttack(from attacker: CombatUnit) -> AttackResult?
+}
+
 public class Enemy: EnemyProtocol {
 
     public var type: EnemyType

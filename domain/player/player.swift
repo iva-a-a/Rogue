@@ -54,8 +54,13 @@ public class Player {
     public func updateBuffs() {
         buffManager.update(player: self)
     }
-
+    
     public func attack(_ target: Enemy) -> AttackResult {
+        if let interceptable = target as? AttackInterceptable,
+           let result = interceptable.interceptAttack(from: self) {
+            return result
+        }
+
         return CombatSystem.performAttack(from: self, to: target)
     }
 

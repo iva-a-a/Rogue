@@ -16,7 +16,10 @@ class Zombie: Enemy {
     }
 }
 
-class Vampire: Enemy {
+class Vampire: Enemy, AttackInterceptable {
+
+    private var wasFirstAttacked = false
+
     init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .vampire,
@@ -27,6 +30,12 @@ class Vampire: Enemy {
             attackBehavior: DrainHealthAttack(),
             indexRoom: 9
         )
+    }
+
+    func interceptAttack(from attacker: CombatUnit) -> AttackResult? {
+        guard !wasFirstAttacked else { return nil }
+        wasFirstAttacked = true
+        return .miss
     }
 }
 
@@ -45,7 +54,6 @@ class Ghost: Enemy {
 
     override func move(level: Level) {
         super.move(level: level)
-        // добавляем изменение видимости
         isVisible = Int.random(in: 1...100) > 20
     }
 }
@@ -68,7 +76,6 @@ class Ogre: Enemy {
     override func move(level: Level) {
         if isResting {
             isResting = false
-            // eсли отдыхает - остаемся на месте
             return
         }
         super.move(level: level)
