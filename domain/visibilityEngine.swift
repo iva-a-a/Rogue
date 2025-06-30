@@ -1,8 +1,3 @@
-//
-//  VisibilityEngine.swift
-//  rogue
-//
-
 import Foundation
 
 public struct VisibilityEngine {
@@ -11,19 +6,30 @@ public struct VisibilityEngine {
 
         for dx in -radius...radius {
             for dy in -radius...radius {
-                let target = Position(origin.x + dx, origin.y + dy)
-                let path = bresenhamLine(from: origin, to: target)
+                let target = Position(origin.x + dx, origin.y + dy)                
 
-                for point in path {
-                    visible.insert(point)
-                    if isOpaque(at: point, in: level) {
-                        break 
-                    }
+                if hasLineOfSight(from: origin, to: target, in: level) {
+                    visible.insert(target)
                 }
             }
         }
 
         return visible
+    }
+
+    private static func hasLineOfSight(from: Position, to: Position, in level: Level) -> Bool {
+        let line = bresenhamLine(from: from, to: to)
+
+        for point in line {
+            if point == to {
+                return true
+            }
+            if isOpaque(at: point, in: level) {
+                return false
+            }
+        }
+
+        return true
     }
 
     private static func bresenhamLine(from start: Position, to end: Position) -> [Position] {
@@ -55,19 +61,27 @@ public struct VisibilityEngine {
         return line
     }
 
-    private static func isOpaque(at pos: Position, in level: Level) -> Bool {
-        for room in level.rooms {
-            if room.contains(pos) {
-                let isWall = (pos.x == room.lowLeft.x || pos.x == room.topRight.x ||
-                              pos.y == room.lowLeft.y || pos.y == room.topRight.y)
-                return isWall
-            }
+   private static func isOpaque(at pos: Position, in level: Level) -> Bool {
+    for room in level.rooms {
+        if room.contains(pos) {
+            let isWall = (
+                pos.x == room.lowLeft.x || pos.x == room.topRight.x ||
+                pos.y == room.lowLeft.y || pos.y == room.topRight.y
+            )
+            return isWall
         }
-
-        if level.coloredDoors.contains(where: { $0.position == pos && !$0.isUnlocked }) {
-            return true
-        }
-
-        return !level.gameMap.isWalkable(pos)
     }
+
+    for corridor in level.corridors {
+        if corridor.route.contains(pos) {
+            return false
+        }
+    }
+
+    if level.coloredDoors.contains(where: { $0.position == pos && !$0.isUnlocked }) {
+        return true
+    }
+
+    return !level.gameMap.isWalkable(pos)
+}
 }
