@@ -4,7 +4,7 @@
 
 import Darwin.ncurses
 
-public class LevelRenderer {
+public class Render {
     public init() {}
 
     public func drawTiles(_ tiles: [DrawableObject]) {
