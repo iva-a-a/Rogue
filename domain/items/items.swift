@@ -148,6 +148,12 @@ public protocol ItemProtocol {
 
 extension ItemProtocol {
     public func pickUp(_ player: Player) -> AddingCode {
-        return player.backpack.addItem(self)
+        let result = player.backpack.addItem(self)
+        if case .isFull = result {
+            GameEventManager.shared.notify(.notPickedUp)
+        } else {
+            GameEventManager.shared.notify(.itemPickedUp(item: type.name))
+        }
+        return result
     }
 }
