@@ -36,7 +36,7 @@ public class Level {
         self.addColoredDoors()
     }
     
-    public func defeatEnemy(_ enemy: Enemy) {
+    private func defeatEnemy(_ enemy: Enemy) {
         if enemy.isDead {
             GameEventManager.shared.notify(.enemyDefeated(enemy: enemy.type.name))
             gameMap.addPosition(enemy.characteristics.position)
@@ -170,12 +170,8 @@ public class Level {
     
     private func pickUpItem(_ item: ItemProtocol, at position: Position) {
         let result = player.pickUpItem(item)
-        switch result {
-            case .success:
-                GameEventManager.shared.notify(.itemPickedUp(item: item.type.name))
-                deleteItem(at: position)
-            case .isFull:
-                GameEventManager.shared.notify(.notPickedUp)
+        if .success == result {
+            deleteItem(at: position)
         }
     }
     
