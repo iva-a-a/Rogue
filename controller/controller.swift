@@ -18,8 +18,7 @@ public class Controller {
     }
 
     public func update(for input: PlayerAction) {
-        GameLogger.shared.clearCombatLog()
-        GameLogger.shared.clearActionLog()
+        GameLogger.shared.clearLog()
         updateBuffs()
         updateState(for: input)
         act(for: input)
@@ -160,20 +159,11 @@ public class Controller {
             renderer.drawString(String(repeating: " ", count: RenderPadding.length),
                               atY: RenderPadding.logTop + i, atX: RenderPadding.null)
         }
-
-        if logger.combatLog.isEmpty {
-            renderer.drawString(logger.currentLog,
-                              atY: RenderPadding.logTop, atX: RenderPadding.null)
-        } else {
-            for (i, line) in logger.combatLog.enumerated() {
-                renderer.drawString(line,
-                                   atY: RenderPadding.logTop + i,
-                                   atX: RenderPadding.null)
-            }
-        }
-
         renderer.drawString(String(repeating: " ", count: RenderPadding.length),
                            atY: RenderPadding.logBuffTop, atX: RenderPadding.null)
+
+        renderer.drawString(logger.currentLog,
+                              atY: RenderPadding.logTop, atX: RenderPadding.null)
 
         if !logger.currentBuffLog.isEmpty {
             renderer.drawString(logger.currentBuffLog,

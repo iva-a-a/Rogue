@@ -31,8 +31,8 @@ public class GameLogger: GameEventObserver {
     
     private var actionLog: String?
     private var moveLog: String?
-    public private(set) var combatLog: [String] = []
-    public private(set) var activeBuffs: [String: Int] = [:]
+    private var combatLog: [String] = []
+    private var activeBuffs: [String: [BuffInfo]] = [:]
     
     private init() {}
     
@@ -52,7 +52,7 @@ public class GameLogger: GameEventObserver {
             combatLog.append("You've been drugged - skipping your turn...")
         case .playerSkipMove:
             combatLog.append("You skipped your turn!")
-            
+
         case .playerMoved(let position):
             moveLog = "Moved to position: (\(position.x), \(position.y))."
         case .playerNotMoved:
@@ -84,28 +84,40 @@ public class GameLogger: GameEventObserver {
             actionLog = "YOU DIED! Game over!"
         case .gameWon:
             actionLog = "YOU WON! Congratulations!"
-        case .buffUpdate(let buffName, let remainingTime):
-            if remainingTime > 0 {
-                activeBuffs[buffName] = remainingTime
-            } else {
+        case .buffUpdate(let buffName, let buffInfo):
+            if buffInfo.isEmpty {
                 activeBuffs.removeValue(forKey: buffName)
+            } else {
+                activeBuffs[buffName] = buffInfo
             }
         }
     }
 
-    public func clearCombatLog() {
+    public func clearLog() {
         combatLog.removeAll()
-    }
-    
-    public var currentLog: String {
-        return actionLog ?? moveLog ?? ""
-    }
-    
-    public var currentBuffLog: String {
-        return activeBuffs.map { "\($0.key): \($0.value)s" }.joined(separator: " | ")
-    }
-    
-    public func clearActionLog() {
         actionLog = nil
+    }
+
+    public var currentLog: String {
+        let logBattle = setCombatLogAsString()
+        if logBattle.isEmpty {
+            return actionLog ?? moveLog ?? ""
+        }
+        return logBattle
+    }
+
+    public var currentBuffLog: String {
+        return activeBuffs.map { key, buffs in
+            let sorted = buffs.sorted(by: { $0.time > $1.time })
+            let buffStrings = sorted.map { "\($0.time)s (+\($0.value))" }
+            return "\(key): \(buffStrings.joined(separator: ", "))"
+        }
+        .sorted(by: { $0 < $1 })
+        .joined(separator: " | ")
+    }
+
+    private func setCombatLogAsString() -> String {
+        guard !combatLog.isEmpty else { return "" }
+        return combatLog.joined(separator: "\n")
     }
 }

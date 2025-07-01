@@ -58,9 +58,9 @@ public enum ElixirType: Hashable, Equatable {
 
     var effectValue: Int {
         switch self {
-        case .health: return 20
-        case .agility: return 5
-        case .strength: return 10
+        case .health: return Int.random(in: 15...25)
+        case .agility: return Int.random(in: 3...6)
+        case .strength: return Int.random(in: 7...13)
         }
     }
 

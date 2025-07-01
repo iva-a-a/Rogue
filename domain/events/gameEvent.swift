@@ -2,6 +2,11 @@
 //  gameEvent.swift
 //  rogue
 
+public struct BuffInfo: Equatable {
+    let time: Int
+    let value: Int
+}
+
 public enum GameEvent: Equatable {
     case playerMissed(target: String)
     case playerSleep
@@ -25,6 +30,6 @@ public enum GameEvent: Equatable {
     case levelComplete(number: Int)
     case gameOver
     case gameWon
-    case buffUpdate(buffName: String, remainingTime: Int)
+    case buffUpdate(buffName: String, buffInfo: [BuffInfo])
 }
 
