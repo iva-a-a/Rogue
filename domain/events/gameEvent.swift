@@ -2,7 +2,7 @@
 //  gameEvent.swift
 //  rogue
 
-public enum GameEvent {
+public enum GameEvent: Equatable {
     case playerMissed(target: String)
     case playerSleep
     case playerSkipMove
@@ -25,5 +25,6 @@ public enum GameEvent {
     case levelComplete(number: Int)
     case gameOver
     case gameWon
+    case buffUpdate(buffName: String, remainingTime: Int)
 }
 

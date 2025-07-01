@@ -29,8 +29,10 @@ public class GameEventManager {
 public class GameLogger: GameEventObserver {
     public static let shared = GameLogger()
     
-    public private(set) var log: String = ""
+    private var actionLog: String?
+    private var moveLog: String?
     public private(set) var combatLog: [String] = []
+    public private(set) var activeBuffs: [String: Int] = [:]
     
     private init() {}
     
@@ -50,41 +52,60 @@ public class GameLogger: GameEventObserver {
             combatLog.append("You've been drugged - skipping your turn...")
         case .playerSkipMove:
             combatLog.append("You skipped your turn!")
+            
+        case .playerMoved(let position):
+            moveLog = "Moved to position: (\(position.x), \(position.y))."
+        case .playerNotMoved:
+            moveLog = "This movement is not possible."
 
         case .itemPickedUp(let item):
-            log = "You picked up: \(item)."
+            actionLog = "You picked up: \(item)."
         case .notPickedUp:
-            log = "You can't pick that up, the backpack is full."
+            actionLog = "You can't pick that up, the backpack is full."
         case .weaponDropped(let weapon):
-            log = "You dropped: \(weapon)."
-        case .playerMoved(let position):
-            log = "Moved to position: (\(position.x), \(position.y))."
-        case .playerNotMoved:
-            log = "This movement is not possible."
+            actionLog = "You dropped: \(weapon)."
         case .eatFood(let food, let amount):
-            log = "You ate \(food), restored \(amount) health."
+            actionLog = "You ate \(food), restored \(amount) health."
         case .drinkElixir(let elixir, let duration):
-            log = "You drank \(elixir), effect lasts \(duration) seconds."
+            actionLog = "You drank \(elixir), effect lasts \(duration) seconds."
         case .readScroll(let scroll, let amount):
-            log = "You read \(scroll), stat increased by \(amount)."
+            actionLog = "You read \(scroll), stat increased by \(amount)."
         case .useWeapon(let weapon, let damage):
-            log = "You used \(weapon), dealing \(damage) damage."
+            actionLog = "You used \(weapon), dealing \(damage) damage."
         case .pickUpTreasure(let treasure, let amount):
-            log = "You found \(treasure) worth \(amount) gold!"
+            actionLog = "You found \(treasure) worth \(amount)!"
         case .openColorDoor(let color):
-            log = "You opened the door with a \(color)."
+            actionLog = "You opened the door with a \(color) Key."
         case .notOpenColorDoor:
-            log = "You can't open that door. Find the key of the door color."
+            actionLog = "You can't open that door. Find the key of the door color."
         case .levelComplete(let number):
-            log = "You completed level \(number). Press any key to continue."
+            actionLog = "You completed level \(number). Press any key to continue."
         case .gameOver:
-            log = "YOU DIED! Game over!"
+            actionLog = "YOU DIED! Game over!"
         case .gameWon:
-            log = "YOU WON! Congratulations!"
+            actionLog = "YOU WON! Congratulations!"
+        case .buffUpdate(let buffName, let remainingTime):
+            if remainingTime > 0 {
+                activeBuffs[buffName] = remainingTime
+            } else {
+                activeBuffs.removeValue(forKey: buffName)
+            }
         }
     }
 
     public func clearCombatLog() {
         combatLog.removeAll()
+    }
+    
+    public var currentLog: String {
+        return actionLog ?? moveLog ?? ""
+    }
+    
+    public var currentBuffLog: String {
+        return activeBuffs.map { "\($0.key): \($0.value)s" }.joined(separator: " | ")
+    }
+    
+    public func clearActionLog() {
+        actionLog = nil
     }
 }
