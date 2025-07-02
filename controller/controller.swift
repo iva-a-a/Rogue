@@ -17,47 +17,57 @@ public class Controller {
     public init() {
         GameEventManager.shared.addObserver(GameLogger.shared)
     }
-
+    
     public func update(for input: PlayerAction) {
         updateBuffs()
+        let previousState = state
         updateState(for: input)
+        handleStateSideEffects(from: previousState, to: state, with: input)
         act(for: input)
     }
 
     private func updateState(for input: PlayerAction) {
         switch state {
         case .beginning:
-            if input == .start {
-                state = .generating
-                levelNumber = 0
-                GameLogger.shared.reset()
-            }
-        case .generating:
-            state = .playing
-            break
+            if input == .start { state = .generating }
+        case .generating: state = .playing
         case .playing:
-            if input == .exit { state = .quit }
-
-            if input == .openWeapon { state = .inventory; inventoryCategory = .weapon }
-            if input == .openFood { state = .inventory; inventoryCategory = .food }
-            if input == .openElixir { state = .inventory; inventoryCategory = .elixir }
-            if input == .openScroll { state = .inventory; inventoryCategory = .scroll }
-        case .inventory:
-            if input == .exit { state = .playing; inventoryCategory = nil }
-        case .levelComplete:
-            state = .generating
-        case .won, .lose:
-            if input == .start {
-                state = .generating
-                levelNumber = 0
-                GameLogger.shared.reset()
+            switch input {
+            case .exit: state = .quit
+            case .openWeapon, .openFood, .openElixir, .openScroll: state = .inventory
+            default: break
             }
-            if input == .exit { state = .quit }
-        case .quit:
-            break
+        case .inventory:
+            if input == .exit { state = .playing }
+        case .levelComplete: state = .generating
+        case .won, .lose:
+            switch input {
+            case .start: state = .generating
+            case .exit: state = .quit
+            default: break
+            }
+        case .quit: break
         }
     }
 
+    private func handleStateSideEffects(from oldState: GameState, to newState: GameState, with input: PlayerAction) {
+        switch (oldState, newState) {
+        case (.beginning, .generating), (.won, .generating), (.lose, .generating):
+            levelNumber = 0
+            GameLogger.shared.reset()
+        case (.playing, .inventory):
+            switch input {
+            case .openWeapon: inventoryCategory = .weapon
+            case .openFood: inventoryCategory = .food
+            case .openElixir: inventoryCategory = .elixir
+            case .openScroll: inventoryCategory = .scroll
+            default: break
+            }
+        case (.inventory, .playing): inventoryCategory = nil
+        default: break
+        }
+    }
+    
     private func act(for input: PlayerAction) {
         switch state {
         case .generating:
@@ -65,13 +75,15 @@ public class Controller {
             generateLevel()
         case .playing:
             motion(input)
-        case .beginning, .levelComplete, .won, .lose, .quit:
+        case .beginning, .levelComplete, .quit:
             break
         case .inventory:
             itemAction(input)
+        case .won, .lose:
+            level?.player.deleteActiveBuffs()
         }
     }
-
+    
     private func generateLevel() {
         let player = levelNumber == 1 ? Player() : (level?.player ?? Player())
         player.deleteAllKeys()
