@@ -83,4 +83,10 @@ public class BuffManager {
             return false
         }
     }
+    
+    public func clearAllBuffs() {
+        buffs.maxHealth.removeAll()
+        buffs.agility.removeAll()
+        buffs.strength.removeAll()
+    }
 }

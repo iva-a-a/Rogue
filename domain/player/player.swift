@@ -55,6 +55,10 @@ public class Player {
         buffManager.update(player: self)
     }
     
+    public func deleteActiveBuffs() {
+        buffManager.clearAllBuffs()
+    }
+    
     public func attack(_ target: Enemy) -> AttackResult {
         if let interceptable = target as? AttackInterceptable,
            let result = interceptable.interceptAttack(from: self) {
