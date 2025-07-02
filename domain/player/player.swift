@@ -82,9 +82,9 @@ public class Player {
 extension Player: CombatUnit {
     public var agility: Int { characteristics.agility }
     public var strength: Int { characteristics.strength }
-
+    
     public var weaponDamage: Int? {
-        weapon?.weaponType.baseDamage
+        weapon?.damage
     }
 
     public func receiveDamage(_ damage: Int) {

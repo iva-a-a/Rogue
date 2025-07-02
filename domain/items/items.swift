@@ -36,7 +36,7 @@ public enum ItemType: Hashable, Equatable {
 public enum FoodType: Hashable, Equatable {
     case apple, bread, meat
 
-    var healthRestore: Int {
+    public var healthRestore: Int {
         switch self {
         case .apple: return 10
         case .bread: return 20
@@ -44,7 +44,7 @@ public enum FoodType: Hashable, Equatable {
         }
     }
 
-    var name: String {
+    public var name: String {
         switch self {
         case .apple: return "Apple"
         case .bread: return "Bread"
@@ -56,15 +56,15 @@ public enum FoodType: Hashable, Equatable {
 public enum ElixirType: Hashable, Equatable {
     case health, agility, strength
 
-    var effectValue: Int {
+    public var effectValue: ClosedRange<Int> {
         switch self {
-        case .health: return Int.random(in: 15...25)
-        case .agility: return Int.random(in: 3...6)
-        case .strength: return Int.random(in: 7...13)
+        case .health: return 15...25
+        case .agility: return 3...6
+        case .strength: return 7...13
         }
     }
 
-    var name: String {
+    public var name: String {
         switch self {
         case .health: return "Health Elixir"
         case .agility: return "Agility Elixir"
@@ -76,15 +76,15 @@ public enum ElixirType: Hashable, Equatable {
 public enum ScrollType: Hashable, Equatable {
     case health, agility, strength
 
-    var effectValue: Int {
+    public var effectValue: ClosedRange<Int> {
         switch self {
-        case .health: return Int.random(in: 5...10)
-        case .agility: return Int.random(in: 3...5)
-        case .strength: return Int.random(in: 5...8)
+        case .health: return 5...10
+        case .agility: return 3...5
+        case .strength: return 5...8
         }
     }
 
-    var name: String {
+    public var name: String {
         switch self {
         case .health: return "Health Scroll"
         case .agility: return "Agility Scroll"
@@ -96,12 +96,12 @@ public enum ScrollType: Hashable, Equatable {
 public enum WeaponType: Hashable, Equatable {
     case sword, bow, dagger, staff
 
-    var baseDamage: Int {
+    public var baseDamage: ClosedRange<Int> {
         switch self {
-        case .sword: return Int.random(in: 12...16)
-        case .bow: return Int.random(in: 9...13)
-        case .dagger: return Int.random(in: 5...9)
-        case .staff: return Int.random(in: 7...11)
+        case .sword: return 12...16
+        case .bow: return 9...13
+        case .dagger: return 5...9
+        case .staff: return 7...11
         }
     }
 

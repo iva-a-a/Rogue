@@ -54,7 +54,7 @@ public struct DifficultyStatistics {
         totalScore -= agilityRatio * weights.agilityWeight
         
         if let weapon = player.weapon {
-            totalScore -= Double(weapon.weaponType.baseDamage) * 0.05
+            totalScore -= Double(weapon.damage) * 0.05
         }
 
         

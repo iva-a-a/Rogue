@@ -25,6 +25,7 @@ public struct Food: ItemProtocol {
 public struct Scroll: ItemProtocol {
     
     let scrollType: ScrollType
+    public let value: Int
 
     public var type: ItemType {
         return .scroll(scrollType)
@@ -32,10 +33,10 @@ public struct Scroll: ItemProtocol {
 
     public init(scrollType: ScrollType) {
         self.scrollType = scrollType
+        value = Int.random(in: scrollType.effectValue)
     }
     
     public func use(_ player: Player) {
-        let value = scrollType.effectValue
         switch scrollType {
             case .health:
                 player.characteristics.maxHealth += value
@@ -51,22 +52,28 @@ public struct Scroll: ItemProtocol {
 
 public struct Elixir: ItemProtocol {
     let elixirType: ElixirType
-    let duration: TimeInterval
+    public let duration: TimeInterval
+    public let value: Int
 
     public var type: ItemType { .elixir(elixirType) }
+    
+    public init(elixirType: ElixirType, duration: TimeInterval) {
+        self.elixirType = elixirType
+        value = Int.random(in: elixirType.effectValue)
+        self.duration = duration
+    }
 
     public func use(_ player: Player) {
-        let effect = elixirType.effectValue
-        player.buffManager.addBuff(for: elixirType, value: effect, duration: duration)
+        player.buffManager.addBuff(for: elixirType, value: value, duration: duration)
 
         switch elixirType {
         case .health:
-            player.characteristics.maxHealth += effect
-            player.characteristics.health += effect
+            player.characteristics.maxHealth += value
+            player.characteristics.health += value
         case .agility:
-            player.characteristics.agility += effect
+            player.characteristics.agility += value
         case .strength:
-            player.characteristics.strength += effect
+            player.characteristics.strength += value
         }
         GameEventManager.shared.notify(.drinkElixir(elixir: elixirType.name, duration: Int(duration)))
     }
@@ -94,7 +101,13 @@ public struct Treasure: ItemProtocol {
 
 public struct Weapon: ItemProtocol {
     public let weaponType: WeaponType
-
+    public let damage: Int
+    
+    public init(weaponType: WeaponType) {
+        self.weaponType = weaponType
+        self.damage = Int.random(in: weaponType.baseDamage)
+    }
+    
     public var type: ItemType { .weapon(weaponType) }
 
     public func use(_ player: Player) {
@@ -102,7 +115,7 @@ public struct Weapon: ItemProtocol {
             _ = player.backpack.addItem(current)
         }
         player.weapon = self
-        GameEventManager.shared.notify(.useWeapon(weapon: weaponType.name, damage: weaponType.baseDamage))
+        GameEventManager.shared.notify(.useWeapon(weapon: weaponType.name, damage: self.damage))
     }
 }
 
