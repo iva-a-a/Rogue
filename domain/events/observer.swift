@@ -33,6 +33,7 @@ public class GameLogger: GameEventObserver {
     private var moveLog: String?
     private var combatLog: [String] = []
     private var activeBuffs: [String: [BuffInfo]] = [:]
+    private var endLog: String = ""
     
     private init() {}
     
@@ -81,9 +82,9 @@ public class GameLogger: GameEventObserver {
         case .levelComplete(let number):
             actionLog = "You completed level \(number). Press any key to continue."
         case .gameOver:
-            actionLog = "YOU DIED! Game over!"
+            endLog = "YOU DIED! Game over!\nPress \"Enter\" to restart or \"Esc\" to exit."
         case .gameWon:
-            actionLog = "YOU WON! Congratulations!"
+            endLog = "YOU WON! Congratulations!\nPress \"Enter\" to restart or \"Esc\" to exit."
         case .buffUpdate(let buffName, let buffInfo):
             if buffInfo.isEmpty {
                 activeBuffs.removeValue(forKey: buffName)
@@ -93,12 +94,23 @@ public class GameLogger: GameEventObserver {
         }
     }
 
-    public func clearLog() {
+    public func clearCombatActionLog() {
         combatLog.removeAll()
         actionLog = nil
     }
+    
+    public func reset() {
+        actionLog = nil
+        moveLog = nil
+        combatLog.removeAll()
+        activeBuffs.removeAll()
+        endLog = ""
+    }
 
     public var currentLog: String {
+        guard endLog.isEmpty else {
+          return endLog
+        }
         let logBattle = setCombatLogAsString()
         if logBattle.isEmpty {
             return actionLog ?? moveLog ?? ""
