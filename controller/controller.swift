@@ -10,6 +10,7 @@ public class Controller {
     public var state: GameState = .beginning
     private let renderer = Render()
     private var inventoryCategory: ItemCategory? = nil
+    private var levelNumber: Int = 0
 
     private var lastUpdateTime = Date()
 
@@ -18,7 +19,6 @@ public class Controller {
     }
 
     public func update(for input: PlayerAction) {
-        GameLogger.shared.clearLog()
         updateBuffs()
         updateState(for: input)
         act(for: input)
@@ -27,7 +27,11 @@ public class Controller {
     private func updateState(for input: PlayerAction) {
         switch state {
         case .beginning:
-            if input == .start { state = .generating }
+            if input == .start {
+                state = .generating
+                levelNumber = 0
+                GameLogger.shared.reset()
+            }
         case .generating:
             state = .playing
             break
@@ -43,7 +47,11 @@ public class Controller {
         case .levelComplete:
             state = .generating
         case .won, .lose:
-            if input == .start { state = .beginning }
+            if input == .start {
+                state = .generating
+                levelNumber = 0
+                GameLogger.shared.reset()
+            }
             if input == .exit { state = .quit }
         case .quit:
             break
@@ -53,31 +61,21 @@ public class Controller {
     private func act(for input: PlayerAction) {
         switch state {
         case .generating:
+            levelNumber += 1
             generateLevel()
         case .playing:
             motion(input)
-        case .levelComplete:
-            break
-        case .won:
-            // показать окно выигрыша
-            break
-        case .lose:
-            // показать окно проигрыша
+        case .beginning, .levelComplete, .won, .lose, .quit:
             break
         case .inventory:
             itemAction(input)
-        case .quit:
-            // Выход из игры
-            break
-        case .beginning:
-            break
         }
     }
 
     private func generateLevel() {
-        let player = level?.player ?? Player()
+        let player = levelNumber == 1 ? Player() : (level?.player ?? Player())
         player.deleteAllKeys()
-        self.level = LevelBuilder.buildLevel(player: player)
+        self.level = LevelBuilder.buildLevel(player: player, levelNumber: levelNumber)
     }
 
     private func motion(_ input: PlayerAction) {
@@ -137,6 +135,7 @@ public class Controller {
         renderer.drawTiles(tiles)
         renderInfo()
         renderLog()
+        GameLogger.shared.clearCombatActionLog()
     }
 
     // переделать
