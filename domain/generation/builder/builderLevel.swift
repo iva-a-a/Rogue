@@ -3,16 +3,13 @@
 //  rogue
 
 public struct LevelBuilder {
-    
-    static private var levelNumber: Int = 0
-    
+
     static public func buildLevel(roomBuilder: RoomBuilderProtocol = RoomBuilder(),
                                   corridorsBuilder: CorridorsBuilderProtocol = CorridorsBuilder(),
                                   player: Player,
-                                  difficulty: GameDifficulty = .normal
+                                  difficulty: GameDifficulty = .normal,
+                                  levelNumber: Int
     ) -> Level {
-
-        levelNumber += 1
         var gameMap = GameMap()
         
         let rooms = roomBuilder.buildRooms()
@@ -22,8 +19,8 @@ public struct LevelBuilder {
         addCoridorsCoordToMap(corridors, gameMap)
         corridorsBuilder.removeUnusedDoors(rooms, corridors)
         addDooorsCoordToMap(rooms, gameMap)
-        let (exitPosition, items, enemies) = buildContent(rooms, graph, &gameMap, player, difficulty)
-        return Level(rooms, corridors, exitPosition, player, enemies, items, self.levelNumber, gameMap)
+        let (exitPosition, items, enemies) = buildContent(rooms, graph, &gameMap, player, difficulty, levelNumber)
+        return Level(rooms, corridors, exitPosition, player, enemies, items, levelNumber, gameMap)
     }
     
     static private func buildCorridors(_ rooms: [Room],
@@ -53,7 +50,8 @@ public struct LevelBuilder {
                                      _ graph: Graph,
                                      _ gameMap: inout GameMap,
                                      _ player: Player,
-                                     _ difficulty: GameDifficulty
+                                     _ difficulty: GameDifficulty,
+                                     _ levelNumber: Int
     ) -> (Position, [Position : ItemProtocol], [Enemy]) {
         
         KeyFactory.usedColors = []
