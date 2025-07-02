@@ -1,6 +1,7 @@
 //
 //  controller.swift
 //  rogue
+
 import Foundation
 import domain
 import presentation
@@ -8,9 +9,9 @@ import presentation
 public class Controller {
     public var level: Level?
     public var state: GameState = .beginning
-    private let renderer = Render()
     private var inventoryCategory: ItemCategory? = nil
     private var levelNumber: Int = 0
+    private let gameRender = GameRenderer()
 
     private var lastUpdateTime = Date()
 
@@ -135,79 +136,16 @@ public class Controller {
         }
     }
 
-    public func renderLevel() {
+    public func rendering() {
         guard let level = level else { return }
 
         if state == .inventory, let category = inventoryCategory {
-            renderInventory(for: category, items: level.getItemsList(category))
+            gameRender.renderInventory(category: inventoryCategory!,
+                                       items: level.getItemsList(category),
+                                       player: level.player)
             return
         }
-
-        let tiles = TileAssembler.buildTiles(from: level)
-        renderer.drawTiles(tiles)
-        renderInfo()
-        renderLog()
+        gameRender.renderLevel(level)
         GameLogger.shared.clearCombatActionLog()
     }
-
-    // переделать
-    private func renderInventory(for category: ItemCategory, items: [ItemProtocol]) {
-        clear()
-        renderer.drawString("Inventory: \(category)", atY: 0, atX: 0)
-
-        for (i, item) in items.prefix(9).enumerated() {
-            let line = "\(i + 1). \(item.type.name)"
-            renderer.drawString(line, atY: i + 1, atX: 0)
-        }
-
-        renderer.drawString("Press 1-9 to use, Esc to return", atY: 11, atX: 0)
-    }
-
-    private func renderLog() {
-        let logger = GameLogger.shared
-
-        for i in 0..<RenderPadding.logCombatStr {
-            renderer.drawString(String(repeating: " ", count: RenderPadding.length),
-                              atY: RenderPadding.logTop + i, atX: RenderPadding.null)
-        }
-        renderer.drawString(String(repeating: " ", count: RenderPadding.length),
-                           atY: RenderPadding.logBuffTop, atX: RenderPadding.null)
-
-        renderer.drawString(logger.currentLog,
-                              atY: RenderPadding.logTop, atX: RenderPadding.null)
-
-        if !logger.currentBuffLog.isEmpty {
-            renderer.drawString(logger.currentBuffLog,
-                               atY: RenderPadding.logBuffTop, atX: RenderPadding.null)
-        }
-    }
-
-    private func renderInfo() {
-        guard let level = level else { return }
-
-        let player = level.player
-        let stats = player.characteristics
-
-        let infoString = String(format: "Level: %d | HP: %d/%d | STR: %d | AGI: %d | Weapon: %@",
-                                level.levelNumber,
-                                stats.maxHealth,
-                                stats.health,
-                                stats.strength,
-                                stats.agility,
-                                player.weapon?.weaponType.name ?? "None")
-
-        renderer.drawString(String(repeating: " ", count: RenderPadding.length),
-                            atY: RenderPadding.infoTop,
-                            atX: RenderPadding.null)
-        renderer.drawString(infoString, atY: RenderPadding.infoTop, atX: RenderPadding.null)
-    }
-}
-
-enum RenderPadding {
-    static let logTop = 27
-    static let logBuffTop = 26
-    static let null = 0
-    static let infoTop = 25
-    static let length = 80
-    static let logCombatStr = 5
 }

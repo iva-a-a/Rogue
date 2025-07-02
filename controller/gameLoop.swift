@@ -17,7 +17,7 @@ public final class GameLoop {
         var isRunning = true
         while isRunning {
             clear()
-            controller.renderLevel()
+            controller.rendering()
             refresh()
 
             let action = InputHandler.getAction()
