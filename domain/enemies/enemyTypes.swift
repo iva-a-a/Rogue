@@ -113,7 +113,7 @@ public protocol DepictsItem {
 class Mimic: Enemy {
     var depictsItem: Bool = true
     var disguisedItemType: ItemType = Mimic.randomDisguisedItem()
-    
+
     init(characteristics: Characteristics, hostility: Int) {
 
         super.init(
@@ -126,12 +126,21 @@ class Mimic: Enemy {
             indexRoom: 9
         )
     }
-    
+
+    override func move(level: Level) {
+        let distanceToPlayer = abs(characteristics.position.x - level.player.characteristics.position.x) +
+        abs(characteristics.position.y - level.player.characteristics.position.y)
+        if distanceToPlayer == 2 && depictsItem == false {
+            hostility = 3
+        }
+        super.move(level: level)
+    }
+
     override func attack(player: Player) -> AttackResult {
         depictsItem = false
         return attackBehavior.attack(attacker: self, player: player)
     }
-    
+
     private static func randomDisguisedItem() -> ItemType {
         let possibleItems: [ItemType] = [
             .food(.apple),
