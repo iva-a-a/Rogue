@@ -1,7 +1,53 @@
-// DataModels.swift
+//
+//  dataModels.swift
+//  rogue
 
 import Foundation
 
+// Модель для статистики попытки прохождения
+public struct GameAttempt: Codable {
+    public let date: Date
+    public var levelsCompleted: Int
+    public var totalTreasure: Int // количество найденных сокровищ
+    public var finalScore: Int // для стоимости сокровища
+    public var wasSuccessful: Bool
+    public var playTime: TimeInterval
+    public var enemiesDefeated: Int
+    public var foodConsumed: Int
+    public var elixirsDrunk: Int
+    public var scrollsRead: Int
+    public var attacksMade: Int // количество сделанных игроком ударов
+    public var attacksMissed: Int // количество ударов, которые сделал игрок и промахнулся
+    public var missFromAttack: Int // количество промахов по игроку
+    public var hitFromAttack: Int  // количество ударов по игроку
+    public var tilesExplored: Int
+    //public let namePlayer: String
+    
+    public init(date: Date, levelsCompleted: Int, totalTreasure: Int, finalScore: Int, wasSuccessful: Bool, playTime: TimeInterval, enemiesDefeated: Int, foodConsumed: Int, elixirsDrunk: Int, scrollsRead: Int, attacksMade: Int, attacksMissed: Int, missFromAttack: Int, hitFromAttack: Int, tilesExplored: Int) {
+        self.date = date
+        self.levelsCompleted = levelsCompleted
+        self.totalTreasure = totalTreasure
+        self.finalScore = finalScore
+        self.wasSuccessful = wasSuccessful
+        self.playTime = playTime
+        self.enemiesDefeated = enemiesDefeated
+        self.foodConsumed = foodConsumed
+        self.elixirsDrunk = elixirsDrunk
+        self.scrollsRead = scrollsRead
+        self.attacksMade = attacksMade
+        self.attacksMissed = attacksMissed
+        self.missFromAttack = missFromAttack
+        self.hitFromAttack = hitFromAttack
+        self.tilesExplored = tilesExplored
+    }
+}
+
+public struct Leaderboard: Codable {
+    let attempts: [GameAttempt]
+}
+
+
+/*
 // Модель для сохранения состояния игрока
 public struct PlayerSaveData: Codable {
     let characteristics: Characteristics
@@ -40,15 +86,6 @@ public struct LevelSaveData: Codable {
     let exitPosition: Position
 }
 
-// Модель для статистики попытки прохождения
-public struct GameAttempt: Codable {
-    let date: Date
-    let levelsCompleted: Int
-    let finalScore: Int
-    let wasSuccessful: Bool
-    let playTime: TimeInterval
-}
-
 // Модель для таблицы лидеров
 public struct LeaderboardEntry: Codable {
     let playerName: String
@@ -56,3 +93,4 @@ public struct LeaderboardEntry: Codable {
     let levelsCompleted: Int
     let date: Date
 }
+*/

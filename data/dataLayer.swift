@@ -1,18 +1,51 @@
-// DataLayer.swift
+//
+//  dataLayer.swift
+//  rogue
 
 import Foundation
 
-class DataLayer {
-    private let saveFileName = "game_save.json"
+public class DataLayer {
+  //  private let saveFileName = "game_save.json"
     private let statsFileName = "game_stats.json"
-    private let leaderboardFileName = "leaderboard.json"
+   // private let leaderboardFileName = "leaderboard.json"
+    
+    public init() { }
 
     private var documentsDirectory: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     }
+    
+    
+    public func saveGameAttempt(_ attempt: GameAttempt) throws {
+        var allAttempts = loadAllGameAttempts()
+        allAttempts.append(attempt)
+
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(allAttempts)
+
+        let statsURL = documentsDirectory.appendingPathComponent(statsFileName)
+        try data.write(to: statsURL)
+    }
+
+    func loadAllGameAttempts() -> [GameAttempt] {
+        let statsURL = documentsDirectory.appendingPathComponent(statsFileName)
+
+        guard FileManager.default.fileExists(atPath: statsURL.path) else {
+            return []
+        }
+
+        do {
+            let data = try Data(contentsOf: statsURL)
+            let decoder = JSONDecoder()
+            return try decoder.decode([GameAttempt].self, from: data)
+        } catch {
+            print("Error loading game attempts: \(error)")
+            return []
+        }
+    }
 
     // MARK: - Сохранение игры
-
+/*
     func saveGame(level: Level, player: Player) throws {
         let levelData = prepareLevelData(level: level, player: player)
 
@@ -134,34 +167,6 @@ class DataLayer {
 
     // MARK: - Статистика и таблица лидеров
 
-    func saveGameAttempt(_ attempt: GameAttempt) throws {
-        var allAttempts = loadAllGameAttempts()
-        allAttempts.append(attempt)
-
-        let encoder = JSONEncoder()
-        let data = try encoder.encode(allAttempts)
-
-        let statsURL = documentsDirectory.appendingPathComponent(statsFileName)
-        try data.write(to: statsURL)
-    }
-
-    func loadAllGameAttempts() -> [GameAttempt] {
-        let statsURL = documentsDirectory.appendingPathComponent(statsFileName)
-
-        guard FileManager.default.fileExists(atPath: statsURL.path) else {
-            return []
-        }
-
-        do {
-            let data = try Data(contentsOf: statsURL)
-            let decoder = JSONDecoder()
-            return try decoder.decode([GameAttempt].self, from: data)
-        } catch {
-            print("Error loading game attempts: \(error)")
-            return []
-        }
-    }
-
     func updateLeaderboard(with entry: LeaderboardEntry) throws {
         var leaderboard = loadLeaderboard()
         leaderboard.append(entry)
@@ -203,4 +208,5 @@ class DataLayer {
             try FileManager.default.removeItem(at: saveURL)
         }
     }
+ */
 }

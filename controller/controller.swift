@@ -7,12 +7,12 @@ import domain
 import presentation
 
 public class Controller {
-    public var level: Level?
+    private var level: Level?
     public var state: GameState = .beginning
     private var inventoryCategory: ItemCategory? = nil
     private var levelNumber: Int = 0
     private let gameRender = GameRenderer()
-
+    private let statsTracker = GameStatsTracker()
     private var lastUpdateTime = Date()
 
     public init() {
