@@ -104,5 +104,9 @@ public class Room {
         }
         return positions
     }
-    
+
+    public func contains(_ pos: Position) -> Bool {
+    return pos.x >= lowLeft.x && pos.x <= topRight.x &&
+           pos.y >= lowLeft.y && pos.y <= topRight.y
+    }
 }

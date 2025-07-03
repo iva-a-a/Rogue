@@ -18,7 +18,7 @@ public class Controller {
     public init() {
         GameEventManager.shared.addObserver(GameLogger.shared)
     }
-    
+
     public func update(for input: PlayerAction) {
         updateBuffs()
         let previousState = state
