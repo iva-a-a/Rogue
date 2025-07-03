@@ -10,7 +10,14 @@ final class GameRenderer {
     private let renderer = Render()
     
     func renderLevel(_ level: Level) {
-        let tiles = TileAssembler.buildTiles(from: level)
+        let visible = VisibilityEngine.computeVisiblePositions(from: level.player.characteristics.position, in: level)
+        level.exploredPositions.formUnion(visible)
+        let tiles = TileAssembler.buildTiles(
+            from: level,
+            visiblePositions: visible,
+            exploredPositions: level.exploredPositions
+        )
+
         renderer.drawTiles(tiles)
         renderInfo(for: level)
         renderLog()

@@ -89,7 +89,7 @@ public struct TileAssembler {
 
         for (pos, item) in items {
             if visiblePositions.contains(pos) {
-                let (char, color) = symbolAndColorForItem(item)
+                let (char, color) = symbolAndColorForItem(item.type)
                 tiles.append(Tile(posX: pos.x, posY: pos.y, char: char, isVisible: true, colorPair: color))
             }
         }

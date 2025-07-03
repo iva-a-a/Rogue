@@ -1,12 +1,12 @@
 import Foundation
 
 public struct VisibilityEngine {
-    public static func computeVisiblePositions(from origin: Position, in level: Level, radius: Int = 8) -> Set<Position> {
+    public static func computeVisiblePositions(from origin: Position, in level: Level, radius: Int = 5) -> Set<Position> {
         var visible: Set<Position> = []
 
         for dx in -radius...radius {
             for dy in -radius...radius {
-                let target = Position(origin.x + dx, origin.y + dy)                
+                let target = Position(origin.x + dx, origin.y + dy)
 
                 if hasLineOfSight(from: origin, to: target, in: level) {
                     visible.insert(target)
