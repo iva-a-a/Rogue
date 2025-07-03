@@ -98,35 +98,35 @@ extension Player: CombatUnit {
 
 // MARK: - Save & Load Support
 
-extension Player {
-    
-    // Сохранение состояния игрока в PlayerSaveData
-    public func toSaveData(currentLevel: Int, score: Int) -> PlayerSaveData {
-        let inventoryData = backpack.getAllItems().map { item in
-            InventoryItemSaveData(category: item.category, specificType: item.uniqueIdentifier)
-        }
-        
-        return PlayerSaveData(
-            characteristics: characteristics,
-            inventory: inventoryData,
-            score: score,
-            currentLevel: currentLevel
-        )
-    }
-    
-    // Инициализация игрока из PlayerSaveData
-    public convenience init(from saveData: PlayerSaveData) {
-        let characteristics = saveData.characteristics
-        let backpack = Backpack()
-        
-        // Восстановление предметов инвентаря из сохранённых данных
-        for itemData in saveData.inventory {
-            if let item = ItemFactory.createItem(category: itemData.category, specificType: itemData.specificType) {
-                backpack.addItem(item)
-            }
-        }
-        
-        let buffManager = BuffManager()
-        self.init(characteristics: characteristics, backpack: backpack, weapon: nil, buffManager: buffManager)
-    }
-}
+//extension Player {
+//    
+//    // Сохранение состояния игрока в PlayerSaveData
+//    public func toSaveData(currentLevel: Int, score: Int) -> PlayerSaveData {
+//        let inventoryData = backpack.getAllItems().map { item in
+//            InventoryItemSaveData(category: item.category, specificType: item.uniqueIdentifier)
+//        }
+//        
+//        return PlayerSaveData(
+//            characteristics: characteristics,
+//            inventory: inventoryData,
+//            score: score,
+//            currentLevel: currentLevel
+//        )
+//    }
+//    
+//    // Инициализация игрока из PlayerSaveData
+//    public convenience init(from saveData: PlayerSaveData) {
+//        let characteristics = saveData.characteristics
+//        let backpack = Backpack()
+//        
+//        // Восстановление предметов инвентаря из сохранённых данных
+//        for itemData in saveData.inventory {
+//            if let item = ItemFactory.createItem(category: itemData.category, specificType: itemData.specificType) {
+//                backpack.addItem(item)
+//            }
+//        }
+//        
+//        let buffManager = BuffManager()
+//        self.init(characteristics: characteristics, backpack: backpack, weapon: nil, buffManager: buffManager)
+//    }
+//}
