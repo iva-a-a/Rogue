@@ -31,5 +31,7 @@ public enum GameEvent: Equatable {
     case gameOver
     case gameWon
     case buffUpdate(buffName: String, buffInfo: [BuffInfo])
+    case saveStats
+    case notSaveStats
 }
 
