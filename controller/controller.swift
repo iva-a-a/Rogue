@@ -13,12 +13,13 @@ public class Controller {
     public var state: GameState = .beginning
     private var inventoryCategory: ItemCategory? = nil
     private var levelNumber: Int = 0
+    private var lastUpdateTime = Date()
 
     private let statsTracker = GameStatsTracker()
-    private var lastUpdateTime = Date()
     private let dataLayer = DataLayer()
     
-    private let menu = MenuRender()
+    private let menu = MenuRender(type: .main)
+    private lazy var exitMenu = MenuRender(type: .pause)
     private let gameRender = GameRenderer()
     private let leaderboard = LeaderboardRenderer()
     
@@ -44,12 +45,13 @@ public class Controller {
                 case .load: state = .loading
                 case .leadboard: state = .showLeaderboard
                 case .exit: state = .quit
+                default: break
                 }
             }
         case .generating: state = .playing
         case .playing:
             switch input {
-            case .exit: state = .quit
+            case .exit: state = .pause
             case .openWeapon, .openFood, .openElixir, .openScroll: state = .inventory
             default: break
             }
@@ -65,7 +67,16 @@ public class Controller {
         case .loading: state = .playing
         case .showLeaderboard:
             if input == .exit { state = .beginning }
-        case .quit: state = .beginning
+        case .pause:
+            if let action = exitMenu.handleInput(input) {
+                switch action {
+                case .resume: state = .playing
+                case .menu: state = .beginning
+                case .exit: state = .quit
+                default: break
+                }
+            }
+        case .quit: break
         }
     }
 
@@ -84,6 +95,7 @@ public class Controller {
             }
         case (.inventory, .playing): inventoryCategory = nil
         case (.beginning, .showLeaderboard):  leaderboard.resetOffset()
+        case (.pause, .beginning), (.pause, .quit):  GameEventManager.shared.notify(.saveGame)
         default: break
         }
     }
@@ -105,7 +117,8 @@ public class Controller {
             GameEventManager.shared.notify(.loadGame)
         case .showLeaderboard:
             leaderboard.handleInput(input)
-        case .quit: saveGame()
+        case .pause: break
+        case .quit: break
         }
     }
     
@@ -163,6 +176,7 @@ public class Controller {
         switch state {
         case .beginning: menu.render()
         case .showLeaderboard: leaderboard.render(attempts: MapperLeaderboard.toViewModel(dataLayer.getSortedGameAttempts()))
+        case .pause: exitMenu.render()
         case .inventory:
             guard let level = level, let category = inventoryCategory else { return }
             let inventoryView = ViewModelBuilder.buildInventoryViewModel(category: category,
