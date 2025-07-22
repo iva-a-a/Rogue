@@ -10,6 +10,7 @@ public struct LevelBuilder {
                                   difficulty: GameDifficulty = .normal,
                                   levelNumber: Int
     ) -> Level {
+        player.deleteAllKeys()
         var gameMap = GameMap()
         
         let rooms = roomBuilder.buildRooms()
