@@ -66,18 +66,19 @@ public class Level {
     private func dropTreasure(for enemy: Enemy) {
         let treasureCount = Self.calculateTreasureCount(for: enemy)
         
-        var positionsTried: Set<Position> = []
+        var occupiedPositions: Set<Position> = []
+        occupiedPositions.insert(player.characteristics.position)
         var dropped = 0
         
         var attempts = 0
-        let maxAttempts = 10
+        let maxAttempts = 30
         while dropped < treasureCount, attempts < maxAttempts {
-            let dropPosition = GetterPositions.randomPositionOnRoom(in: rooms[enemy.indexRoom], offset: 1)
-            positionsTried.insert(dropPosition)
+            let dropPosition = GetterPositions.randomPositionOnRoom(in: rooms[enemy.indexRoom], offset: 1, excluding: occupiedPositions)
             if items[dropPosition] == nil {
                 let treasure = ItemEntityFactory.createItem(of: .treasure, for: .normal,
                                                             player: player, level: levelNumber)
                 items[dropPosition] = treasure
+                occupiedPositions.insert(dropPosition)
                 dropped += 1
             }
             attempts += 1
@@ -88,10 +89,10 @@ public class Level {
         let hostilityFactor = Double(enemy.hostility) * 0.3
         let strengthFactor = Double(enemy.strength) * 0.25
         let agilityFactor = Double(enemy.agility) * 0.2
-        let healthFactor = Double(enemy.characteristics.health) * 0.15
+        let healthFactor = Double(enemy.characteristics.maxHealth) * 0.15
 
         let base = hostilityFactor + strengthFactor + agilityFactor + healthFactor
-        let scaled = base / 10.0 // нормализация
+        let scaled = base / 10.0
         let randomFactor = Double.random(in: 0.8...1.2)
 
         return max(1, Int((scaled * randomFactor).rounded()))

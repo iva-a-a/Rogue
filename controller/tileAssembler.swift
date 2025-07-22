@@ -48,8 +48,6 @@ public struct TileAssembler {
     return tiles
 }
 
-
-
     private static func buildCorridorTiles(corridors: [Corridor], visiblePositions: Set<Position>) -> [DrawableObject] {
         var tiles = [DrawableObject]()
 
@@ -173,5 +171,5 @@ enum ColorCode {
     static let yellow = 3
     static let blue = 4
     static let green = 5
-    static let gray = 6 
+    static let gray = 6
 }
