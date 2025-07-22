@@ -3,10 +3,18 @@
 //  rogue
 
 public class GameMap {
-    var walkablePositions: Set<Position> = []
+    public var walkablePositions: Set<Position> = []
     
-    private(set) var visibleTiles: Set<Position> = []
-    private(set) var seenTiles: Set<Position> = []
+    public private(set) var visibleTiles: Set<Position> = []
+    public private(set) var seenTiles: Set<Position> = []
+    
+    public init() { }
+    
+    public init(_ walkablePositions: Set<Position>, _ visibleTiles: Set<Position>, _ seenTiles: Set<Position>) {
+        self.walkablePositions = walkablePositions
+        self.visibleTiles = visibleTiles
+        self.seenTiles = seenTiles
+    }
     
     public func addPositions(_ positions: [Position]) {
         positions.forEach { walkablePositions.insert($0) }
