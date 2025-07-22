@@ -12,7 +12,7 @@ public struct LeaderboardView {
     public let attacks: Int
     public let missed: Int
     public let tiles: Int
-    
+
     public init(treasure: Int, levelsCompleted: Int, enemiesDefeated: Int,
                 food: Int, elixirs: Int, scrolls: Int, attacks: Int,
                 missed: Int, tiles: Int) {
