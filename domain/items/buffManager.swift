@@ -5,21 +5,36 @@
 import Foundation
 
 public struct ElixirBuf {
-    var statIncrease: Int
-    var effectEnd: Date
+    public var statIncrease: Int
+    public var effectEnd: Date
+    
+    public init(statIncrease: Int, effectEnd: Date) {
+        self.statIncrease = statIncrease
+        self.effectEnd = effectEnd
+    }
 }
 
 public struct Buffs {
-    var maxHealth: [ElixirBuf]
-    var agility: [ElixirBuf]
-    var strength: [ElixirBuf]
+    public var health: [ElixirBuf]
+    public var agility: [ElixirBuf]
+    public var strength: [ElixirBuf]
+    
+    public init(health: [ElixirBuf], agility: [ElixirBuf], strength: [ElixirBuf]) {
+        self.health = health
+        self.agility = agility
+        self.strength = strength
+    }
 }
 
 public class BuffManager {
-    private(set) var buffs: Buffs
+    public private(set) var buffs: Buffs
 
     public init() {
-        self.buffs = Buffs(maxHealth: [], agility: [], strength: [])
+        self.buffs = Buffs(health: [], agility: [], strength: [])
+    }
+    
+    public init (buffs: Buffs) {
+        self.buffs = buffs
     }
 
     public func addBuff(for type: ElixirType, value: Int, duration: TimeInterval) {
@@ -29,7 +44,7 @@ public class BuffManager {
         var buffName: String = ""
         switch type {
         case .health:
-            self.buffs.maxHealth.append(buf)
+            self.buffs.health.append(buf)
             buffName = "Health Boost"
         case .agility:
             self.buffs.agility.append(buf)
@@ -39,7 +54,7 @@ public class BuffManager {
             buffName = "Strength Boost"
         }
         
-        let activeBuffs = (type == .health ? self.buffs.maxHealth :
+        let activeBuffs = (type == .health ? self.buffs.health :
                           type == .agility ? self.buffs.agility :
                           self.buffs.strength)
         let buffInfo = activeBuffs.map { buf in
@@ -52,7 +67,7 @@ public class BuffManager {
     public func update(player: Player) {
         let now = Date()
 
-        self.processBuffList(list: &self.buffs.maxHealth, applyChange: { change in
+        self.processBuffList(list: &self.buffs.health, applyChange: { change in
             player.characteristics.maxHealth += change
             player.characteristics.health = max(1, min(player.characteristics.health + change, player.characteristics.maxHealth))
         }, buffName: "Health Boost", now: now)
@@ -85,7 +100,7 @@ public class BuffManager {
     }
     
     public func clearAllBuffs() {
-        buffs.maxHealth.removeAll()
+        buffs.health.removeAll()
         buffs.agility.removeAll()
         buffs.strength.removeAll()
     }
