@@ -2,6 +2,8 @@
 //  logger.swift
 //  rogue
 
+import Foundation
+
 public class GameLogger: GameEventObserver {
     public static let shared = GameLogger()
 
@@ -10,7 +12,8 @@ public class GameLogger: GameEventObserver {
     private var combatLog: [String] = []
     private var activeBuffs: [String: [BuffInfo]] = [:]
     private var endLog: String = ""
-    private var statsLog: String?
+    private var operationLog: [String] = []
+    private let logFileName = "log.txt"
 
     private init() {}
 
@@ -66,10 +69,10 @@ public class GameLogger: GameEventObserver {
             } else {
                 activeBuffs[buffName] = buffInfo
             }
-        case .saveStats:
-            statsLog = "Game statistics saved successfully!"
-        case .notSaveStats:
-            statsLog = "Failed to save game statistics."
+        case .operationSuccess(let message):
+            operationLog.append(message)
+        case .operationFailed(let error):
+            operationLog.append("Error: \(error)")
         default: break
         }
     }
@@ -85,14 +88,10 @@ public class GameLogger: GameEventObserver {
         combatLog.removeAll()
         activeBuffs.removeAll()
         endLog = ""
-        statsLog = nil
     }
 
     public var currentLog: String {
         guard endLog.isEmpty else {
-            if let statsMessage = statsLog {
-                return endLog + "\n\n" + statsMessage
-            }
           return endLog
         }
         let logBattle = setCombatLogAsString()
@@ -116,6 +115,21 @@ public class GameLogger: GameEventObserver {
         guard !combatLog.isEmpty else { return "" }
         return combatLog.joined(separator: "\n")
     }
+    
+    public func saveLogsToFile() {
+        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return
+        }
+        let logFileURL = documentsDirectory.appendingPathComponent(logFileName)
+        let logContent = operationLog.joined(separator: "\n")
+        try? logContent.write(to: logFileURL, atomically: true, encoding: .utf8)
+       }
+    
+    private func clearLogFile() {
+        guard let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return
+        }
+        let logFileURL = documentsDirectory.appendingPathComponent(logFileName)
+        try? FileManager.default.removeItem(at: logFileURL)
+      }
 }
-
-

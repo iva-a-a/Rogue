@@ -77,9 +77,9 @@ public final class GameStatsTracker: GameEventObserver {
 
         do {
             try dataLayer.saveGameAttempt(attempt)
-            GameLogger.shared.didReceiveEvent(event: .saveStats)
-        } catch {
-            GameLogger.shared.didReceiveEvent(event: .notSaveStats)
+            GameLogger.shared.didReceiveEvent(event: .operationSuccess(message: "Game statistics saved successfully!"))
+        } catch let error {
+            GameLogger.shared.didReceiveEvent(event: .operationFailed(error: error.localizedDescription))
         }
     }
 }
