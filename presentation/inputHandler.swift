@@ -12,7 +12,6 @@ public enum PlayerAction: Equatable {
     case openFood
     case openElixir
     case openScroll
-    case showStats
     case start
     case useItem(index: Int)
     case dropWeapon
@@ -27,7 +26,6 @@ public enum PlayerAction: Equatable {
         case (.openFood, .openFood): return true
         case (.openElixir, .openElixir): return true
         case (.openScroll, .openScroll): return true
-        case (.showStats, .showStats): return true
         case (.start, .start): return true
         case (.useItem(let i1), .useItem(let i2)):
             return i1 == i2
@@ -43,16 +41,22 @@ public struct InputHandler {
         let key = getch()
 
         switch key {
-
-        case Int32(Character("w").asciiValue!): return .move(dx: -1, dy: 0)
-        case Int32(Character("s").asciiValue!): return .move(dx: 1, dy: 0)
-        case Int32(Character("a").asciiValue!): return .move(dx: 0, dy: -1)
-        case Int32(Character("d").asciiValue!): return .move(dx: 0, dy: 1)
-        case Int32(Character("h").asciiValue!): return .openWeapon
-        case Int32(Character("j").asciiValue!): return .openFood
-        case Int32(Character("k").asciiValue!): return .openElixir
-        case Int32(Character("e").asciiValue!): return .openScroll
-        case Int32(Character("i").asciiValue!): return .showStats
+        case Int32(Character("w").asciiValue!), Int32(Character("W").asciiValue!):
+            return .move(dx: -1, dy: 0)
+        case Int32(Character("s").asciiValue!), Int32(Character("S").asciiValue!):
+            return .move(dx: 1, dy: 0)
+        case Int32(Character("a").asciiValue!), Int32(Character("A").asciiValue!):
+            return .move(dx: 0, dy: -1)
+        case Int32(Character("d").asciiValue!), Int32(Character("D").asciiValue!):
+            return .move(dx: 0, dy: 1)
+        case Int32(Character("h").asciiValue!), Int32(Character("H").asciiValue!):
+            return .openWeapon
+        case Int32(Character("j").asciiValue!), Int32(Character("J").asciiValue!):
+            return .openFood
+        case Int32(Character("k").asciiValue!), Int32(Character("K").asciiValue!):
+            return .openElixir
+        case Int32(Character("e").asciiValue!), Int32(Character("E").asciiValue!):
+            return .openScroll
         case 27: return .exit          // Esc
         case 10, 13: return .start     // Enter
         case Int32(UnicodeScalar("1").value)...Int32(UnicodeScalar("9").value):
