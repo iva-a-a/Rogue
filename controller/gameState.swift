@@ -12,5 +12,6 @@ public enum GameState {
     case levelComplete
     case won
     case lose
+    case pause
     case quit
 }
