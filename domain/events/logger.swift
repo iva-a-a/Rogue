@@ -2,19 +2,18 @@
 //  logger.swift
 //  rogue
 
-
 public class GameLogger: GameEventObserver {
     public static let shared = GameLogger()
-    
+
     private var actionLog: String?
     private var moveLog: String?
     private var combatLog: [String] = []
     private var activeBuffs: [String: [BuffInfo]] = [:]
     private var endLog: String = ""
     private var statsLog: String?
-    
+
     private init() {}
-    
+
     public func didReceiveEvent(event: GameEvent) {
         switch event {
         case .playerMissed(let target):
@@ -31,12 +30,10 @@ public class GameLogger: GameEventObserver {
             combatLog.append("You've been drugged - skipping your turn...")
         case .playerSkipMove:
             combatLog.append("You skipped your turn!")
-
         case .playerMoved(let position):
             moveLog = "Moved to position: (\(position.x), \(position.y))."
         case .playerNotMoved:
             moveLog = "This movement is not possible."
-
         case .itemPickedUp(let item):
             actionLog = "You picked up: \(item)."
         case .notPickedUp:
@@ -69,11 +66,11 @@ public class GameLogger: GameEventObserver {
             } else {
                 activeBuffs[buffName] = buffInfo
             }
-
         case .saveStats:
             statsLog = "Game statistics saved successfully!"
         case .notSaveStats:
             statsLog = "Failed to save game statistics."
+        default: break
         }
     }
 
@@ -81,7 +78,7 @@ public class GameLogger: GameEventObserver {
         combatLog.removeAll()
         actionLog = nil
     }
-    
+
     public func reset() {
         actionLog = nil
         moveLog = nil
