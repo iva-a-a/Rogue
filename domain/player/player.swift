@@ -15,9 +15,17 @@ public class Player {
         self.weapon = weapon
         self.buffManager = buffManager
     }
+    
+    public init(characteristics: Characteristics, backpack: Backpack, weapon: Weapon?, buffManager: BuffManager, isAsleep: Bool) {
+        self.characteristics = characteristics
+        self.backpack = backpack
+        self.weapon = weapon
+        self.buffManager = buffManager
+        self.isAsleep = isAsleep
+    }
 
     public convenience init() {
-        let characteristics = Characteristics(position: Position(0, 0), maxHealth: 200, health: 200, agility: 10, strength: 8)
+        let characteristics = Characteristics(position: Position(0, 0), maxHealth: 20000, health: 20000, agility: 10, strength: 8)
         let backpack = Backpack()
         let buffManager = BuffManager()
         self.init(characteristics: characteristics, backpack: backpack, weapon: nil, buffManager: buffManager)
@@ -95,38 +103,3 @@ extension Player: CombatUnit {
         characteristics.health <= 0
     }
 }
-
-// MARK: - Save & Load Support
-
-//extension Player {
-//    
-//    // Сохранение состояния игрока в PlayerSaveData
-//    public func toSaveData(currentLevel: Int, score: Int) -> PlayerSaveData {
-//        let inventoryData = backpack.getAllItems().map { item in
-//            InventoryItemSaveData(category: item.category, specificType: item.uniqueIdentifier)
-//        }
-//        
-//        return PlayerSaveData(
-//            characteristics: characteristics,
-//            inventory: inventoryData,
-//            score: score,
-//            currentLevel: currentLevel
-//        )
-//    }
-//    
-//    // Инициализация игрока из PlayerSaveData
-//    public convenience init(from saveData: PlayerSaveData) {
-//        let characteristics = saveData.characteristics
-//        let backpack = Backpack()
-//        
-//        // Восстановление предметов инвентаря из сохранённых данных
-//        for itemData in saveData.inventory {
-//            if let item = ItemFactory.createItem(category: itemData.category, specificType: itemData.specificType) {
-//                backpack.addItem(item)
-//            }
-//        }
-//        
-//        let buffManager = BuffManager()
-//        self.init(characteristics: characteristics, backpack: backpack, weapon: nil, buffManager: buffManager)
-//    }
-//}

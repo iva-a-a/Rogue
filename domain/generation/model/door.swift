@@ -2,7 +2,7 @@
 //  door.swift
 //  rogue
 
-public enum Direction: CaseIterable {
+public enum Direction: String, CaseIterable {
     case up, down, left, right
 
     var opposite: Direction {
@@ -15,7 +15,7 @@ public enum Direction: CaseIterable {
     }
 }
 
-public enum Color {
+public enum Color: String {
     case red, green, blue, none
     
     var name: String {
@@ -30,11 +30,11 @@ public enum Color {
 
 public class Door {
     public let position: Position
-    let direction: Direction
+    public let direction: Direction
     public var color: Color
-    var isUnlocked: Bool
+    public var isUnlocked: Bool
     
-    init(_ position: Position, _ direction: Direction, _ color: Color = .none, isUnlocked: Bool = true) {
+    public init(_ position: Position, _ direction: Direction, _ color: Color = .none, isUnlocked: Bool = true) {
         self.position = position
         self.direction = direction
         self.color = color

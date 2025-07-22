@@ -5,7 +5,7 @@
 import Foundation
 
 public struct Food: ItemProtocol {
-    let foodType: FoodType
+    public let foodType: FoodType
 
     public var type: ItemType {
         return .food(foodType)
@@ -24,7 +24,7 @@ public struct Food: ItemProtocol {
 
 public struct Scroll: ItemProtocol {
     
-    let scrollType: ScrollType
+    public let scrollType: ScrollType
     public let value: Int
 
     public var type: ItemType {
@@ -34,6 +34,11 @@ public struct Scroll: ItemProtocol {
     public init(scrollType: ScrollType) {
         self.scrollType = scrollType
         value = Int.random(in: scrollType.effectValue)
+    }
+    
+    public init(scrollType: ScrollType, value: Int) {
+        self.scrollType = scrollType
+        self.value = value
     }
     
     public func use(_ player: Player) {
@@ -51,7 +56,7 @@ public struct Scroll: ItemProtocol {
 }
 
 public struct Elixir: ItemProtocol {
-    let elixirType: ElixirType
+    public let elixirType: ElixirType
     public let duration: TimeInterval
     public let value: Int
 
@@ -60,6 +65,12 @@ public struct Elixir: ItemProtocol {
     public init(elixirType: ElixirType, duration: TimeInterval) {
         self.elixirType = elixirType
         value = Int.random(in: elixirType.effectValue)
+        self.duration = duration
+    }
+    
+    public init(elixirType: ElixirType, value: Int, duration: TimeInterval) {
+        self.elixirType = elixirType
+        self.value = value
         self.duration = duration
     }
 
@@ -80,9 +91,13 @@ public struct Elixir: ItemProtocol {
 }
 
 public struct Treasure: ItemProtocol {
-    let treasureType: TreasureType
+    public let treasureType: TreasureType
 
     public var type: ItemType { .treasure(treasureType) }
+    
+    public init(treasureType: TreasureType) {
+        self.treasureType = treasureType
+    }
 
     var value: Int {
         treasureType.baseValue
@@ -108,6 +123,11 @@ public struct Weapon: ItemProtocol {
         self.damage = Int.random(in: weaponType.baseDamage)
     }
     
+    public init(weaponType: WeaponType, damage: Int) {
+        self.weaponType = weaponType
+        self.damage = damage
+    }
+    
     public var type: ItemType { .weapon(weaponType) }
 
     public func use(_ player: Player) {
@@ -120,9 +140,13 @@ public struct Weapon: ItemProtocol {
 }
 
 public struct Key: ItemProtocol {
-    let keyColor: Color
+    public let keyColor: Color
     
     public var type: ItemType { .key(keyColor) }
+    
+    public init(keyColor: Color) {
+        self.keyColor = keyColor
+    }
     
     public func use(_ player: Player) {
         GameEventManager.shared.notify(.openColorDoor(color: keyColor.name))

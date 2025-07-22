@@ -43,6 +43,12 @@ public class Room {
         self.lowLeft = lowLeft
         generateRandomDoors(sector)
     }
+    
+    public init(_ topRight: Position, _ lowLeft: Position, _ doors: [Door]) {
+        self.topRight = topRight
+        self.lowLeft = lowLeft
+        self.doors = doors
+    }
 
     private func randomDoorPosition(for direction: Direction) -> Position {
         switch direction {

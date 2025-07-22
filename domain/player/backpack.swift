@@ -2,7 +2,7 @@
 //  backpack.swift
 //  rogue
 
-public enum ItemCategory: Hashable {
+public enum ItemCategory: String, Hashable {
     case food
     case weapon
     case scroll
@@ -12,10 +12,15 @@ public enum ItemCategory: Hashable {
 }
 
 public class Backpack {
-    var items: [ItemCategory: [any ItemProtocol]] = [:]
+    public var items: [ItemCategory: [any ItemProtocol]] = [:]
     public var totalTreasureValue: Int = 0
 
     public init() {}
+    
+    public init(_ items: [ItemCategory: [any ItemProtocol]], _ totalTreasureValue: Int) {
+        self.items = items
+        self.totalTreasureValue = totalTreasureValue
+    }
 
     public func useItem(_ player: Player, category: ItemCategory, index: Int) {
         guard var itemArray = items[category], itemArray.indices.contains(index) else { return }

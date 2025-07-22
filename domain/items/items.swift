@@ -33,7 +33,7 @@ public enum ItemType: Hashable, Equatable {
     }
 }
 
-public enum FoodType: Hashable, Equatable {
+public enum FoodType: String, Hashable, Equatable {
     case apple, bread, meat
 
     public var healthRestore: Int {
@@ -53,7 +53,7 @@ public enum FoodType: Hashable, Equatable {
     }
 }
 
-public enum ElixirType: Hashable, Equatable {
+public enum ElixirType: String, Hashable, Equatable {
     case health, agility, strength
 
     public var effectValue: ClosedRange<Int> {
@@ -73,7 +73,7 @@ public enum ElixirType: Hashable, Equatable {
     }
 }
 
-public enum ScrollType: Hashable, Equatable {
+public enum ScrollType: String, Hashable, Equatable {
     case health, agility, strength
 
     public var effectValue: ClosedRange<Int> {
@@ -93,7 +93,7 @@ public enum ScrollType: Hashable, Equatable {
     }
 }
 
-public enum WeaponType: Hashable, Equatable {
+public enum WeaponType: String, Hashable, Equatable {
     case sword, bow, dagger, staff
 
     public var baseDamage: ClosedRange<Int> {
@@ -115,7 +115,7 @@ public enum WeaponType: Hashable, Equatable {
     }
 }
 
-public enum TreasureType: Hashable, Equatable {
+public enum TreasureType: String, Hashable, Equatable {
     case gold, gem, artifact
 
     var baseValue: Int {

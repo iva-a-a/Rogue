@@ -4,6 +4,10 @@
 
 public class Corridor {
     public var route: [Position] = []
+    
+    public init(route: [Position]) {
+        self.route = route
+    }
 
     public init(from: Position, to: Position) {
         generateZShaped(from, to)
