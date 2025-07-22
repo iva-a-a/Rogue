@@ -52,6 +52,7 @@ public final class GameStatsTracker: GameEventObserver {
         case .gameOver: save()
         case .gameWon:
             attempt.wasSuccessful = true
+            attempt.levelsCompleted += 1
             save()
         default: break
         }
