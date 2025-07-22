@@ -29,10 +29,31 @@ public struct Tile: DrawableObject {
         self.colorPair = colorPair
     }
 
+    public init() {
+        self.posX = 0
+        self.posY = 0
+        self.char = " "
+        self.isVisible = true
+        self.colorPair = 1
+    }
+
     public func draw() {
         guard isVisible else { return }
         attron(COLOR_PAIR(Int32(colorPair)))
         mvaddch(Int32(posX), Int32(posY), UInt32(char.asciiValue ?? 32))
         attroff(COLOR_PAIR(Int32(colorPair)))
+    }
+}
+
+extension Tile {
+    public func getDrawableObjectsFromString(str: String, x: Int, y: Int) -> [DrawableObject] {
+        var result = [DrawableObject]()
+        var thisX = x
+
+        for char in str {
+            result.append(Tile(posX: y, posY: thisX, char: char))
+            thisX += 1
+        }
+        return result
     }
 }
