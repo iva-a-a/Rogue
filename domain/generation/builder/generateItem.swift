@@ -175,7 +175,7 @@ public final class TreasureFactory: ItemFactory {
             switch level {
                 case 0..<5: return .gold
                 case 5..<10: return [.gold, .gem].randomElement()!
-                default: return [.gold, .gem, .artifact].randomElement()!
+                default: return [.gem, .artifact].randomElement()!
             }
         }()
         return Treasure(treasureType: type)
