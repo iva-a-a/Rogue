@@ -1,9 +1,8 @@
 //
 //  menu.swift
 //  rogue
-//
-//  unifiedMenu.swift
-//  rogue
+
+import Foundation
 
 public enum MenuType {
     case main
@@ -31,6 +30,7 @@ public enum MenuAction: Hashable, Equatable, Encodable {
 public class MenuRender {
     private var selectedIndex = 0
     private let type: MenuType
+    private var tempoparyMessage: (text: String, expiration: Date)? = nil
     
     public init(type: MenuType) {
         self.type = type
@@ -131,6 +131,24 @@ public class MenuRender {
     public func resetSelect() {
         selectedIndex = 0
     }
+    
+    public func getTemporaryMessage() -> (text: String, expiration: Date)? {
+        return tempoparyMessage
+    }
+    
+    public func setTemporaryMessage() {
+        tempoparyMessage = (text: MenuConstants.notSavedGame, expiration: Date().addingTimeInterval(2))
+    }
+    
+    public func resetTemporaryMessage() {
+        tempoparyMessage = nil
+    }
+    
+    public func renderTemporaryMessage() {
+        if tempoparyMessage != nil {
+            Render.drawString(tempoparyMessage!.text, atY: MenuConstants.downPaddingTempLog, atX: MenuConstants.leftPaddingTempLog)
+        }
+    }
 }
 
 enum MenuConstants {
@@ -139,6 +157,9 @@ enum MenuConstants {
     static let bracketSpacing = 2
     static let downPadding = 2
     static let titlePadding = 1
+    
+    static let downPaddingTempLog = 31
+    static let leftPaddingTempLog = 10
     
     static let icon = [
 "          _____                   _______                   _____                    _____                    _____          ",
@@ -190,4 +211,6 @@ enum MenuConstants {
 
     static let options = ["   NEW GAME   ", "   LOAD GAME   ", "   LEADERBOARD   ", "   EXIT   "]
     static let pauseOptions = ["   CONTINUE   ", "   MAIN MENU   ", "   EXIT   "]
+    
+    static let notSavedGame = "No saved games found"
 }

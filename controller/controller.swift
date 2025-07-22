@@ -14,7 +14,7 @@ public class Controller {
     private var inventoryCategory: ItemCategory? = nil
     private var levelNumber: Int = 0
     private var lastUpdateTime = Date()
-
+    
     private let statsTracker = GameStatsTracker()
     private let dataLayer = DataLayer()
     
@@ -27,7 +27,7 @@ public class Controller {
         GameEventManager.shared.addObserver(GameLogger.shared)
         GameEventManager.shared.addObserver(self)
     }
-
+    
     public func update(for input: PlayerAction) {
         updateBuffs()
         let previousState = state
@@ -35,7 +35,7 @@ public class Controller {
         handleStateSideEffects(from: previousState, to: state, with: input)
         act(for: input)
     }
-
+    
     private func updateState(for input: PlayerAction) {
         switch state {
         case .beginning:
@@ -79,7 +79,7 @@ public class Controller {
         case .quit: break
         }
     }
-
+    
     private func handleStateSideEffects(from oldState: GameState, to newState: GameState, with input: PlayerAction) {
         switch (oldState, newState) {
         case (.beginning, .generating), (.won, .generating), (.lose, .generating):
@@ -95,7 +95,11 @@ public class Controller {
             }
         case (.inventory, .playing): inventoryCategory = nil
         case (.beginning, .showLeaderboard):  leaderboard.resetOffset()
-        case (.pause, .beginning), (.pause, .quit):  GameEventManager.shared.notify(.saveGame)
+        case (.pause, .beginning), (.pause, .quit):
+            GameEventManager.shared.notify(.saveGame)
+            menu.resetSelect()
+        case (.playing, .pause): exitMenu.resetSelect()
+        case (.showLeaderboard, .beginning): menu.resetSelect()
         default: break
         }
     }
@@ -107,8 +111,6 @@ public class Controller {
             generateLevel()
         case .playing:
             motion(input)
-        case .beginning, .levelComplete:
-            break
         case .inventory:
             itemAction(input)
         case .won, .lose:
@@ -117,19 +119,20 @@ public class Controller {
             GameEventManager.shared.notify(.loadGame)
         case .showLeaderboard:
             leaderboard.handleInput(input)
-        case .pause: break
-        case .quit: break
+        case .quit:
+            GameLogger.shared.saveLogsToFile()
+        default: break
         }
     }
     
     private func generateLevel() {
-        let player = levelNumber == 1 ? Player() : (level?.player ?? Player())
+        let player = levelNumber == ControllerConstants.initialLevelNumber ? Player() : (level?.player ?? Player())
         self.level = LevelBuilder.buildLevel(player: player, levelNumber: levelNumber)
     }
-
+    
     private func motion(_ input: PlayerAction) {
         guard let level = level else  { return }
-
+        
         if case .move(let dx, let dy) = input {
             level.playerTurn(dx, dy)
             if level.isWin() {
@@ -150,7 +153,7 @@ public class Controller {
             }
         }
     }
-
+    
     private func itemAction(_ input: PlayerAction) {
         guard let level = level else  { return }
         if case .useItem(let index) = input {
@@ -163,18 +166,23 @@ public class Controller {
             inventoryCategory = nil
         }
     }
-
+    
     private func updateBuffs() {
         let currentTime = Date()
-        if currentTime.timeIntervalSince(lastUpdateTime) >= 1.0 {
+        if currentTime.timeIntervalSince(lastUpdateTime) >= ControllerConstants.buffUpdateInterval {
             level?.player.updateBuffs()
             lastUpdateTime = currentTime
         }
     }
-
+    
     public func rendering() {
+        if let tempLog = menu.getTemporaryMessage(), tempLog.expiration < Date() {
+            menu.resetTemporaryMessage()
+        }
         switch state {
-        case .beginning: menu.render()
+        case .beginning:
+            menu.render()
+            menu.renderTemporaryMessage()
         case .showLeaderboard: leaderboard.render(attempts: MapperLeaderboard.toViewModel(dataLayer.getSortedGameAttempts()))
         case .pause: exitMenu.render()
         case .inventory:
@@ -196,20 +204,27 @@ public class Controller {
         let dto = LevelMapper.toDTO(level)
         do {
             try dataLayer.saveLevelDTO(dto)
-        } catch {
-
+            GameLogger.shared.didReceiveEvent(event: .operationSuccess(message: "The game was saved successfully!"))
+        } catch let error {
+            GameLogger.shared.didReceiveEvent(event: .operationFailed(error: error.localizedDescription))
         }
     }
-
+    
     private func loadGame() {
         do {
             if let dto = try dataLayer.loadLevelDTO() {
                 self.level = LevelMapper.toDomain(dto)
                 self.levelNumber = dto.levelNumber
                 self.state = .playing
+                GameLogger.shared.didReceiveEvent(event: .operationSuccess(message: "The game has been uploaded successfully!"))
+            } else {
+                state = .beginning
+                menu.setTemporaryMessage()
+                GameLogger.shared.didReceiveEvent(event: .operationFailed(error: "No saved games found"))
             }
-        } catch {
-           // GameLogger.shared.didReceiveEvent(event: .notSaveStats)
+        } catch let error {
+            state = .beginning
+            GameLogger.shared.didReceiveEvent(event: .operationFailed(error: error.localizedDescription))
         }
     }
 }
@@ -217,12 +232,14 @@ public class Controller {
 extension Controller: GameEventObserver {
     public func didReceiveEvent(event: GameEvent) {
         switch event {
-        case .saveGame:
-            saveGame()
-        case .loadGame:
-            loadGame()
-        default:
-            break
+        case .saveGame: saveGame()
+        case .loadGame: loadGame()
+        default: break
         }
     }
+}
+
+enum ControllerConstants {
+    static let initialLevelNumber = 1
+    static let buffUpdateInterval: TimeInterval = 1.0
 }
