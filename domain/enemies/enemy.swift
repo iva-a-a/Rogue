@@ -2,7 +2,7 @@
 //  enemy.swift
 //  rogue
 
-public enum EnemyType {
+public enum EnemyType: String {
     case zombie, vampire, ghost, ogre, snakeMage, mimic
     
     var name: String {

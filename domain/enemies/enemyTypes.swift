@@ -2,8 +2,8 @@
 //  enemyTypes.swift
 //  rogue
 
-class Zombie: Enemy {
-    init(characteristics: Characteristics, hostility: Int) {
+public class Zombie: Enemy {
+    public init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .zombie,
             characteristics: characteristics,
@@ -16,11 +16,11 @@ class Zombie: Enemy {
     }
 }
 
-class Vampire: Enemy, AttackInterceptable {
+public class Vampire: Enemy, AttackInterceptable {
 
     private var wasFirstAttacked = false
 
-    init(characteristics: Characteristics, hostility: Int) {
+    public init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .vampire,
             characteristics: characteristics,
@@ -32,15 +32,23 @@ class Vampire: Enemy, AttackInterceptable {
         )
     }
 
-    func interceptAttack(from attacker: CombatUnit) -> AttackResult? {
+    public func interceptAttack(from attacker: CombatUnit) -> AttackResult? {
         guard !wasFirstAttacked else { return nil }
         wasFirstAttacked = true
         return .miss
     }
+    
+    public func getWasFirstAttacked() -> Bool {
+        return wasFirstAttacked
+    }
+    
+    public func setWasFirstAttacked(_ value: Bool) {
+        wasFirstAttacked = value
+    }
 }
 
-class Ghost: Enemy {
-    init(characteristics: Characteristics, hostility: Int) {
+public class Ghost: Enemy {
+    public init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .ghost,
             characteristics: characteristics,
@@ -52,16 +60,16 @@ class Ghost: Enemy {
         )
     }
 
-    override func move(level: Level) {
+    public override func move(level: Level) {
         super.move(level: level)
         isVisible = Int.random(in: 1...100) > 20
     }
 }
 
-class Ogre: Enemy {
-    var isResting: Bool = false
+public class Ogre: Enemy {
+    private var isResting: Bool = false
 
-    init(characteristics: Characteristics, hostility: Int) {
+    public init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .ogre,
             characteristics: characteristics,
@@ -73,7 +81,7 @@ class Ogre: Enemy {
         )
     }
 
-    override func move(level: Level) {
+    public override func move(level: Level) {
         if isResting {
             isResting = false
             return
@@ -81,7 +89,7 @@ class Ogre: Enemy {
         super.move(level: level)
     }
 
-    override func attack(player: Player) -> AttackResult {
+    public override func attack(player: Player) -> AttackResult {
         var result = AttackResult.miss
         if !isResting {
             result = attackBehavior.attack(attacker: self, player: player)
@@ -89,10 +97,18 @@ class Ogre: Enemy {
         isResting = !isResting
         return result
     }
+    
+    public func getIsResting() -> Bool {
+        return isResting
+    }
+    
+    public func setIsResting(_ isResting: Bool) {
+        self.isResting = isResting
+    }
 }
 
-class SnakeMage: Enemy {
-    init(characteristics: Characteristics, hostility: Int) {
+public class SnakeMage: Enemy {
+    public init(characteristics: Characteristics, hostility: Int) {
         super.init(
             type: .snakeMage,
             characteristics: characteristics,
@@ -110,11 +126,11 @@ public protocol DepictsItem {
     var disguisedItemType: ItemType { get set }
 }
 
-class Mimic: Enemy {
-    var depictsItem: Bool = true
-    var disguisedItemType: ItemType = Mimic.randomDisguisedItem()
+public class Mimic: Enemy {
+    public var depictsItem: Bool = true
+    public var disguisedItemType: ItemType = Mimic.randomDisguisedItem()
 
-    init(characteristics: Characteristics, hostility: Int) {
+    public init(characteristics: Characteristics, hostility: Int) {
 
         super.init(
             type: .mimic,
@@ -127,7 +143,7 @@ class Mimic: Enemy {
         )
     }
 
-    override func move(level: Level) {
+    public override func move(level: Level) {
         let distanceToPlayer = abs(characteristics.position.x - level.player.characteristics.position.x) +
         abs(characteristics.position.y - level.player.characteristics.position.y)
         if distanceToPlayer == 2 && depictsItem == false {
@@ -136,7 +152,7 @@ class Mimic: Enemy {
         super.move(level: level)
     }
 
-    override func attack(player: Player) -> AttackResult {
+    public override func attack(player: Player) -> AttackResult {
         depictsItem = false
         return attackBehavior.attack(attacker: self, player: player)
     }
