@@ -23,10 +23,6 @@ public struct TileAssembler {
         let playerRoom = level.rooms.first(where: { $0.contains(level.player.characteristics.position) })
 
         tiles.append(contentsOf: buildEnemyTiles(enemies: level.enemies, visiblePositions: visiblePositions, exploredPositions: exploredPositions, playerRoom: playerRoom))
-
-
-
-        // tiles.append(contentsOf: buildEnemyTiles(enemies: level.enemies, visiblePositions: visiblePositions))
         tiles.append(buildPlayerTile(player: level.player))
 
         return tiles
@@ -46,7 +42,7 @@ public struct TileAssembler {
                     let char: Character = isWall ? "#" : "."
                     tiles.append(Tile(posX: x, posY: y, char: char, isVisible: true, colorPair: ColorCode.white))
                 } else if exploredPositions.contains(pos) && isWall {
-                    tiles.append(Tile(posX: x, posY: y, char: "#", isVisible: true, colorPair: ColorCode.gray))
+                    tiles.append(Tile(posX: x, posY: y, char: "#", isVisible: true, colorPair: ColorCode.grey))
                 }
             }
         }
@@ -65,7 +61,7 @@ public struct TileAssembler {
             if visiblePositions.contains(pos) {
                 tiles.append(Tile(posX: pos.x, posY: pos.y, char: "+", isVisible: true, colorPair: ColorCode.white))
             } else if exploredPositions.contains(pos) {
-                tiles.append(Tile(posX: pos.x, posY: pos.y, char: "+", isVisible: true, colorPair: ColorCode.green))
+                tiles.append(Tile(posX: pos.x, posY: pos.y, char: "+", isVisible: true, colorPair: ColorCode.grey))
             }
         }
     }
@@ -80,11 +76,11 @@ public struct TileAssembler {
     for room in rooms {
         for door in room.doors {
             let pos = door.position
+            let color = colorForDoor(door.color)
             if visiblePositions.contains(pos) {
-                let color = colorForDoor(door.color)
                 tiles.append(Tile(posX: pos.x, posY: pos.y, char: "D", isVisible: true, colorPair: color))
             } else if exploredPositions.contains(pos) {
-                tiles.append(Tile(posX: pos.x, posY: pos.y, char: "D", isVisible: true, colorPair: ColorCode.green))
+                tiles.append(Tile(posX: pos.x, posY: pos.y, char: "D", isVisible: true, colorPair: color == ColorCode.white ? ColorCode.grey : color))
             }
         }
     }
@@ -126,7 +122,6 @@ public struct TileAssembler {
             tiles.append(Tile(posX: pos.x, posY: pos.y, char: char, isVisible: true, colorPair: color))
         }
     }
-
     return tiles
 }
 
@@ -181,5 +176,5 @@ enum ColorCode {
     static let yellow = 3
     static let blue = 4
     static let green = 5
-    static let gray = 6
+    static let grey = 6
 }
