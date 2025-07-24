@@ -13,8 +13,7 @@ public class DataLayer {
     private var documentsDirectory: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     }
-    
-    
+
     public func saveGameAttempt(_ attempt: GameAttempt) throws {
         var allAttempts = loadAllGameAttempts()
         allAttempts.append(attempt)

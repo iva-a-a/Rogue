@@ -8,31 +8,31 @@ import domain
 
 public struct LevelMapper {
     public static func toDTO(_ level: Level) -> LevelDTO {
-
-        let itemsDTO = level.items.mapKeys { PositionMapper.toDTO($0) }
-                                .mapValues { ItemMapper.toDTO($0) }
-
         return LevelDTO(rooms: level.rooms.map(RoomMapper.toDTO),
                         corridors: level.corridors.map(CorridorMapper.toDTO),
                         exitPosition: PositionMapper.toDTO(level.exitPosition),
                         player: PlayerMapper.toDTO(level.player),
                         enemies: level.enemies.map(EnemyMapper.toDTO),
-                        items: itemsDTO,
+                        items: level.items.mapKeys(PositionMapper.toDTO).mapValues(ItemMapper.toDTO),
                         levelNumber: level.levelNumber,
-                        gameMap: GameMapMapper.toDTO(level.gameMap))
+                        gameMap: GameMapMapper.toDTO(level.gameMap),
+                        exploredPositions: Set(level.exploredPositions.map(PositionMapper.toDTO)))
     }
-
+    
     public static func toDomain(_ dto: LevelDTO) -> Level {
-        let items = dto.items.mapKeys { PositionMapper.toDomain($0) }
-                            .mapValues { ItemMapper.toDomain($0) }
-        return Level(dto.rooms.map(RoomMapper.toDomain),
-                     dto.corridors.map(CorridorMapper.toDomain),
-                     PositionMapper.toDomain(dto.exitPosition),
-                     PlayerMapper.toDomain(dto.player),
-                     dto.enemies.map(EnemyMapper.toDomain),
-                     items,
-                     dto.levelNumber,
-                     GameMapMapper.toDomain(dto.gameMap))
+        let level = Level(
+            dto.rooms.map(RoomMapper.toDomain),
+            dto.corridors.map(CorridorMapper.toDomain),
+            PositionMapper.toDomain(dto.exitPosition),
+            PlayerMapper.toDomain(dto.player),
+            dto.enemies.map(EnemyMapper.toDomain),
+            dto.items.mapKeys(PositionMapper.toDomain).mapValues(ItemMapper.toDomain),
+            dto.levelNumber,
+            GameMapMapper.toDomain(dto.gameMap)
+        )
+        
+        level.exploredPositions = Set(dto.exploredPositions.map(PositionMapper.toDomain))
+        return level
     }
 }
 

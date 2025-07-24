@@ -54,6 +54,7 @@ public struct LevelDTO: Codable {
     public let items: [PositionDTO: ItemDTO]
     public let levelNumber: Int
     public let gameMap: GameMapDTO
+    public let exploredPositions: Set<PositionDTO>
     
     public init(rooms: [RoomDTO],
                 corridors: [CorridorDTO],
@@ -62,7 +63,8 @@ public struct LevelDTO: Codable {
                 enemies: [EnemyDTO],
                 items: [PositionDTO: ItemDTO],
                 levelNumber: Int,
-                gameMap: GameMapDTO) {
+                gameMap: GameMapDTO,
+                exploredPositions: Set<PositionDTO>) {
         self.rooms = rooms
         self.corridors = corridors
         self.exitPosition = exitPosition
@@ -71,6 +73,7 @@ public struct LevelDTO: Codable {
         self.items = items
         self.levelNumber = levelNumber
         self.gameMap = gameMap
+        self.exploredPositions = exploredPositions
     }
 }
 
