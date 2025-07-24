@@ -86,7 +86,7 @@ public final class ViewModelBuilder {
             description += " (+\(foodType.healthRestore) HP)"
         case .weapon(_):
             if let weapon = item as? Weapon {
-                description += " (\(weapon.damage) dmg)"
+                description += " (+\(weapon.damage) damage)"
             }
         case .scroll(let scrollType):
             if let scroll = item as? Scroll {
