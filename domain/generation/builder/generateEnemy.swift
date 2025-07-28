@@ -10,8 +10,7 @@ public final class EnemyEntityFactory: EntityFactory {
                          excluding: Set<Position>,
                          player: Player,
                          level: Int,
-                         difficulty: GameDifficulty
-    ) -> [Position : EntityType] {
+                         difficulty: GameDifficulty) -> [Position : EntityType] {
 
         var enemies: [Position: Enemy] = [:]
         let enemyCount = SpawnBalancer.calculateEntityCount(
@@ -60,11 +59,8 @@ public final class EnemyEntityFactory: EntityFactory {
         return (difficultyModifier, levelModifier)
     }
     
-    private static func adjustCharacteristics(
-        baseStats: inout (maxHealth: Int, health: Int, agility: Int, strength: Int, hostility: Int),
-        difficulty: GameDifficulty,
-        level: Int
-    ) {
+    private static func adjustCharacteristics(baseStats: inout (maxHealth: Int, health: Int, agility: Int, strength: Int, hostility: Int),
+                                              difficulty: GameDifficulty,level: Int) {
         let (difficultyModifier, levelModifier) = getModifiers(for: difficulty, level: level)
 
         baseStats.maxHealth = Int(Double(baseStats.maxHealth) * difficultyModifier * levelModifier)

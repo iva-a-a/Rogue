@@ -10,8 +10,7 @@ public final class ItemEntityFactory: EntityFactory {
                          excluding: Set<Position>,
                          player: Player,
                          level: Int,
-                         difficulty: GameDifficulty
-    ) -> [Position: EntityType] {
+                         difficulty: GameDifficulty) -> [Position: EntityType] {
 
         var items: [Position: ItemProtocol] = [:]
         let itemCount = SpawnBalancer.calculateEntityCount(
@@ -28,8 +27,7 @@ public final class ItemEntityFactory: EntityFactory {
     private static func randomItem(probabilities: [ItemCategory: Double],
                                    difficulty: GameDifficulty,
                                    player: Player,
-                                   level: Int
-    ) -> any ItemProtocol {
+                                   level: Int) -> any ItemProtocol {
 
         let random = Double.random(in: 0..<1)
         var runningSum = 0.0
@@ -46,8 +44,7 @@ public final class ItemEntityFactory: EntityFactory {
     public static func createItem(of category: ItemCategory,
                                   for difficulty: GameDifficulty,
                                   player: Player,
-                                  level: Int
-    ) -> any ItemProtocol {
+                                  level: Int) -> any ItemProtocol {
 
         let factory: ItemFactory
         switch category {

@@ -8,8 +8,7 @@ public struct LevelBuilder {
                                   corridorsBuilder: CorridorsBuilderProtocol = CorridorsBuilder(),
                                   player: Player,
                                   difficulty: GameDifficulty = .normal,
-                                  levelNumber: Int
-    ) -> Level {
+                                  levelNumber: Int) -> Level {
         player.deleteAllKeys()
         var gameMap = GameMap()
         
@@ -25,8 +24,7 @@ public struct LevelBuilder {
     }
     
     static private func buildCorridors(_ rooms: [Room],
-                                       _ generator: CorridorsBuilderProtocol
-    ) -> ([Corridor], Graph) {
+                                       _ generator: CorridorsBuilderProtocol) -> ([Corridor], Graph) {
         var (graph, newCorridors) = generator.buildRandomCorridors(rooms: rooms)
         var corridors = newCorridors
         graph.dfs(from: 0)
@@ -52,8 +50,7 @@ public struct LevelBuilder {
                                      _ gameMap: inout GameMap,
                                      _ player: Player,
                                      _ difficulty: GameDifficulty,
-                                     _ levelNumber: Int
-    ) -> (Position, [Position : ItemProtocol], [Enemy]) {
+                                     _ levelNumber: Int) -> (Position, [Position : ItemProtocol], [Enemy]) {
         
         KeyFactory.usedColors = []
         
@@ -76,8 +73,7 @@ public struct LevelBuilder {
                                       _ graph: Graph,
                                       _ occupiedPositions: inout Set<Position>,
                                       _ levelNumber: Int,
-                                      _ gameMap: inout GameMap
-    ) -> (items: [Position: ItemProtocol], enemies: [Enemy]) {
+                                      _ gameMap: inout GameMap) -> (items: [Position: ItemProtocol], enemies: [Enemy]) {
         
         let entityBuilder: EntityBuilderProtocol = EntityBuilder()
         
@@ -99,8 +95,7 @@ public struct LevelBuilder {
     static private func buildStart(_ rooms: [Room],
                                    _ gameMap: inout GameMap,
                                    _ player: Player,
-                                   _ occupiedPositions: inout Set<Position>
-    ) -> (index: Int, position: Position) {
+                                   _ occupiedPositions: inout Set<Position>) -> (index: Int, position: Position) {
     
         let indexStart = Int.random(in: 0..<rooms.count)
         rooms[indexStart].setStartRoom()
@@ -117,8 +112,7 @@ public struct LevelBuilder {
     static private func buildExit(_ rooms: [Room],
                                   _ graph: Graph,
                                   _ startRoomIndex: Int,
-                                  _ occupiedPositions: inout Set<Position>
-    ) -> Position {
+                                  _ occupiedPositions: inout Set<Position>) -> Position {
 
         var mutableGraph = graph
         let indexEnd = mutableGraph.bfs(from: startRoomIndex) ??
