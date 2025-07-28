@@ -96,8 +96,7 @@ public class Room {
         return point.x > lowLeft.x && point.x < topRight.x &&
                    point.y > lowLeft.y && point.y < topRight.y
     }
-    
-    // Все внутренние точки комнаты (без границ)
+
     public func interiorPositions() -> [Position] {
         var positions: [Position] = []
         guard topRight.x > lowLeft.x + 1 && topRight.y > lowLeft.y + 1 else {
@@ -112,7 +111,22 @@ public class Room {
     }
 
     public func contains(_ pos: Position) -> Bool {
-    return pos.x >= lowLeft.x && pos.x <= topRight.x &&
-           pos.y >= lowLeft.y && pos.y <= topRight.y
+        return pos.x >= lowLeft.x && pos.x <= topRight.x &&
+               pos.y >= lowLeft.y && pos.y <= topRight.y
+    }
+    
+    public func isWall(_ pos: Position) -> Bool {
+        guard self.contains(pos) else {
+            return false
+        }
+        return (pos.x == lowLeft.x || pos.x == topRight.x || pos.y == lowLeft.y || pos.y == topRight.y)
+    }
+    
+    public var width: Int {
+        return topRight.x - lowLeft.x
+    }
+    
+    public var height: Int {
+        return topRight.y - lowLeft.y
     }
 }

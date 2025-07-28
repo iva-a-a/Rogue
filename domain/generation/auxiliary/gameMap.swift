@@ -43,7 +43,7 @@ public class GameMap {
         self.removePosition(newPosition)
     }
 
-    public func updateVisibility(from origin: Position, radius: Int = 8) {
+    public func updateVisibility(from origin: Position, radius: Int = 5) {
         visibleTiles.removeAll()
 
         for dx in -radius...radius {
