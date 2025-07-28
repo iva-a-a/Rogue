@@ -118,7 +118,7 @@ public struct TileAssembler {
 
         if visiblePositions.contains(pos) {
             tiles.append(Tile(posX: pos.x, posY: pos.y, char: char, isVisible: true, colorPair: color))
-        } else if exploredPositions.contains(pos), playerRoom?.contains(pos) == true {        
+        } else if exploredPositions.contains(pos), playerRoom?.contains(pos) == false {
             tiles.append(Tile(posX: pos.x, posY: pos.y, char: char, isVisible: true, colorPair: color))
         }
     }
