@@ -7,16 +7,14 @@ public protocol EntityBuilderProtocol {
                        excluding occupiedPositions: inout Set<Position>,
                        player: Player,
                        difficulty: GameDifficulty,
-                       levelNumber: Int
-    ) -> [Position : ItemProtocol]
+                       levelNumber: Int) -> [Position : ItemProtocol]
 
     func generateEnemies(in rooms: [Room],
                          excluding occupiedPositions: Set<Position>,
                          player: Player,
                          difficulty: GameDifficulty,
                          gameMap: inout GameMap,
-                         levelNumber: Int
-    ) -> [Enemy]
+                         levelNumber: Int) -> [Enemy]
 
     func generateColorDoorsKeys(in rooms: [Room],
                                 startRoomIndex: Int,
@@ -24,8 +22,7 @@ public protocol EntityBuilderProtocol {
                                 difficulty: GameDifficulty,
                                 graph: Graph,
                                 excluding occupiedPositions: inout Set<Position>,
-                                level: Int
-    ) -> [Position: ItemProtocol]
+                                level: Int) -> [Position: ItemProtocol]
 }
 
 public class EntityBuilder: EntityBuilderProtocol {
@@ -36,8 +33,7 @@ public class EntityBuilder: EntityBuilderProtocol {
                               excluding occupiedPositions: inout Set<Position>,
                               player: Player,
                               difficulty: GameDifficulty,
-                              levelNumber: Int
-    ) -> [Position : ItemProtocol] {
+                              levelNumber: Int) -> [Position : ItemProtocol] {
 
         let factory = ItemEntityFactory()
         let items = factory.generate(in: rooms, excluding: occupiedPositions, player: player,
@@ -51,8 +47,7 @@ public class EntityBuilder: EntityBuilderProtocol {
                                 player: Player,
                                 difficulty: GameDifficulty,
                                 gameMap: inout GameMap,
-                                levelNumber: Int
-    ) -> [Enemy] {
+                                levelNumber: Int) -> [Enemy] {
         
         let factory = EnemyEntityFactory()
         let enemiesWithPositions = factory.generate(in: rooms, excluding: occupiedPositions, player: player,
@@ -70,15 +65,13 @@ public class EntityBuilder: EntityBuilderProtocol {
                                        difficulty: GameDifficulty,
                                        graph: Graph,
                                        excluding occupiedPositions: inout Set<Position>,
-                                       level: Int
-    ) -> [Position: ItemProtocol] {
+                                       level: Int) -> [Position: ItemProtocol] {
         
         var keys: [Position: ItemProtocol] = [:]
         var updatedGraph = graph
         var usedDoors = Set<ObjectIdentifier>()
-        var doorCount: Int = 0
         
-        while keys.count < GenerationConstants.countColorDoors && doorCount < GenerationConstants.countColorDoors {
+        while keys.count < GenerationConstants.countColorDoors {
             
             guard let (keyRoomIndex, keyRoom) = findRandomAccessibleRoom(updatedGraph, startRoomIndex, rooms) else {
                 break
@@ -101,7 +94,6 @@ public class EntityBuilder: EntityBuilderProtocol {
                                              graph: &updatedGraph)
             if isLockDoor == true {
                 keys[keyPosition] = keyItem
-                doorCount += 1
             } else {
                 KeyFactory.usedColors.remove(color)
                 keys.removeValue(forKey: keyPosition)
@@ -137,8 +129,7 @@ public class EntityBuilder: EntityBuilderProtocol {
                                      player: Player,
                                      difficulty: GameDifficulty,
                                      level: Int,
-                                     occupiedPositions: Set<Position>
-    ) -> (item: ItemProtocol, position: Position)? {
+                                     occupiedPositions: Set<Position>) -> (item: ItemProtocol, position: Position)? {
 
         let keyItem = ItemEntityFactory.createItem(of: .key, for: difficulty, player: player, level: level)
         guard case .key(_) = keyItem.type else { return nil }
@@ -161,17 +152,16 @@ public class EntityBuilder: EntityBuilderProtocol {
                                  color: Color,
                                  rooms: [Room],
                                  usedDoors: inout Set<ObjectIdentifier>,
-                                 graph: inout Graph
-    ) -> Bool {
+                                 graph: inout Graph) -> Bool {
         
         for (roomIndex, room) in rooms.enumerated().shuffled() {
             if roomIndex == startRoomIndex || roomIndex == keyRoomIndex { continue }
-            
+
             for door in room.doors.shuffled() {
                 let doorId = ObjectIdentifier(door)
                 if usedDoors.contains(doorId) { continue }
-                
-                if tryLockDoor(
+
+                let success = tryLockDoor(
                     door: door,
                     color: color,
                     roomIndex: roomIndex,
@@ -179,11 +169,17 @@ public class EntityBuilder: EntityBuilderProtocol {
                     startRoomIndex: startRoomIndex,
                     usedDoors: &usedDoors,
                     graph: &graph
-                ) {
+                )
+
+                if success {
                     return true
+                } else {
+                    door.color = .none
+                    door.isUnlocked = true
                 }
             }
         }
+
         return false
     }
 
@@ -193,8 +189,7 @@ public class EntityBuilder: EntityBuilderProtocol {
                              keyRoomIndex: Int,
                              startRoomIndex: Int,
                              usedDoors: inout Set<ObjectIdentifier>,
-                             graph: inout Graph
-    ) -> Bool {
+                             graph: inout Graph) -> Bool {
         var testGraph = graph
         testGraph.removeAllConnections(for: roomIndex)
         
