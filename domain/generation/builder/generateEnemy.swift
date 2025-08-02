@@ -2,6 +2,8 @@
 //  generateEnemy.swift
 //  rogue
 
+import Foundation
+
 public final class EnemyEntityFactory: EntityFactory {
 
     public typealias EntityType = Enemy
@@ -59,18 +61,46 @@ public final class EnemyEntityFactory: EntityFactory {
         return (difficultyModifier, levelModifier)
     }
 
+//    private static func adjustCharacteristics(baseStats: inout (maxHealth: Int, health: Int, agility: Int, strength: Int, hostility: Int),
+//                                              difficulty: GameDifficulty, level: Int) {
+//        let difficultyModifier: Double
+//        switch difficulty {
+//            case .easy: difficultyModifier = 0.8
+//            case .normal: difficultyModifier = 1.0
+//            case .hard: difficultyModifier = 1.2
+//        }
+//
+//        let healthScale = 1.0 + Double(level) * 0.03
+//        let strengthScale = 1.0 + Double(level) * 0.045
+//        let agilityScale = 1.0 + Double(level) * 0.035
+//
+//        baseStats.maxHealth = Int(Double(baseStats.maxHealth) * difficultyModifier * healthScale)
+//        baseStats.health = baseStats.maxHealth
+//        baseStats.strength = Int(Double(baseStats.strength) * difficultyModifier * strengthScale)
+//        baseStats.agility = Int(Double(baseStats.agility) * difficultyModifier * agilityScale)
+//    }
+    
     private static func adjustCharacteristics(baseStats: inout (maxHealth: Int, health: Int, agility: Int, strength: Int, hostility: Int),
                                               difficulty: GameDifficulty, level: Int) {
         let difficultyModifier: Double
         switch difficulty {
-            case .easy: difficultyModifier = 0.8
+            case .easy: difficultyModifier = 0.9
             case .normal: difficultyModifier = 1.0
-            case .hard: difficultyModifier = 1.2
+            case .hard: difficultyModifier = 1.1
         }
 
-        let healthScale = 1.0 + Double(level) * 0.03
-        let strengthScale = 1.0 + Double(level) * 0.045
-        let agilityScale = 1.0 + Double(level) * 0.035
+        let isHighLevel = level >= 17
+        let healthScale = isHighLevel
+            ? 1.0 + Double(level) * 0.06 + pow(Double(level - 16), 1.05) * 0.03
+            : 1.0 + Double(level) * 0.03
+
+        let strengthScale = isHighLevel
+            ? 1.0 + Double(level) * 0.07
+            : 1.0 + Double(level) * 0.045
+
+        let agilityScale = isHighLevel
+            ? 1.0 + Double(level) * 0.075
+            : 1.0 + Double(level) * 0.035
 
         baseStats.maxHealth = Int(Double(baseStats.maxHealth) * difficultyModifier * healthScale)
         baseStats.health = baseStats.maxHealth

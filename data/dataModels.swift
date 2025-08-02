@@ -4,7 +4,6 @@
 
 import Foundation
 
-// Модель для статистики попытки прохождения
 public struct GameAttempt: Codable {
     public let date: Date
     public var levelsCompleted: Int
@@ -21,7 +20,6 @@ public struct GameAttempt: Codable {
     public var missFromAttack: Int // количество промахов по игроку
     public var hitFromAttack: Int  // количество ударов по игроку
     public var tilesExplored: Int
-    //public let namePlayer: String
     
     public init(date: Date, levelsCompleted: Int, totalTreasure: Int,
                 finalScore: Int, wasSuccessful: Bool, playTime: TimeInterval,

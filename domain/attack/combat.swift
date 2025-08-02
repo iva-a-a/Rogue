@@ -8,8 +8,6 @@ public protocol CombatUnit {
     var strength: Int { get }
     func receiveDamage(_ damage: Int)
     var isDead: Bool { get }
-
-    // По умолчанию — нет оружия
     var weaponDamage: Int? { get }
 }
 

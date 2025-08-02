@@ -1,5 +1,5 @@
 //
-//  character.swift
+//  characteristics.swift
 //  rogue
 
 public struct Characteristics {

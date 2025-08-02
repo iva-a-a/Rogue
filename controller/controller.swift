@@ -142,7 +142,9 @@ public class Controller {
         
         GameLogger.shared.didReceiveEvent(event: .operationSuccess(message: difficultyMessage))
         self.level = LevelBuilder.buildLevel(player: player, difficulty: difficulty, levelNumber: levelNumber)
-        GameStatsLevel.shared.didReceiveEvent(event: .levelGenerated)
+        if level != nil {
+            GameStatsLevel.shared.didReceiveEvent(event: .levelGenerated)
+        }
     }
     
     private func motion(_ input: PlayerAction) {

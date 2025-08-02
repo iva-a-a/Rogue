@@ -195,7 +195,6 @@ public final class KeyFactory: ItemFactory {
             fatalError("No available colors for key generation")
         }
 
-        KeyFactory.usedColors.insert(color)
         return Key(keyColor: color)
     }
 }
