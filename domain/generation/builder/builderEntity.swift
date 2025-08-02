@@ -71,32 +71,36 @@ public class EntityBuilder: EntityBuilderProtocol {
         var updatedGraph = graph
         var usedDoors = Set<ObjectIdentifier>()
         
-        while keys.count < GenerationConstants.countColorDoors {
-            
-            guard let (keyRoomIndex, keyRoom) = findRandomAccessibleRoom(updatedGraph, startRoomIndex, rooms) else {
-                break
-            }
-            guard let (keyItem, keyPosition) = generateAndPlaceKey(in: keyRoom,
-                                                                   startRoom: rooms[startRoomIndex],
-                                                                   player: player,
-                                                                   difficulty: difficulty,
-                                                                   level: level,
-                                                                   occupiedPositions: occupiedPositions
-            ), case let .key(color) = keyItem.type else {
-                continue
-            }
-            
-            let isLockDoor = findAndLockDoor(for: keyRoomIndex,
-                                             startRoomIndex: startRoomIndex,
-                                             color: color,
-                                             rooms: rooms,
-                                             usedDoors: &usedDoors,
-                                             graph: &updatedGraph)
-            if isLockDoor == true {
-                keys[keyPosition] = keyItem
-            } else {
-                KeyFactory.usedColors.remove(color)
-                keys.removeValue(forKey: keyPosition)
+        for _ in 0..<GenerationConstants.countColorDoors {
+            var success = false
+
+            while !success {
+
+                guard let (keyRoomIndex, keyRoom) = findRandomAccessibleRoom(updatedGraph, startRoomIndex, rooms) else {
+                    continue
+                }
+
+                guard let (keyItem, keyPosition) = generateAndPlaceKey(
+                    in: keyRoom,
+                    startRoom: rooms[startRoomIndex],
+                    player: player,
+                    difficulty: difficulty,
+                    level: level,
+                    occupiedPositions: occupiedPositions
+                ), case let .key(color) = keyItem.type else {
+                    continue
+                }
+
+                if findAndLockDoor(for: keyRoomIndex,
+                                   startRoomIndex: startRoomIndex,
+                                   color: color,
+                                   rooms: rooms,
+                                   usedDoors: &usedDoors,
+                                   graph: &updatedGraph) {
+                    keys[keyPosition] = keyItem
+                    KeyFactory.usedColors.insert(color)
+                    success = true
+                }
             }
         }
         occupiedPositions.formUnion(keys.keys)
