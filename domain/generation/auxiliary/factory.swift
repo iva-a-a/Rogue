@@ -8,24 +8,20 @@ public protocol EntityFactory {
                   excluding: Set<Position>,
                   player: Player,
                   level: Int,
-                  difficulty: GameDifficulty
-    ) -> [Position: EntityType]
+                  difficulty: GameDifficulty) -> [Position: EntityType]
 }
 
 public struct SpawnBalancer {
 
-    // для модификатора: положительный для предметов 1, отрицательный для врагов -1
     public static func calculateEntityCount(base: Int,
                                             level: Int,
                                             difficulty: GameDifficulty,
                                             player: Player,
                                             maxCount: Int = 21,
-                                            modifier: Int
-    ) -> Int {
+                                            modifier: Int) -> Int {
         var count = base
 
-        // Меньше предметов на высоких уровнях
-        count -= modifier * level / 5
+        count += modifier * (level / 3) * -1
 
         switch difficulty {
         case .easy:

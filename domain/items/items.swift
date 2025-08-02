@@ -38,9 +38,9 @@ public enum FoodType: String, Hashable, Equatable {
 
     public var healthRestore: Int {
         switch self {
-        case .apple: return 10
-        case .bread: return 20
-        case .meat: return 30
+        case .apple: return 15
+        case .bread: return 25
+        case .meat: return 35
         }
     }
 
@@ -59,7 +59,7 @@ public enum ElixirType: String, Hashable, Equatable {
     public var effectValue: ClosedRange<Int> {
         switch self {
         case .health: return 15...25
-        case .agility: return 3...6
+        case .agility: return 5...8
         case .strength: return 7...13
         }
     }
@@ -78,9 +78,9 @@ public enum ScrollType: String, Hashable, Equatable {
 
     public var effectValue: ClosedRange<Int> {
         switch self {
-        case .health: return 5...10
+        case .health: return 15...20
         case .agility: return 3...5
-        case .strength: return 5...8
+        case .strength: return 2...4
         }
     }
 
@@ -98,7 +98,7 @@ public enum WeaponType: String, Hashable, Equatable {
 
     public var baseDamage: ClosedRange<Int> {
         switch self {
-        case .sword: return 12...16
+        case .sword: return 16...19
         case .bow: return 9...13
         case .dagger: return 5...9
         case .staff: return 7...11

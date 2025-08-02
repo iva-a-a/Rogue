@@ -14,6 +14,7 @@ public class Controller {
     private var inventoryCategory: ItemCategory? = nil
     private var levelNumber: Int = 0
     private var lastUpdateTime = Date()
+    private var currentDifficulty: GameDifficulty = .normal
     
     private let statsTracker = GameStatsTracker()
     private let dataLayer = DataLayer()
@@ -127,7 +128,21 @@ public class Controller {
     
     private func generateLevel() {
         let player = levelNumber == ControllerConstants.initialLevelNumber ? Player() : (level?.player ?? Player())
-        self.level = LevelBuilder.buildLevel(player: player, levelNumber: levelNumber)
+        let stats = GameStatsLevel.shared.currentStats()
+        let difficulty = DifficultyCalculator.getDifficulty(
+            for: player,
+            for: levelNumber,
+            for: currentDifficulty
+        )
+        self.currentDifficulty = difficulty
+
+        let difficultyMessage = levelNumber > ControllerConstants.initialLevelNumber ?
+            "Level \(levelNumber) (\(difficulty.stringValue)) | Previous: \(stats.defeatedEnemies) kills, \(stats.receivedDamage) dmg, \(stats.itemsUsed) items" :
+            "Level \(levelNumber) (\(difficulty.stringValue)) | New game started"
+        
+        GameLogger.shared.didReceiveEvent(event: .operationSuccess(message: difficultyMessage))
+        self.level = LevelBuilder.buildLevel(player: player, difficulty: difficulty, levelNumber: levelNumber)
+        GameStatsLevel.shared.didReceiveEvent(event: .levelGenerated)
     }
     
     private func motion(_ input: PlayerAction) {

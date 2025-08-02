@@ -14,7 +14,7 @@ public final class EnemyEntityFactory: EntityFactory {
 
         var enemies: [Position: Enemy] = [:]
         let enemyCount = SpawnBalancer.calculateEntityCount(
-                base: 15, level: level, difficulty: difficulty, player: player, maxCount: 10, modifier: -1)
+                base: 5, level: level, difficulty: difficulty, player: player, maxCount: 20, modifier: -1)
         let positions = GetterPositions.make(in: rooms, excluding: excluding, count: enemyCount, offset: 2)
         let probabilities = Self.getProbabilities(level, difficulty)
         for i in 0..<positions.count {
@@ -51,28 +51,37 @@ public final class EnemyEntityFactory: EntityFactory {
                                                                                      levelModifier: Double) {
         let difficultyModifier: Double
         switch difficulty {
-            case .easy: difficultyModifier = 0.8
+            case .easy: difficultyModifier = 0.9
             case .normal: difficultyModifier = 1.0
-            case .hard: difficultyModifier = 1.3
+            case .hard: difficultyModifier = 1.1
         }
-        let levelModifier = 1.0 + Double(level) * 0.05
+        let levelModifier = level > 1 ? 1.0 + Double(level) * 0.025 : 1.0
         return (difficultyModifier, levelModifier)
     }
-    
-    private static func adjustCharacteristics(baseStats: inout (maxHealth: Int, health: Int, agility: Int, strength: Int, hostility: Int),
-                                              difficulty: GameDifficulty,level: Int) {
-        let (difficultyModifier, levelModifier) = getModifiers(for: difficulty, level: level)
 
-        baseStats.maxHealth = Int(Double(baseStats.maxHealth) * difficultyModifier * levelModifier)
+    private static func adjustCharacteristics(baseStats: inout (maxHealth: Int, health: Int, agility: Int, strength: Int, hostility: Int),
+                                              difficulty: GameDifficulty, level: Int) {
+        let difficultyModifier: Double
+        switch difficulty {
+            case .easy: difficultyModifier = 0.8
+            case .normal: difficultyModifier = 1.0
+            case .hard: difficultyModifier = 1.2
+        }
+
+        let healthScale = 1.0 + Double(level) * 0.03
+        let strengthScale = 1.0 + Double(level) * 0.045
+        let agilityScale = 1.0 + Double(level) * 0.035
+
+        baseStats.maxHealth = Int(Double(baseStats.maxHealth) * difficultyModifier * healthScale)
         baseStats.health = baseStats.maxHealth
-        baseStats.strength = Int(Double(baseStats.strength) * difficultyModifier * levelModifier)
-        baseStats.agility = Int(Double(baseStats.agility) * difficultyModifier)
+        baseStats.strength = Int(Double(baseStats.strength) * difficultyModifier * strengthScale)
+        baseStats.agility = Int(Double(baseStats.agility) * difficultyModifier * agilityScale)
     }
 
     private static func getBaseProbabilities() -> [EnemyType: Double] {
         return [
-            .zombie: 0.4,
-            .vampire: 0.27,
+            .zombie: 0.42,
+            .vampire: 0.25,
             .ghost: 0.15,
             .ogre: 0.1,
             .snakeMage: 0.05,
@@ -104,13 +113,13 @@ public final class EnemyEntityFactory: EntityFactory {
             case .easy:
                 probabilities[.zombie]? *= 1.3
                 probabilities[.ogre]? *= 0.5
-                probabilities[.snakeMage]? *= 0.3
+                probabilities[.snakeMage]? *= 0.2
                 probabilities[.mimic]? *= 0.3
             case .normal: break
             case .hard:
                 probabilities[.zombie]? *= 0.7
                 probabilities[.ogre]? *= 1.5
-                probabilities[.snakeMage]? *= 2.0
+                probabilities[.snakeMage]? *= 1.6
                 probabilities[.mimic]? *= 1.5
         }
     }
@@ -125,8 +134,7 @@ public final class EnemyEntityFactory: EntityFactory {
     private static func randomEnemy(probabilities: [EnemyType: Double],
                                     difficulty: GameDifficulty,
                                     player: Player,
-                                    level: Int
-    ) -> Enemy {
+                                    level: Int) -> Enemy {
         let random = Double.random(in: 0..<1)
         var runningSum = 0.0
         
