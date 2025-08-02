@@ -35,5 +35,6 @@ public enum GameEvent: Equatable {
     case operationFailed(error: String)
     case loadGame
     case saveGame
+    case levelGenerated
 }
 
