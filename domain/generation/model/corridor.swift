@@ -45,27 +45,27 @@ public class Corridor {
     func generateZShaped(_ from: Position, _ to: Position) {
         guard from != to else { return }
 
-        // Определяем направление движения
         let xDirection = from.x < to.x ? 1 : -1
         let yDirection = from.y < to.y ? 1 : -1
 
-        // выбрать точку разлома линий
         let xDistance = abs(from.x - to.x)
         let yDistance = abs(from.y - to.y)
         let splitX = xDistance > 2 ? from.x + Int.random(in: 1..<xDistance) * xDirection : from.x
         let splitY = yDistance > 2 ? from.y + Int.random(in: 1..<yDistance) * yDirection : from.y
 
         if Bool.random() {
-            // горизонтально -> вертикально -> горизонтально
             generateHorizontal(from, toY: splitY)
             generateVertical(Position(from.x, splitY), toX: to.x)
             generateHorizontal(Position(to.x, splitY), toY: to.y)
         } else {
-            // вертикально -> горизонтально -> вертикально
             generateVertical(from, toX: splitX)
             generateHorizontal(Position(splitX, from.y), toY: to.y)
             generateVertical(Position(splitX, to.y), toX: to.x)
         }
+    }
+    
+    public func contains(_ point: Position) -> Bool {
+        return route.contains(point)
     }
 }
 

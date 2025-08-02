@@ -18,4 +18,9 @@ public func configureCurses() {
     init_pair(4, Int16(COLOR_BLUE), Int16(COLOR_BLACK))
     init_pair(5, Int16(COLOR_GREEN), Int16(COLOR_BLACK))
     init_pair(6, 8, Int16(COLOR_BLACK))
+    
+    init_pair(7, Int16(COLOR_BLACK), Int16(COLOR_RED))
+    init_pair(8, Int16(COLOR_BLACK), Int16(COLOR_GREEN))
+    init_pair(9, Int16(COLOR_BLACK), Int16(COLOR_BLUE))
+    init_pair(10, Int16(COLOR_BLACK), 8)
 }

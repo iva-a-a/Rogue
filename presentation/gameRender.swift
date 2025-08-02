@@ -36,7 +36,7 @@ public final class GameRenderer {
 
     public func renderGameScreen(_ viewModel: GameScreenView) {
         clear()
-        Render.drawTiles(viewModel.tiles)
+        
 
         Render.drawString(String(repeating: " ", count: RenderPadding.length),
                           atY: RenderPadding.infoTop,
@@ -58,6 +58,8 @@ public final class GameRenderer {
                               atY: RenderPadding.logBuffTop,
                               atX: RenderPadding.zero)
         }
+
+        Render.drawTiles(viewModel.tiles)
     }
 
     public func renderInventory(_ viewModel: InventoryView) {

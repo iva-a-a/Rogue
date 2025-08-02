@@ -17,10 +17,10 @@ public final class ViewModelBuilder {
         )
 
         let stats = level.player.characteristics
-        let info = String(format: "Level: %d | HP: %d/%d | STR: %d | AGI: %d | Weapon: %@ (+%d)",
+        let info = String(format: "Level: %d | Keys:     | HP: %d/%d | STR: %d | AGI: %d | Weapon: %@ (+%d)",
                           level.levelNumber,
-                          stats.maxHealth,
                           stats.health,
+                          stats.maxHealth,
                           stats.strength,
                           stats.agility,
                           level.player.weapon?.weaponType.name ?? "None",
@@ -47,7 +47,7 @@ public final class ViewModelBuilder {
 
         if category == .weapon, player.weapon != nil {
             let currentWeapon = player.weapon!.type.name
-            itemLines.append("0. Remove weapon (currently: \(currentWeapon))")
+            itemLines.append("0. Remove weapon (currently: \(currentWeapon) +\(player.weapon!.damage) damage)")
         }
 
         if items.isEmpty {
