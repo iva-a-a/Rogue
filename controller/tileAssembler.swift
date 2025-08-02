@@ -19,12 +19,11 @@ public struct TileAssembler {
         if visiblePositions.contains(level.exitPosition) {
             tiles.append(buildExitTile(position: level.exitPosition))
         }
-
-        let playerRoom = level.rooms.first(where: { $0.contains(level.player.characteristics.position) })
-
-        tiles.append(contentsOf: buildEnemyTiles(enemies: level.enemies, visiblePositions: visiblePositions, exploredPositions: exploredPositions, playerRoom: playerRoom))
+        let doorPositions: [Position] = level.rooms.flatMap { $0.doors.map { $0.position } }
+        let corridorsPositions: [Position] = level.corridors.flatMap{ $0.route.map {$0 } }
+        tiles.append(contentsOf: buildEnemyTiles(enemies: level.enemies, visiblePositions: visiblePositions, exploredPositions: exploredPositions, corridor: corridorsPositions, doorsPositions: doorPositions))
         tiles.append(buildPlayerTile(player: level.player))
-
+        tiles.append(contentsOf: buildKeys(from: level))
         return tiles
     }
 
@@ -51,7 +50,25 @@ public struct TileAssembler {
     return tiles
 }
 
+    private static func buildKeys(from level: Level) -> [DrawableObject] {
+        var tiles = [DrawableObject]()
+        
+        let row = 25
+        let startCol = level.levelNumber < 10 ? 17 : 18
 
+        let keys: [(Character, Color, Int, Int)] = [
+            ("r", .red, ColorCode.redBackgroud, ColorCode.greyBackgroud),
+            ("g", .green, ColorCode.greenBackgroud, ColorCode.greyBackgroud),
+            ("b", .blue, ColorCode.blueBackgroud, ColorCode.greyBackgroud)
+        ]
+        
+        for (i, (char, color, activeColor, inactiveColor)) in keys.enumerated() {
+            let hasKey = level.player.hasKey(for: color)
+            tiles.append(Tile(posX: row, posY: startCol + i, char: char, isVisible: true, colorPair: hasKey ? activeColor : inactiveColor))
+        }
+
+        return tiles
+    }
 
     private static func buildCorridorTiles(corridors: [Corridor], visiblePositions: Set<Position>, exploredPositions: Set<Position>) -> [DrawableObject] {
     var tiles = [DrawableObject]()
@@ -68,7 +85,6 @@ public struct TileAssembler {
 
     return tiles
 }
-
 
     private static func buildDoorTiles(rooms: [Room], visiblePositions: Set<Position>, exploredPositions: Set<Position>) -> [DrawableObject] {
     var tiles = [DrawableObject]()
@@ -108,8 +124,8 @@ public struct TileAssembler {
                     isVisible: true,
                     colorPair: ColorCode.white)
     }
-
-    private static func buildEnemyTiles(enemies: [Enemy], visiblePositions: Set<Position>, exploredPositions: Set<Position>, playerRoom: Room?) -> [DrawableObject] {
+    
+    private static func buildEnemyTiles(enemies: [Enemy], visiblePositions: Set<Position>, exploredPositions: Set<Position>, corridor:  [Position], doorsPositions: [Position]) -> [DrawableObject] {
     var tiles = [DrawableObject]()
 
     for enemy in enemies {
@@ -118,12 +134,15 @@ public struct TileAssembler {
 
         if visiblePositions.contains(pos) {
             tiles.append(Tile(posX: pos.x, posY: pos.y, char: char, isVisible: true, colorPair: color))
-        } else if exploredPositions.contains(pos), playerRoom?.contains(pos) == false {
-            tiles.append(Tile(posX: pos.x, posY: pos.y, char: char, isVisible: true, colorPair: color))
+        } else if exploredPositions.contains(pos) {
+            if corridor.contains(pos) == true || doorsPositions.contains(pos) == true {
+                tiles.append(Tile(posX: pos.x, posY: pos.y, char: char, isVisible: true, colorPair: color))
+            }
         }
     }
     return tiles
 }
+
 
 
     private static func buildPlayerTile(player: Player) -> DrawableObject {
@@ -177,4 +196,9 @@ enum ColorCode {
     static let blue = 4
     static let green = 5
     static let grey = 6
+    
+    static let redBackgroud = 7
+    static let greenBackgroud = 8
+    static let blueBackgroud = 9
+    static let greyBackgroud = 10
 }
