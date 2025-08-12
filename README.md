@@ -116,7 +116,7 @@
 ![Инвентарь](screens/inventory.png)
 
 ### Таблица рекордов
-![Таблица рекордов](screens/leaderboard.png)
+![Таблица рекордов](screens/leaderBoard.png)
 
 Больше скриншотов в папке screens/
 
